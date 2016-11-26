@@ -34,8 +34,8 @@ class TestOrderBook(unittest.TestCase):
         self.book.on_new_order(sellorder)
         self.assertEqual(self.book.count_buy_orders(), 1)
         self.assertEqual(self.book.count_sell_orders(), 1)
-	
-	def test_two_orders_no_match(self):
+
+    def test_two_orders_no_match(self):
         buyorder = Order(Way.BUY, self.instrument, 50, 40.0, 'Trader1')
         sellorder = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader2')
         self.book.on_new_order(buyorder)
