@@ -1,6 +1,6 @@
-class Currency:                                                                                                                                                                                                    
+class Currency:
     id = None
-    isocode = None # ISO 4217                                                                                                                                                                                      
+    isocode = None # ISO 4217
 
     def __init__(self, id, isocode):
         self.id = id

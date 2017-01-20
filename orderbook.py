@@ -1,4 +1,4 @@
-from way import Way                                                                                                                                                                                                
+from way import Way
 
 class OrderBook:
     bids = None
@@ -50,21 +50,21 @@ class OrderBook:
         if order.way == Way.BUY:
             matchingPrice = sorted([x for x in self.asks if x.price == order.price], key=lambda o: o.timestamp)
             for orderInTradingBook in matchingPrice:
-                # Full exec                                                                                                                                                                                        
+                # Full exec
                 if order.get_remaining_quantity() >= orderInTradingBook.get_remaining_quantity():
                     print('[Debug] a trading book order has been totally executed ({})'.format(orderInTradingBook.get_remaining_quantity()))
                     order.executedquantity += orderInTradingBook.get_remaining_quantity()
                     orderInTradingBook.executedquantity += orderInTradingBook.get_remaining_quantity()
                     self.asks.remove(orderInTradingBook)
-                else: # Partial exec                                                                                                                                                                               
+                else: # Partial exec
                     print('[Debug] a trading book order has been partially executed ({})'.format(order.get_remaining_quantity()))
                     order.executedquantity += order.get_remaining_quantity()
                     orderInTradingBook.executedquantity += order.get_remaining_quantity()
-                    # TODO: create a deal                                                                                                                                                                          
+                    # TODO: create a deal
                     self.on_new_deal(order)
                 if order.get_remaining_quantity() == 0.0:
                     break
         elif order.way == Way.SELL:
             pass
-            #matches = [x for x in self.bids if x.price == order.price]                                                                                                                                            
+            #matches = [x for x in self.bids if x.price == order.price]
             #print(matches)

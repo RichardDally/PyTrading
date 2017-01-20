@@ -1,4 +1,4 @@
-import time                                                                                                                                                                                                        
+import time
 from way import Way
 
 class Order:

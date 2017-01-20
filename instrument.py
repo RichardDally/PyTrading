@@ -1,4 +1,4 @@
-class Instrument:                                                                                                                                                                                                  
+class Instrument:
     id = None
     name = None
     currency = None

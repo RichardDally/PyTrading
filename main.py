@@ -1,4 +1,4 @@
-from way import Way                                                                                                                                                                                                
+from way import Way
 from order import Order
 from currency import Currency
 from orderbook import OrderBook

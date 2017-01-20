@@ -1,4 +1,4 @@
-import unittest                                                                                                                                                                                                    
+import unittest
 from way import Way
 from order import Order
 from currency import Currency

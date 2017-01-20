@@ -1,4 +1,4 @@
-class Deal:                                                                                                                                                                                                        
+class Deal:
     way = None
     quantity = None
     price = None
