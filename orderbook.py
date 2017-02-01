@@ -47,15 +47,15 @@ class OrderBook:
         elif order.way == Way.SELL:
             self.asks.append(order)
 
-    def get_matching_orders(self, incomingOrder):
-        if incomingOrder.way == Way.BUY:
-            return sorted([x for x in self.asks if x.price <= incomingOrder.price], key=lambda o: o.timestamp)
-        elif incomingOrder.way == Way.SELL:
-            return sorted([x for x in self.bids if x.price >= incomingOrder.price], key=lambda o: o.timestamp)
-        raise Exception('Way is not set')
+    def get_matching_orders(self, attackingOrder):
+        if attackingOrder.way == Way.BUY:
+            return sorted([x for x in self.asks if x.price <= attackingOrder.price], key=lambda o: o.timestamp)
+        elif attackingOrder.way == Way.SELL:
+            return sorted([x for x in self.bids if x.price >= attackingOrder.price], key=lambda o: o.timestamp)
+        raise Exception('Way is invalid')
 
-    def match_order(self, incomingOrder):
-        matchingTradingBookOrders = self.get_matching_orders(incomingOrder)
+    def match_order(self, attackingOrder):
+        matchingTradingBookOrders = self.get_matching_orders(attackingOrder)
 
         for orderInTradingBook in matchingTradingBookOrders:
             # Full exec
