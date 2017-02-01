@@ -7,7 +7,7 @@ from instrument import Instrument
 tr = OrderBook()
 
 if 1:
-    euroCurrency = Currency(0, 'EUR')
+    euroCurrency = Currency.get_available()[0]
     carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
     tr.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader4'))
     tr.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader5'))
