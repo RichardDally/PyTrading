@@ -15,16 +15,16 @@ class TestOrderBook(unittest.TestCase):
         self.currency = Currency.get_available()[0]
         self.instrument = Instrument(0, 'Carrefour', self.currency, 'FR0000120172')
 
-    def test_one_buy_order(self):
-        order = Order(Way.BUY, self.instrument, 50, 42.0, 'Trader1')
-        self.book.on_new_order(order)
-        self.assertEqual(self.book.count_buy_orders(), 1)
-        self.assertEqual(self.book.count_sell_orders(), 0)
-
-    def test_one_sell_order(self):
-        order = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader1')
-        self.book.on_new_order(order)
+    def test_count_buy_orders(self):
+        buyorder = Order(Way.BUY, self.instrument, 50, 42.0, 'Trader1')
         self.assertEqual(self.book.count_buy_orders(), 0)
+        self.book.on_new_order(buyorder)
+        self.assertEqual(self.book.count_buy_orders(), 1)
+
+    def test_count_sell_orders(self):
+        sellorder = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader1')
+        self.assertEqual(self.book.count_sell_orders(), 0)
+        self.book.on_new_order(sellorder)
         self.assertEqual(self.book.count_sell_orders(), 1)
 
     def test_two_orders_no_match(self):
