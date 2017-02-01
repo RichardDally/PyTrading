@@ -30,6 +30,7 @@ class OrderBook:
         else:
             print('[Debug] entering order has been totally executed')
 
+    # TODO: implement
     def on_new_deal(self, deal):
         self.last = deal.price
         if not self.high and not self.low:
