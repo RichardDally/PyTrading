@@ -24,7 +24,7 @@ class OrderBook:
         return len(self.asks)
 
     def on_new_order(self, order):
-        self.find_match(order)
+        self.match_order(order)
         if order.get_remaining_quantity() > 0.0:
             self.add_order(order)
         else:
@@ -46,25 +46,27 @@ class OrderBook:
         elif order.way == Way.SELL:
             self.asks.append(order)
 
-    def find_match(self, order):
-        if order.way == Way.BUY:
-            matchingPrice = sorted([x for x in self.asks if x.price == order.price], key=lambda o: o.timestamp)
-            for orderInTradingBook in matchingPrice:
-                # Full exec
-                if order.get_remaining_quantity() >= orderInTradingBook.get_remaining_quantity():
-                    print('[Debug] a trading book order has been totally executed ({})'.format(orderInTradingBook.get_remaining_quantity()))
-                    order.executedquantity += orderInTradingBook.get_remaining_quantity()
-                    orderInTradingBook.executedquantity += orderInTradingBook.get_remaining_quantity()
-                    self.asks.remove(orderInTradingBook)
-                else: # Partial exec
-                    print('[Debug] a trading book order has been partially executed ({})'.format(order.get_remaining_quantity()))
-                    order.executedquantity += order.get_remaining_quantity()
-                    orderInTradingBook.executedquantity += order.get_remaining_quantity()
-                    # TODO: create a deal
-                    self.on_new_deal(order)
-                if order.get_remaining_quantity() == 0.0:
-                    break
-        elif order.way == Way.SELL:
-            pass
-            #matches = [x for x in self.bids if x.price == order.price]
-            #print(matches)
+    def get_matching_orders(self, incomingOrder):
+        if incomingOrder.way == Way.BUY:
+            return sorted([x for x in self.asks if x.price <= incomingOrder.price], key=lambda o: o.timestamp)
+        elif incomingOrder.way == Way.SELL:
+            return sorted([x for x in self.bids if x.price >= incomingOrder.price], key=lambda o: o.timestamp)
+        raise Exception('Way is not set')
+
+    def match_order(self, incomingOrder):
+        matchingTradingBookOrders = self.get_matching_orders(incomingOrder)
+
+        for orderInTradingBook in matchingTradingBookOrders:
+            # Full exec
+            if incomingOrder.get_remaining_quantity() >= orderInTradingBook.get_remaining_quantity():
+                print('[Debug] a trading book order has been totally executed ({})'.format(orderInTradingBook.get_remaining_quantity()))
+                incomingOrder.executedquantity += orderInTradingBook.get_remaining_quantity()
+                orderInTradingBook.executedquantity += orderInTradingBook.get_remaining_quantity()
+                self.asks.remove(orderInTradingBook)
+            else: # Partial exec
+                print('[Debug] a trading book order has been partially executed ({})'.format(incomingOrder.get_remaining_quantity()))
+                incomingOrder.executedquantity += incomingOrder.get_remaining_quantity()
+                orderInTradingBook.executedquantity += incomingOrder.get_remaining_quantity()
+                self.on_new_deal(incomingOrder)
+            if incomingOrder.get_remaining_quantity() == 0.0:
+                break
