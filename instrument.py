@@ -12,6 +12,3 @@ class Instrument:
 
     def __str__(self):
         return self.name
-
-    def get_available(self):
-        return [Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')]
