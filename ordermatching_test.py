@@ -76,7 +76,7 @@ class TestOrderMatching(unittest.TestCase):
         price = 42.0
         attackingOrder = Order(Way.BUY, self.instrument, attackingQuantity, price, 'Trader1')
         attackedOrders = []
-        for x in xrange(0, 5):
+        for _ in list(range(5)):
             attackedOrder = Order(Way.SELL, self.instrument, attackedQuantity, price, 'Trader2')
             attackedOrders.append(attackedOrder)
             self.book.on_new_order(attackedOrder)
