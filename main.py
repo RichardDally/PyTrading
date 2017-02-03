@@ -22,11 +22,11 @@ if 1:
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader1'))
 
 if 0:
-    tr.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 21.0, 'Trader1'))
-    tr.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader2'))
-    tr.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 19.0, 'Trader3'))
-    tr.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 22.0, 'Trader4'))
-    tr.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 23.0, 'Trader5'))
-    tr.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 24.0, 'Trader6'))
+    orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 21.0, 'Trader1'))
+    orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader2'))
+    orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 19.0, 'Trader3'))
+    orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 22.0, 'Trader4'))
+    orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 23.0, 'Trader5'))
+    orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 24.0, 'Trader6'))
 
 logger.info(orderbook)
