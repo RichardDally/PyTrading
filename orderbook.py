@@ -1,4 +1,5 @@
 from way import Way
+import logging
 
 class OrderBook:
     bids = None
@@ -6,6 +7,7 @@ class OrderBook:
     last = None
     high = None
     low = None
+    logger = logging.getLogger(__name__)
 
     def __init__(self):
         self.asks = []
@@ -33,9 +35,10 @@ class OrderBook:
     def on_new_order(self, order):
         self.match_order(order)
         if order.get_remaining_quantity() > 0.0:
+            self.logger.debug('Attacking order cannot be fully executed, adding it to trading book')
             self.add_order(order)
         else:
-            print('[Debug] entering order has been totally executed')
+            self.logger.debug('Attacking order has been totally executed')
 
     # TODO: implement
     def on_new_deal(self, deal):
@@ -62,16 +65,17 @@ class OrderBook:
         raise Exception('Way is invalid')
 
     def match_order(self, attackingOrder):
+        self.logger.debug('Find a matching order for [{}]'.format(attackingOrder))
         matchingTradingBookOrders = self.get_matching_orders(attackingOrder)
 
         for attackedOrder in matchingTradingBookOrders:
             if self.is_attacked_order_full_executed(attackingOrder, attackedOrder):
-                print('[Debug] a trading book order has been totally executed ({})'.format(attackedOrder.get_remaining_quantity()))
+                self.logger.debug('A trading book order has been totally executed ({})'.format(attackedOrder.get_remaining_quantity()))
                 attackingOrder.executedquantity += attackedOrder.get_remaining_quantity()
                 attackedOrder.executedquantity += attackedOrder.get_remaining_quantity()
                 self.get_orders(attackedOrder.way).remove(attackedOrder)
             else: # Partial execution
-                print('[Debug] a trading book order has been partially executed ({})'.format(attackingOrder.get_remaining_quantity()))
+                self.logger.debug('A trading book order has been partially executed ({})'.format(attackingOrder.get_remaining_quantity()))
                 attackingOrder.executedquantity += attackingOrder.get_remaining_quantity()
                 attackedOrder.executedquantity += attackingOrder.get_remaining_quantity()
                 self.on_new_deal(attackingOrder)
