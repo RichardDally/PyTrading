@@ -56,7 +56,8 @@ class OrderBook:
             self.bids.append(order)
         elif order.way == Way.SELL:
             self.asks.append(order)
-        raise Exception('Way is invalid')
+        else:
+            raise Exception('Way is invalid')
 
     def get_matching_orders(self, attackingOrder):
         if attackingOrder.way == Way.BUY:
