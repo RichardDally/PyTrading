@@ -12,16 +12,17 @@ logging.basicConfig(filename='Pytrading.log',
 logger = logging.getLogger(__name__)
 orderbook = OrderBook()
 
+euroCurrency = Currency.get_available()[0]
+carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
+
 if 1:
-    euroCurrency = Currency.get_available()[0]
-    carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader4'))
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader5'))
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader2'))
     logger.info(orderbook)
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader1'))
 
-if 0:
+if 1:
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 21.0, 'Trader1'))
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader2'))
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 19.0, 'Trader3'))

@@ -13,11 +13,19 @@ class OrderBook:
         self.asks = []
         self.bids = []
 
+    # TODO: improve string formating
     def __str__(self):
-        stats = 'Last: {}\nHigh: {}\nLow: {}\n'.format(self.last, self.high, self.low)
-        bidSide = '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse = True)])
-        askSide = '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
-        return stats + 'Bid side:\n' + bidSide + '\nAsk side:\n' + askSide
+        string = '\n--- [{}] order book ---\n'.format(self.instrument)
+        string += 'Last: {}\nHigh: {}\nLow: {}\n'.format(self.last, self.high, self.low)
+        if len(self.bids):
+            string += 'Bid side:\n'
+            string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse = True)])
+        if len(self.asks):
+            if len(self.bids):
+                string += '\n'
+            string += 'Ask side:\n'
+            string += '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
+        return string
 
     def get_orders(self, way):
         if way == Way.BUY:
@@ -35,7 +43,7 @@ class OrderBook:
     def on_new_order(self, order):
         self.match_order(order)
         if order.get_remaining_quantity() > 0.0:
-            self.logger.debug('Attacking order cannot be fully executed, adding it to trading book')
+            self.logger.debug('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
             self.add_order(order)
         else:
             self.logger.debug('Attacking order has been totally executed')
