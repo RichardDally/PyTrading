@@ -76,6 +76,9 @@ class OrderBook:
             return sorted([x for x in self.bids if x.price >= attackingOrder.price], key=lambda o: o.timestamp)
         raise Exception('Way is invalid')
 
+    def is_attacked_order_full_executed(self, attackingOrder, attackedOrder):
+        return attackingOrder.get_remaining_quantity() >= attackedOrder.get_remaining_quantity()
+
     def match_order(self, attackingOrder):
         self.logger.debug('Find a matching order for [{}]'.format(attackingOrder))
         matchingTradingBookOrders = self.get_matching_orders(attackingOrder)
@@ -94,6 +97,3 @@ class OrderBook:
                 self.on_new_deal(attackingOrder)
             if attackingOrder.get_remaining_quantity() == 0.0:
                 break
-
-    def is_attacked_order_full_executed(self, attackingOrder, attackedOrder):
-        return attackingOrder.get_remaining_quantity() >= attackedOrder.get_remaining_quantity()
