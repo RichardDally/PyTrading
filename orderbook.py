@@ -53,11 +53,10 @@ class OrderBook:
         self.last = deal.price
         if not self.high and not self.low:
             self.high = self.low = deal.price
-        else:
-            if deal.price > self.high:
-                self.high = deal.price
-            elif deal.price < self.low:
-                self.low = deal.price
+        elif deal.price > self.high:
+            self.high = deal.price
+        elif deal.price < self.low:
+            self.low = deal.price
 
     def add_order(self, order):
         if order.way == Way.BUY:
