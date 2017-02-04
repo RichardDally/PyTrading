@@ -11,9 +11,9 @@ class TestOrderBook(unittest.TestCase):
     instrument = None
 
     def setUp(self):
-        self.book = OrderBook()
         self.currency = Currency.get_available()[0]
         self.instrument = Instrument(0, 'Carrefour', self.currency, 'FR0000120172')
+        self.book = OrderBook(self.instrument)
 
     def test_count_buy_orders(self):
         buyorder = Order(Way.BUY, self.instrument, 50, 42.0, 'Trader1')

@@ -7,9 +7,11 @@ class OrderBook:
     last = None
     high = None
     low = None
+    instrument = None
     logger = logging.getLogger(__name__)
 
-    def __init__(self):
+    def __init__(self, instrument):
+        self.instrument = instrument
         self.asks = []
         self.bids = []
 
@@ -41,6 +43,7 @@ class OrderBook:
         return len(self.asks)
 
     def on_new_order(self, order):
+        assert (order.instrument == self.instrument), 'Order instrument must match order book instrument'
         self.match_order(order)
         if order.get_remaining_quantity() > 0.0:
             self.logger.debug('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))

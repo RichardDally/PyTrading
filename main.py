@@ -10,10 +10,10 @@ logging.basicConfig(filename='Pytrading.log',
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%d/%m/%Y %I:%M:%S %p')
 logger = logging.getLogger(__name__)
-orderbook = OrderBook()
 
 euroCurrency = Currency.get_available()[0]
 carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
+orderbook = OrderBook(carrefourInstrument)
 
 if 1:
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader4'))

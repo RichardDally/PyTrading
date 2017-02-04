@@ -11,9 +11,9 @@ class TestOrderMatching(unittest.TestCase):
     instrument = None
 
     def setUp(self):
-        self.book = OrderBook()
         self.currency = Currency.get_available()[0]
         self.instrument = Instrument(0, 'Carrefour', self.currency, 'FR0000120172')
+        self.book = OrderBook(self.instrument)
 
     def validate_one_matching(self, attackingOrder, attackedOrder):
         self.book.on_new_order(attackedOrder)
