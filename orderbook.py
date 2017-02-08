@@ -18,14 +18,14 @@ class OrderBook:
     # TODO: improve string formating
     def __str__(self):
         string = '\n--- [{}] order book ---\n'.format(self.instrument)
-        string += 'Last: {}\nHigh: {}\nLow: {}\n'.format(self.last, self.high, self.low)
+        string += 'Last: {1} {0}\nHigh: {2} {0}\nLow: {3} {0}\n'.format(self.instrument.currency, self.last, self.high, self.low)
         if len(self.bids):
-            string += 'Bid side:\n'
+            string += 'Bid side ({}):\n'.format(len(self.bids))
             string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse = True)])
         if len(self.asks):
             if len(self.bids):
                 string += '\n'
-            string += 'Ask side:\n'
+            string += 'Ask side ({}):\n'.format(len(self.asks))
             string += '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
         return string
 
@@ -49,7 +49,7 @@ class OrderBook:
             self.logger.debug('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
             self.add_order(order)
         else:
-            self.logger.debug('Attacking order has been totally executed')
+            self.logger.debug('Attacking order [{}] has been totally executed'.format(order))
 
     # TODO: implement
     def on_new_deal(self, deal):
@@ -85,13 +85,13 @@ class OrderBook:
 
         for attackedOrder in matchingTradingBookOrders:
             if self.is_attacked_order_full_executed(attackingOrder, attackedOrder):
-                self.logger.debug('A trading book order has been totally executed ({})'.format(attackedOrder.get_remaining_quantity()))
+                self.logger.debug('[{}] has been totally executed'.format(attackedOrder))
                 attackingOrder.executedquantity += attackedOrder.get_remaining_quantity()
                 attackedOrder.executedquantity += attackedOrder.get_remaining_quantity()
                 self.on_new_deal(attackedOrder)
                 self.get_orders(attackedOrder.way).remove(attackedOrder)
             else: # Partial execution
-                self.logger.debug('A trading book order has been partially executed ({})'.format(attackingOrder.get_remaining_quantity()))
+                self.logger.debug('[{}] has been partially executed ({})'.format(attackedOrder))
                 attackingOrder.executedquantity += attackingOrder.get_remaining_quantity()
                 attackedOrder.executedquantity += attackingOrder.get_remaining_quantity()
                 self.on_new_deal(attackingOrder)
