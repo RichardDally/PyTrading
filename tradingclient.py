@@ -23,6 +23,7 @@ class TradingClient:
 
             print('Connecting')
             serverSocket.connect((host, port))
+            # TODO: fix receiving, send ACK to referential to get full snapshot
             self.receive_referential(serverSocket)
             self.receive_order_books_full_snapshot(serverSocket)
 
@@ -41,7 +42,9 @@ class TradingClient:
     def receive_referential(self, serverSocket):
         self.logger.debug('Receiving referential from [{}]'.format(serverSocket))
         buffer = serverSocket.recv(4096)
+        print(buffer)
         self.referential = pickle.loads(buffer)
+        print('Referential', self.referential)
 
     """ private """
     def receive_order_books_full_snapshot(self, serverSocket):
