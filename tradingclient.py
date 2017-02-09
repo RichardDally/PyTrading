@@ -12,24 +12,25 @@ class TradingClient:
 
     """ public """
     def start(self):
-        clientSocket = None
+        serverSocket = None
 
         try:
-            clientSocket = socket.socket()
+            serverSocket = socket.socket()
             host = socket.gethostname()
             port = 12345
 
             print('Connecting')
-            clientSocket.connect((host, port))
-            buffer = clientSocket.recv(1024)
-            print(buffer)
+            serverSocket.connect((host, port))
+            self.receive_referential(serverSocket)
+
         except KeyboardInterrupt:
             print('Stopped by user')
         except Exception, exception:
+        # TODO: catch other exceptions
             print(exception)
 
-        if clientSocket:
-            clientSocket.close()
+        if serverSocket:
+            serverSocket.close()
 
         print('Ok')
 
