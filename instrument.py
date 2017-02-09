@@ -11,4 +11,4 @@ class Instrument:
         self.isin = isin
 
     def __str__(self):
-        return self.name
+        return '{} {} {} {}'.format(self.name, self.id, self.currency, self.isin)
