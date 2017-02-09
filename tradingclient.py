@@ -1,5 +1,6 @@
 import logging
 import socket
+import pickle
 from instrument import Instrument
 from referential import Referential
 
