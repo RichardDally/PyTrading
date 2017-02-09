@@ -54,5 +54,9 @@ class TradingServer:
         self.logger.debug('Instruments are loaded')
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='TradingServer.log',
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)-8s %(message)s',
+                        datefmt='%d/%m/%Y %I:%M:%S %p')
     server = TradingServer()
     server.start()

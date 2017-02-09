@@ -48,5 +48,9 @@ class TradingClient:
         self.logger.debug('Referential is loaded')
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='TradingServer.log',
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)-8s %(message)s',
+                        datefmt='%d/%m/%Y %I:%M:%S %p')
     client = TradingClient()
     client.start()
