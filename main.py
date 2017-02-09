@@ -11,9 +11,11 @@ logging.basicConfig(filename='Pytrading.log',
                     datefmt='%d/%m/%Y %I:%M:%S %p')
 logger = logging.getLogger(__name__)
 
-euroCurrency = Currency.get_available()[0]
-carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
-orderbook = OrderBook(carrefourInstrument)
+
+if 1:
+    euroCurrency = Currency.get_available()[0]
+    carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
+    orderbook = OrderBook(carrefourInstrument)
 
 if 1:
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader4'))
@@ -30,4 +32,5 @@ if 1:
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 23.0, 'Trader5'))
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 24.0, 'Trader6'))
 
-logger.info(orderbook)
+if 1:
+    logger.info(orderbook)

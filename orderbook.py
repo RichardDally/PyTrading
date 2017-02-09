@@ -2,13 +2,13 @@ from way import Way
 import logging
 
 class OrderBook:
+    logger = logging.getLogger(__name__)
     bids = None
     asks = None
     last = None
     high = None
     low = None
     instrument = None
-    logger = logging.getLogger(__name__)
 
     def __init__(self, instrument):
         self.instrument = instrument
@@ -28,13 +28,6 @@ class OrderBook:
             string += 'Ask side ({}):\n'.format(len(self.asks))
             string += '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
         return string
-
-    def get_orders(self, way):
-        if way == Way.BUY:
-            return self.bids
-        elif way == Way.SELL:
-            return self.asks
-        raise Exception('Way is invalid')
 
     def count_buy_orders(self):
         return len(self.bids)
@@ -78,6 +71,13 @@ class OrderBook:
 
     def is_attacked_order_full_executed(self, attackingOrder, attackedOrder):
         return attackingOrder.get_remaining_quantity() >= attackedOrder.get_remaining_quantity()
+
+    def get_orders(self, way):
+        if way == Way.BUY:
+            return self.bids
+        elif way == Way.SELL:
+            return self.asks
+        raise Exception('Way is invalid')
 
     def match_order(self, attackingOrder):
         self.logger.debug('Find a matching order for [{}]'.format(attackingOrder))
