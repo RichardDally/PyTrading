@@ -1,6 +1,7 @@
 import logging
 import socket
 import pickle
+import select
 from referential import Referential
 from instrument import Instrument
 from currency import Currency
@@ -10,29 +11,37 @@ class TradingServer:
     logger = logging.getLogger(__name__)
     referential = None
     orderBooks = None
+    inputs = None
+    outputs = None
+    listener = None
+    messageStacks = None
 
     def __init__(self):
         self.initialize_referential()
         self.initialize_order_books()
+        self.inputs = []
+        self.outputs = []
+        self.messageStacks = {}
 
     """ public """
     def start(self):
-        listener = None
-        clientSocket = None
-
         try:
-            listener = socket.socket()
+            self.listener = socket.socket()
+            self.listener.setblocking(0)
             host = socket.gethostname()
             port = 12345
-            listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            listener.bind((host, port))
+            self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.listener.bind((host, port))
 
             print('Listening')
-            listener.listen(1)
-            clientSocket, addr = listener.accept()
-            print('Got connection from', addr)
-            self.send_referential(clientSocket)
-            self.send_order_books_full_snapshot(clientSocket)
+            self.listener.listen(5)
+            self.inputs.append(self.listener)
+
+            while self.inputs:
+                readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs)
+                self.handle_readable(readable)
+                self.handle_writable(writable)
+                self.handle_exceptional(exceptional)
 
         except KeyboardInterrupt, exception:
             print('Stopped by user')
@@ -40,22 +49,10 @@ class TradingServer:
         # TODO: catch other exceptions
             print(exception)
 
-        if listener:
-            listener.close()
-        if clientSocket:
-            clientSocket.close()
+        if self.listener:
+            self.listener.close()
 
         print('Ok')
-
-    """ private """
-    def send_referential(self, clientSocket):
-        self.logger.debug('Sending referential to [{}]'.format(clientSocket))
-        clientSocket.send(pickle.dumps(self.referential))
-
-    """ private """
-    def send_order_books_full_snapshot(self, clientSocket):
-        self.logger.debug('Sending order books to [{}]'.format(clientSocket))
-        clientSocket.send(pickle.dumps(self.orderBooks))
 
     """ private """
     def initialize_referential(self):
@@ -71,6 +68,55 @@ class TradingServer:
         for instrument in self.referential.instruments:
             self.orderBooks[instrument.id] = OrderBook(instrument)
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
+
+    """ private """
+    def handle_readable(self, readable):
+        for s in readable:
+            if s is self.listener:
+                connection, client_address = self.listener.accept()
+                print('Got connection from', client_address)
+                connection.setblocking(0)
+                self.inputs.append(connection)
+
+                # Pushing messages to send
+                messageStack = []
+                messageStack.append(pickle.dumps(self.referential))
+                messageStack.append(pickle.dumps(self.orderBooks))
+                self.messageStacks[connection] = messageStack
+
+                # Adding client socket to write list
+                self.outputs.append(connection)
+
+            else:
+                data = s.recv(4096)
+                if not data:
+                    print('Client closed its socket')
+                    if s in self.outputs:
+                        self.outputs.remove(s)
+                    self.inputs.remove(s)
+                    s.close()
+                    del self.messageStacks[s]
+
+    """ private """
+    def handle_writable(self, writable):
+        for s in writable:
+            try:
+                next_msg = self.messageStacks[s].pop(0)
+                print('Message stack length:', len(self.messageStacks[s]))
+            except Exception, exception:
+                print(exception)
+                self.outputs.remove(s)
+            else:
+                s.send(next_msg)
+
+    """ private """
+    def handle_exceptional(self, exceptional):
+        for s in exceptional:
+            self.inputs.remove(s)
+            if s in self.outputs:
+                self.outputs.remove(s)
+            s.close()
+            del self.messageStacks[s]
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingServer.log',
