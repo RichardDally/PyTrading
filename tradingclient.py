@@ -5,10 +5,10 @@ from referential import Referential
 
 class TradingClient:
     logger = logging.getLogger(__name__)
-    referential = Referential()
+    referential = None
 
     def __init__(self):
-        pass
+        self.initialize_referential()
 
     """ public """
     def start(self):
@@ -32,6 +32,18 @@ class TradingClient:
             clientSocket.close()
 
         print('Ok')
+
+    """ private """
+    def receive_referential(self, serverSocket):
+        self.logger.debug('Receiving referential from [{}]'.format(serverSocket))
+        buffer = serverSocket.recv(4096)
+        self.referential = pickle.loads(buffer)
+
+    """ private """
+    def initialize_referential(self):
+        self.logger.debug('Loading referential')
+        self.referential = Referential.get_default()
+        self.logger.debug('Referential is loaded')
 
 if __name__ == '__main__':
     client = TradingClient()
