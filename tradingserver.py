@@ -32,6 +32,7 @@ class TradingServer:
             clientSocket, addr = listener.accept()
             print('Got connection from', addr)
             self.send_referential(clientSocket)
+            self.send_order_books_full_snapshot(clientSocket)
 
         except KeyboardInterrupt, exception:
             print('Stopped by user')
@@ -50,6 +51,11 @@ class TradingServer:
     def send_referential(self, clientSocket):
         self.logger.debug('Sending referential to [{}]'.format(clientSocket))
         clientSocket.send(pickle.dumps(self.referential))
+
+    """ private """
+    def send_order_books_full_snapshot(self, clientSocket):
+        self.logger.debug('Sending order books to [{}]'.format(clientSocket))
+        clientSocket.send(pickle.dumps(self.orderBooks))
 
     """ private """
     def initialize_referential(self):

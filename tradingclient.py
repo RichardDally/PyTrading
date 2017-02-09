@@ -7,6 +7,7 @@ from referential import Referential
 class TradingClient:
     logger = logging.getLogger(__name__)
     referential = None
+    orderBooks = None
 
     def __init__(self):
         self.initialize_referential()
@@ -23,6 +24,7 @@ class TradingClient:
             print('Connecting')
             serverSocket.connect((host, port))
             self.receive_referential(serverSocket)
+            self.receive_order_books_full_snapshot(serverSocket)
 
         except KeyboardInterrupt:
             print('Stopped by user')
@@ -40,6 +42,12 @@ class TradingClient:
         self.logger.debug('Receiving referential from [{}]'.format(serverSocket))
         buffer = serverSocket.recv(4096)
         self.referential = pickle.loads(buffer)
+
+    """ private """
+    def receive_order_books_full_snapshot(self, serverSocket):
+        self.logger.debug('Receiving order books full snapshot from [{}]'.format(serverSocket))
+        buffer = serverSocket.recv(4096)
+        self.orderBooks = pickle.loads(buffer)
 
     """ private """
     def initialize_referential(self):
