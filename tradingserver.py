@@ -1,5 +1,6 @@
 import logging
 import socket
+import pickle
 from referential import Referential
 from instrument import Instrument
 from currency import Currency
@@ -29,8 +30,8 @@ class TradingServer:
             listener.listen(1)
             clientSocket, addr = listener.accept()
             print('Got connection from', addr)
-            clientSocket.send('Thank you for connecting')
-            clientSocket.close()
+            self.send_referential(clientSocket)
+
         except KeyboardInterrupt, exception:
             print('Stopped by user')
         except Exception, exception:
@@ -45,13 +46,24 @@ class TradingServer:
         print('Ok')
 
     """ private """
-    def load_instruments(self):
-        euroCurrency = Currency.get_available()[0]
-        instrumentId = 0
-        instrument = Instrument(id=instrumentId, name='Carrefour', currency=euroCurrency, isin='FR0000120172')
-        self.referential.add_instrument(instrument)
-        self.orderBooks[instrumentId] = instrument
-        self.logger.debug('Instruments are loaded')
+    def send_referential(self, clientSocket):
+        self.logger.debug('Sending referential to [{}]'.format(clientSocket))
+        clientSocket.send(pickle.dumps(self.referential))
+
+    """ private """
+    def initialize_referential(self):
+        self.logger.debug('Loading referential')
+        self.referential = Referential.get_default()
+        self.logger.debug('Referential is loaded')
+
+    """ private """
+    def initialize_order_books(self):
+        self.logger.debug('Initializing order books')
+        self.orderBooks = {}
+        # TODO: use generator
+        for instrument in self.referential.instruments:
+            self.orderBooks[instrument.id] = OrderBook(instrument)
+        self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingServer.log',
