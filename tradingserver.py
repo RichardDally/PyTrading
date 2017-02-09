@@ -8,11 +8,12 @@ from orderbook import OrderBook
 
 class TradingServer:
     logger = logging.getLogger(__name__)
-    referential = Referential()
-    orderBooks = {}
+    referential = None
+    orderBooks = None
 
     def __init__(self):
-        self.load_instruments()
+        self.initialize_referential()
+        self.initialize_order_books()
 
     """ public """
     def start(self):
