@@ -10,7 +10,7 @@ class TradingClient:
     orderBooks = None
 
     def __init__(self):
-        self.initialize_referential()
+        pass
 
     """ public """
     def start(self):
@@ -48,12 +48,7 @@ class TradingClient:
         self.logger.debug('Receiving order books full snapshot from [{}]'.format(serverSocket))
         buffer = serverSocket.recv(4096)
         self.orderBooks = pickle.loads(buffer)
-
-    """ private """
-    def initialize_referential(self):
-        self.logger.debug('Loading referential')
-        self.referential = Referential.get_default()
-        self.logger.debug('Referential is loaded')
+        print('Order books', self.orderBooks)
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingServer.log',
