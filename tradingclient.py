@@ -1,6 +1,8 @@
 import logging
 import socket
-import pickle
+import capnp
+import struct
+import referential_capnp
 from instrument import Instrument
 from referential import Referential
 
@@ -25,7 +27,7 @@ class TradingClient:
             serverSocket.connect((host, port))
             # TODO: fix receiving, send ACK to referential to get full snapshot
             self.receive_referential(serverSocket)
-            self.receive_order_books_full_snapshot(serverSocket)
+            #self.receive_order_books_full_snapshot(serverSocket)
 
         except KeyboardInterrupt:
             print('Stopped by user')
@@ -42,9 +44,14 @@ class TradingClient:
     def receive_referential(self, serverSocket):
         self.logger.debug('Receiving referential from [{}]'.format(serverSocket))
         buffer = serverSocket.recv(4096)
-        print(buffer)
-        self.referential = pickle.loads(buffer)
-        print('Referential', self.referential)
+
+        messageLength = struct.unpack_from('>Q', buffer)[0]
+        print(messageLength)
+
+        readableBytes = len(buffer) - 8
+        if messageLength <= readableBytes:
+            self.referential = referential_capnp.Referential.from_bytes(buffer[8:8 + messageLength])
+            print('Referential', self.referential)
 
     """ private """
     def receive_order_books_full_snapshot(self, serverSocket):
