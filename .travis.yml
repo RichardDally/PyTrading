@@ -1,6 +1,7 @@
 sudo: required
 
 language: python
+compiler: gcc
 
 python:
   - "2.7"
@@ -12,8 +13,17 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "nightly" # currently points to 3.7-dev
 
-compiler: gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
 
-install: "sudo pip install -r requirements.txt"
+install:
+  - export CXX="g++-4.8" CC="gcc-4.8"
+  - sudo pip install -r requirements.txt
 
-script: python -m unittest discover -p '*_test.py'
+script:
+  - python -m unittest discover -p '*_test.py'
