@@ -1,6 +1,7 @@
 sudo: required
 
 language: python
+
 python:
   - "2.7"
   - "3.2"
@@ -10,7 +11,9 @@ python:
   - "3.5-dev" # 3.5 development branch
   - "3.6-dev" # 3.6 development branch
   - "nightly" # currently points to 3.7-dev
-# command to install dependencies
+
+compiler: gcc
+
 install: "sudo pip install -r requirements.txt"
-# command to run tests
+
 script: python -m unittest discover -p '*_test.py'
