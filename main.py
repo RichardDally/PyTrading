@@ -12,19 +12,25 @@ logging.basicConfig(filename='Pytrading.log',
                     datefmt='%d/%m/%Y %I:%M:%S %p')
 logger = logging.getLogger(__name__)
 
-
 if 1:
     carrefourInstrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
     orderbook = OrderBook(carrefourInstrument)
+    orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader4'))
+    orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader5'))
 
-if 1:
+    side = 'bids'
+    print(eval('orderbook.get_{}()'.format(side)))
+    print(eval('orderbook.count_{}()'.format(side)))
+
+
+if 0:
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader4'))
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader5'))
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 20.0, 'Trader2'))
     logger.info(orderbook)
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader1'))
 
-if 1:
+if 0:
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 21.0, 'Trader1'))
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 20.0, 'Trader2'))
     orderbook.on_new_order(Order(Way.BUY, carrefourInstrument, 50, 19.0, 'Trader3'))
@@ -32,5 +38,5 @@ if 1:
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 23.0, 'Trader5'))
     orderbook.on_new_order(Order(Way.SELL, carrefourInstrument, 50, 24.0, 'Trader6'))
 
-if 1:
+if 0:
     logger.info(orderbook)
