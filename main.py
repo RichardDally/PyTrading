@@ -4,6 +4,7 @@ from order import Order
 from currency import Currency
 from orderbook import OrderBook
 from instrument import Instrument
+from staticdata import StaticData
 
 logging.basicConfig(filename='Pytrading.log',
                     level=logging.DEBUG,
@@ -13,8 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 if 1:
-    euroCurrency = Currency.get_available()[0]
-    carrefourInstrument = Instrument(0, 'Carrefour', euroCurrency, 'FR0000120172')
+    carrefourInstrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
     orderbook = OrderBook(carrefourInstrument)
 
 if 1:

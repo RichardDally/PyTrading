@@ -1,9 +1,8 @@
 import logging
 import socket
 import select
-import capnp
 import struct
-import referential_capnp
+from staticdata import StaticData
 from referential import Referential
 from instrument import Instrument
 from currency import Currency
@@ -59,7 +58,7 @@ class TradingServer:
     """ private """
     def initialize_referential(self):
         self.logger.debug('Loading referential')
-        self.referential = Referential.get_default()
+        self.referential = StaticData.get_default_referential()
         self.logger.debug('Referential is loaded')
 
     """ private """

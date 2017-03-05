@@ -29,4 +29,6 @@ class Order:
             way = 'BUY'
         elif self.way == Way.SELL:
             way = 'SELL'
-        return '{} {} {} {} @ {} ({})'.format(way, self.instrument, self.get_remaining_quantity(), self.instrument.currency, self.price, self.timestamp)
+
+        currency = StaticData.get_currency(self.instrument.currencyId)
+        return '{} {} {} {} @ {} ({})'.format(way, self.instrument.name, self.get_remaining_quantity(), currency, self.price, self.timestamp)

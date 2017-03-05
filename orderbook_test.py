@@ -7,12 +7,10 @@ from instrument import Instrument
 
 class TestOrderBook(unittest.TestCase):
     book = None
-    currency = None
     instrument = None
 
     def setUp(self):
-        self.currency = Currency.get_available()[0]
-        self.instrument = Instrument(0, 'Carrefour', self.currency, 'FR0000120172')
+        self.instrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
         self.book = OrderBook(self.instrument)
 
     def test_count_buy_orders(self):

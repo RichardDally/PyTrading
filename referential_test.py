@@ -1,15 +1,14 @@
 import unittest
 from currency import Currency
-from referential import Referential
 from instrument import Instrument
+from staticdata import StaticData
+from referential import Referential
 
 class TestReferential(unittest.TestCase):
-    currency = None
     instrument = None
 
     def setUp(self):
-        self.currency = Currency.get_available()[0]
-        self.instrument = Instrument(0, 'Carrefour', self.currency, 'FR0000120172')
+        self.instrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
 
     def test_length(self):
         referential = Referential()
@@ -18,7 +17,7 @@ class TestReferential(unittest.TestCase):
         self.assertEqual(len(referential), 1)
 
     def test_get_default_is_not_empty(self):
-        referential = Referential.get_default()
+        referential = StaticData.get_default_referential()
         self.assertGreater(len(referential), 0)
 
 if __name__ == '__main__':

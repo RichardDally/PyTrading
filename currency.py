@@ -9,6 +9,3 @@ class Currency:
     def __str__(self):
         return self.isocode
 
-    @staticmethod
-    def get_available():
-        return [Currency(0, 'EUR')]

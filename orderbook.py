@@ -1,4 +1,5 @@
 from way import Way
+from staticdata import StaticData
 import logging
 
 class OrderBook:
@@ -17,8 +18,9 @@ class OrderBook:
 
     # TODO: improve string formating
     def __str__(self):
-        string = '\n--- [{}] order book ---\n'.format(self.instrument)
-        string += 'Last: {1} {0}\nHigh: {2} {0}\nLow: {3} {0}\n'.format(self.instrument.currency, self.last, self.high, self.low)
+        string = '\n--- [{}] order book ---\n'.format(self.instrument.name)
+        currency = StaticData.get_currency(self.instrument.currencyId)
+        string += 'Last: {1} {0}\nHigh: {2} {0}\nLow: {3} {0}\n'.format(currency, self.last, self.high, self.low)
         if len(self.bids):
             string += 'Bid side ({}):\n'.format(len(self.bids))
             string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse = True)])
