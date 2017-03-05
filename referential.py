@@ -1,4 +1,6 @@
 import logging
+import capnp
+import referential_capnp
 from currency import Currency
 from instrument import Instrument
 
@@ -35,11 +37,21 @@ class Referential:
     def get_instruments(self):
         return self.instruments
 
-    @staticmethod
-    def get_default():
-        referential = Referential()
-        euroCurrency = Currency.get_available()[0]
-        instrumentId = 0
-        instrument = Instrument(id=instrumentId, name='Carrefour', currency=euroCurrency, isin='FR0000120172')
-        referential.add_instrument(instrument)
-        return referential
+    def encode(self):
+        referentialMessage = referential_capnp.Referential.new_message()
+        instrumentsSize = len(self.instruments)
+        if instrumentsSize:
+            instrumentList = referentialMessage.init('instruments', instrumentsSize)
+            for index, instrument in enumerate(self.instruments):
+                instrumentList[index].id = instrument.id
+                instrumentList[index].name = instrument.name
+                instrumentList[index].isin = instrument.isin
+                instrumentList[index].currencyId = instrument.currencyId
+        return referentialMessage
+
+    def decode(self, encodedMessage):
+        referential = referential_capnp.Referential.from_bytes(encodedMessage)
+        for instrument in referential.instruments:
+            instr = Instrument(id=instrument.id, name=instrument.name, isin=instrument.isin, currencyId=instrument.currencyId)
+            self.add_instrument(instr)
+        print(self)

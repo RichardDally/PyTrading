@@ -82,20 +82,9 @@ class TradingServer:
                 messageStack = []
 
                 # Encode referential
-                referential = referential_capnp.Referential.new_message()
-                instruments = referential.init('instruments', 2)
-
-                instruments[0].id = 0
-                instruments[0].name = 'Carrefour'
-                instruments[0].currency = 'EUR'
-                instruments[0].isin = 'FR0000120172'
-                instruments[1].id = 1
-                instruments[1].name = 'Societe Generale'
-                instruments[1].currency = 'EUR'
-                instruments[1].isin = 'FR0000130809'
-
-                encodedMessage = referential.to_bytes()
-                message = struct.pack('>Q', len(encodedMessage)) + encodedMessage
+                referentialMessage = self.referential.encode()
+                referentialBytes = referentialMessage.to_bytes()
+                message = struct.pack('>Q', len(referentialBytes)) + referentialBytes
 
                 messageStack.append(message)
                 #messageStack.append(pickle.dumps(self.orderBooks))

@@ -8,7 +8,7 @@ from referential import Referential
 
 class TradingClient:
     logger = logging.getLogger(__name__)
-    referential = None
+    referential = Referential()
     orderBooks = None
 
     def __init__(self):
@@ -49,8 +49,7 @@ class TradingClient:
 
         readableBytes = len(buffer) - 8
         if messageLength <= readableBytes:
-            self.referential = referential_capnp.Referential.from_bytes(buffer[8:8 + messageLength])
-            print('Referential', self.referential)
+            self.referential.decode(buffer[8 : 8 + messageLength])
 
     """ private """
     def receive_order_books_full_snapshot(self, serverSocket):
