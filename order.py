@@ -1,7 +1,19 @@
 import time
 from way import Way
+from staticdata import StaticData
+
+class Counter:
+    def __init__(self):
+        self.value = 0
+
+    def get_value(self):
+        value = self.value
+        self.value += 1
+        return value
+counter = Counter()
 
 class Order:
+    id = None
     way = None
     quantity = None
     price = None
@@ -9,6 +21,7 @@ class Order:
     timestamp = None
 
     def __init__(self, way, instrument, quantity, price, counterparty):
+        self.id = counter.get_value()
         self.way = way
         self.instrument = instrument
         self.quantity = quantity
