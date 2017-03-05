@@ -83,9 +83,13 @@ class TradingServer:
                 referentialMessage = Serialization.encode_referential(self.referential)
                 referentialBytes = referentialMessage.to_bytes()
                 message = struct.pack('>Q', len(referentialBytes)) + referentialBytes
-
                 messageStack.append(message)
-                #messageStack.append(pickle.dumps(self.orderBooks))
+
+                orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
+                orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
+                message = struct.pack('>Q', len(orderBookFullSnapshotBytes)) + orderBookFullSnapshotBytes
+                messageStack.append(message)
+
                 self.messageStacks[connection] = messageStack
 
                 # Adding client socket to write list

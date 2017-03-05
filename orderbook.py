@@ -6,9 +6,9 @@ class OrderBook:
     logger = logging.getLogger(__name__)
     bids = None
     asks = None
-    last = None
-    high = None
-    low = None
+    last = 0.0
+    high = 0.0
+    low = 0.0
     instrument = None
 
     def __init__(self, instrument):
