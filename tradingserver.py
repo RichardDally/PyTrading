@@ -47,7 +47,6 @@ class TradingServer:
         except KeyboardInterrupt, exception:
             print('Stopped by user')
         except Exception, exception:
-        # TODO: catch other exceptions
             print(exception)
 
         if self.listener:

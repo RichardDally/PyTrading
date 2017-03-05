@@ -25,14 +25,13 @@ class TradingClient:
 
             print('Connecting')
             serverSocket.connect((host, port))
-            # TODO: fix receiving, send ACK to referential to get full snapshot
+
             self.receive_referential(serverSocket)
             #self.receive_order_books_full_snapshot(serverSocket)
 
         except KeyboardInterrupt:
             print('Stopped by user')
         except Exception, exception:
-        # TODO: catch other exceptions
             print(exception)
 
         if serverSocket:

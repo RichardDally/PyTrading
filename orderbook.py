@@ -92,7 +92,7 @@ class OrderBook:
                 attackedOrder.executedquantity += attackedOrder.get_remaining_quantity()
                 self.on_new_deal(attackedOrder)
                 self.get_orders(attackedOrder.way).remove(attackedOrder)
-            else: # Partial execution
+            else:
                 self.logger.debug('[{}] has been partially executed ({})'.format(attackedOrder))
                 attackingOrder.executedquantity += attackingOrder.get_remaining_quantity()
                 attackedOrder.executedquantity += attackingOrder.get_remaining_quantity()
