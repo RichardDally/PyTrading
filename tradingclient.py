@@ -1,10 +1,9 @@
 import logging
 import socket
-import capnp
 import struct
-import referential_capnp
 from instrument import Instrument
 from referential import Referential
+from serialization import Serialization
 
 class TradingClient:
     logger = logging.getLogger(__name__)
@@ -49,7 +48,7 @@ class TradingClient:
 
         readableBytes = len(buffer) - 8
         if messageLength <= readableBytes:
-            self.referential.decode(buffer[8 : 8 + messageLength])
+            self.referential = Serialization.decode_referential(buffer[8 : 8 + messageLength])
 
     """ private """
     def receive_order_books_full_snapshot(self, serverSocket):

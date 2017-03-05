@@ -7,6 +7,7 @@ from referential import Referential
 from instrument import Instrument
 from currency import Currency
 from orderbook import OrderBook
+from serialization import Serialization
 
 class TradingServer:
     logger = logging.getLogger(__name__)
@@ -78,11 +79,8 @@ class TradingServer:
                 connection.setblocking(0)
                 self.inputs.append(connection)
 
-                # Pushing messages to send
                 messageStack = []
-
-                # Encode referential
-                referentialMessage = self.referential.encode()
+                referentialMessage = Serialization.encode_referential(self.referential)
                 referentialBytes = referentialMessage.to_bytes()
                 message = struct.pack('>Q', len(referentialBytes)) + referentialBytes
 
