@@ -25,6 +25,17 @@ class TradingServer:
         self.outputs = []
         self.messageStacks = {}
 
+    def broadcast(self):
+        orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
+        orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
+        message = struct.pack('>Q', len(orderBookFullSnapshotBytes)) + orderBookFullSnapshotBytes
+
+        for s in self.inputs:
+            if s is self.listener:
+                continue
+            print('Adding message to ', s, ' message queue')
+            self.messageStacks[s].append(message)
+
     """ public """
     def start(self):
         try:
