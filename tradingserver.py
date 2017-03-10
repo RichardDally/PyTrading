@@ -40,7 +40,7 @@ class TradingServer:
             self.inputs.append(self.listener)
 
             while self.inputs:
-                readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs)
+                readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs, 1)
                 self.handle_readable(readable)
                 self.handle_writable(writable)
                 self.handle_exceptional(exceptional)
