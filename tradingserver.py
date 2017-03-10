@@ -112,8 +112,8 @@ class TradingServer:
                 next_msg = self.messageStacks[s].pop(0)
                 print('Message stack length:', len(self.messageStacks[s]))
             except Exception, exception:
-                print(exception)
-                self.outputs.remove(s)
+                if s in self.outputs:
+                    self.outputs.remove(s)
             else:
                 s.send(next_msg)
 
