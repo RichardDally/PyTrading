@@ -50,11 +50,17 @@ class TradingServer:
             self.listener.listen(5)
             self.inputs.append(self.listener)
 
+            counter = 0
+
             while self.inputs:
                 readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs, 1)
                 self.handle_readable(readable)
                 self.handle_writable(writable)
                 self.handle_exceptional(exceptional)
+
+                if len(self.inputs) > 0 and counter < 10:
+                    counter += 1
+                    self.broadcast()
 
         except KeyboardInterrupt, exception:
             print('Stopped by user')
