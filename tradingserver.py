@@ -71,30 +71,33 @@ class TradingServer:
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
     """ private """
+    def accept_connection(self):
+        connection, client_address = self.listener.accept()
+        print('Got connection from', client_address)
+        connection.setblocking(0)
+        self.inputs.append(connection)
+
+        messageStack = []
+        referentialMessage = Serialization.encode_referential(self.referential)
+        referentialBytes = referentialMessage.to_bytes()
+        message = struct.pack('>Q', len(referentialBytes)) + referentialBytes
+        messageStack.append(message)
+
+        orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
+        orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
+        message = struct.pack('>Q', len(orderBookFullSnapshotBytes)) + orderBookFullSnapshotBytes
+        messageStack.append(message)
+
+        self.messageStacks[connection] = messageStack
+
+        # Adding client socket to write list
+        self.outputs.append(connection)
+
+    """ private """
     def handle_readable(self, readable):
         for s in readable:
             if s is self.listener:
-                connection, client_address = self.listener.accept()
-                print('Got connection from', client_address)
-                connection.setblocking(0)
-                self.inputs.append(connection)
-
-                messageStack = []
-                referentialMessage = Serialization.encode_referential(self.referential)
-                referentialBytes = referentialMessage.to_bytes()
-                message = struct.pack('>Q', len(referentialBytes)) + referentialBytes
-                messageStack.append(message)
-
-                orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
-                orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
-                message = struct.pack('>Q', len(orderBookFullSnapshotBytes)) + orderBookFullSnapshotBytes
-                messageStack.append(message)
-
-                self.messageStacks[connection] = messageStack
-
-                # Adding client socket to write list
-                self.outputs.append(connection)
-
+                self.accept_connection()
             else:
                 removeSocket = True
                 try:
