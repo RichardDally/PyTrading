@@ -28,7 +28,7 @@ class TradingServer:
     def broadcast(self):
         orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
         orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
-        message = struct.pack('>Q', len(orderBookFullSnapshotBytes)) + orderBookFullSnapshotBytes
+        message = struct.pack('>Qc', len(orderBookFullSnapshotBytes), 'S') + orderBookFullSnapshotBytes
 
         for s in self.inputs:
             if s is self.listener:
