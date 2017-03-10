@@ -97,12 +97,12 @@ class TradingServer:
         messageStack = []
         referentialMessage = Serialization.encode_referential(self.referential)
         referentialBytes = referentialMessage.to_bytes()
-        message = struct.pack('>Q', len(referentialBytes)) + referentialBytes
+        message = struct.pack('>Qc', len(referentialBytes), 'R') + referentialBytes
         messageStack.append(message)
 
         orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
         orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
-        message = struct.pack('>Q', len(orderBookFullSnapshotBytes)) + orderBookFullSnapshotBytes
+        message = struct.pack('>Qc', len(orderBookFullSnapshotBytes), 'S') + orderBookFullSnapshotBytes
         messageStack.append(message)
 
         self.messageStacks[connection] = messageStack

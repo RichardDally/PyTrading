@@ -11,9 +11,9 @@ class TradingClient:
         self.inputs = []
         self.buffer = ''
         self.orderBooks = {}
-        self.decode_buffer = None
         self.logger = logging.getLogger(__name__)
         self.referential = Referential()
+        self.decodeMapping = { 'R' : self.handle_referential, 'S' : self.handle_orderbookfullsnapshot }
 
     """ public """
     def start(self):
@@ -28,13 +28,12 @@ class TradingClient:
             serverSocket.connect((host, port))
 
             self.inputs.append(serverSocket)
-            self.decode_buffer = self.decode_referential
             while self.inputs:
-                print('---')
                 readable, writable, exceptional = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
-                while len(self.buffer) > 8:
+                while len(self.buffer) > 9:
                     self.decode_buffer()
+                print('---')
 
         except KeyboardInterrupt:
             print('Stopped by user')
@@ -46,6 +45,7 @@ class TradingClient:
 
         print('Ok')
 
+    """ private """
     def handle_readable(self, readable):
         assert(len(readable) <= 1), 'Readable must contain only 1 socket'
         for s in readable:
@@ -57,28 +57,28 @@ class TradingClient:
                 self.inputs.remove(s)
 
     """ private """
-    def decode_referential(self):
-        messageLength = struct.unpack_from('>Q', self.buffer)[0]
-        readableBytes = len(self.buffer) - 8
-        if messageLength <= readableBytes:
-            self.referential = Serialization.decode_referential(self.buffer[8 : 8 + messageLength])
-            print('Buffer length before [{}]'.format(len(self.buffer)))
-            self.buffer = self.buffer[8 + messageLength:]
-            print('Buffer length after [{}]'.format(len(self.buffer)))
-            print('Referential received:\n{}'.format(str(self.referential)))
-            self.decode_buffer = self.decode_orderbookfullsnapshot
+    def handle_referential(self, buffer):
+        self.referential = Serialization.decode_referential(buffer)
+        print('Referential received:\n{}'.format(str(self.referential)))
+
 
     """ private """
-    def decode_orderbookfullsnapshot(self):
-        messageLength = struct.unpack_from('>Q', self.buffer)[0]
-        readableBytes = len(self.buffer) - 8
+    def handle_orderbookfullsnapshot(self, buffer):
+        orderbook = Serialization.decode_orderbookfullsnapshot(buffer)
+        print('Order book received:{}'.format(str(orderbook)))
+
+    """ private """
+    def decode_buffer(self):
+        messageLength, messageType = struct.unpack_from('>Qc', self.buffer)
+        headerSize = 9
+        readableBytes = len(self.buffer) - headerSize
+        print('Message length [{}]'.format(messageLength))
+        print('Message type [{}]'.format(messageType))
         if messageLength <= readableBytes:
-            orderbook = Serialization.decode_orderbookfullsnapshot(self.buffer[8 : 8 + messageLength])
+            self.decodeMapping[messageType](self.buffer[headerSize : headerSize + messageLength])
             print('Buffer length before [{}]'.format(len(self.buffer)))
-            self.buffer = self.buffer[8 + messageLength:]
+            self.buffer = self.buffer[headerSize + messageLength:]
             print('Buffer length after [{}]'.format(len(self.buffer)))
-            self.orderBooks[orderbook.instrument.id] = orderbook
-            print('Order book received:{}'.format(str(orderbook)))
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingClient.log',
