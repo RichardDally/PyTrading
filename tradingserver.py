@@ -96,8 +96,17 @@ class TradingServer:
                 self.outputs.append(connection)
 
             else:
-                data = s.recv(4096)
-                if not data:
+                removeSocket = True
+                try:
+                    data = s.recv(4096)
+                    if data:
+                        removeSocket = False
+                except KeyboardInterrupt:
+                    raise
+                except:
+                    pass
+
+                if removeSocket:
                     print('Client closed its socket')
                     if s in self.outputs:
                         self.outputs.remove(s)
