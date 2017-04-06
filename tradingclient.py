@@ -6,6 +6,7 @@ from instrument import Instrument
 from referential import Referential
 from serialization import Serialization
 
+
 class TradingClient:
     def __init__(self):
         self.inputs = []
@@ -14,6 +15,7 @@ class TradingClient:
         self.logger = logging.getLogger(__name__)
         self.referential = Referential()
         self.decodeMapping = { 'R' : self.handle_referential, 'S' : self.handle_orderbookfullsnapshot }
+
 
     """ public """
     def start(self):
@@ -34,7 +36,6 @@ class TradingClient:
                 while len(self.buffer) > 9:
                     self.decode_buffer()
                 print('---')
-
         except KeyboardInterrupt:
             print('Stopped by user')
         except Exception, exception:
@@ -44,6 +45,7 @@ class TradingClient:
             serverSocket.close()
 
         print('Ok')
+
 
     """ private """
     def handle_readable(self, readable):
@@ -56,6 +58,7 @@ class TradingClient:
                 print('Server closed its socket')
                 self.inputs.remove(s)
 
+
     """ private """
     def handle_referential(self, buffer):
         self.referential = Serialization.decode_referential(buffer)
@@ -66,6 +69,7 @@ class TradingClient:
     def handle_orderbookfullsnapshot(self, buffer):
         orderbook = Serialization.decode_orderbookfullsnapshot(buffer)
         print('Order book received:{}'.format(str(orderbook)))
+
 
     """ private """
     def decode_buffer(self):

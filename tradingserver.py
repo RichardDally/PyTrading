@@ -9,6 +9,7 @@ from currency import Currency
 from orderbook import OrderBook
 from serialization import Serialization
 
+
 class TradingServer:
     logger = logging.getLogger(__name__)
     referential = None
@@ -17,6 +18,7 @@ class TradingServer:
     outputs = None
     listener = None
     messageStacks = None
+
 
     def __init__(self):
         self.initialize_referential()
@@ -72,11 +74,13 @@ class TradingServer:
 
         print('Ok')
 
+
     """ private """
     def initialize_referential(self):
         self.logger.debug('Loading referential')
         self.referential = StaticData.get_default_referential()
         self.logger.debug('Referential is loaded')
+
 
     """ private """
     def initialize_order_books(self):
@@ -109,6 +113,7 @@ class TradingServer:
 
         # Adding client socket to write list
         self.outputs.append(connection)
+
 
     """ private """
     def handle_readable(self, readable):
@@ -154,6 +159,7 @@ class TradingServer:
                 self.outputs.remove(s)
             s.close()
             del self.messageStacks[s]
+
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingServer.log',
