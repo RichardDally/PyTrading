@@ -51,7 +51,7 @@ class TradingClient:
         for s in readable:
             data = s.recv(8192)
             if data:
-                print('Adding server data ({}) to buffer'.format(len(data)))
+                self.logger.debug('Adding server data ({}) to buffer'.format(len(data)))
                 self.buffer += data
             else:
                 print('Server closed its socket')
@@ -61,13 +61,13 @@ class TradingClient:
     """ private """
     def handle_referential(self, buffer):
         self.referential = Serialization.decode_referential(buffer)
-        print('Referential received:\n{}'.format(str(self.referential)))
+        self.logger.debug('Referential received:\n{}'.format(str(self.referential)))
 
 
     """ private """
     def handle_orderbookfullsnapshot(self, buffer):
         orderbook = Serialization.decode_orderbookfullsnapshot(buffer)
-        print('Order book received:{}'.format(str(orderbook)))
+        self.logger.debug('Order book received:{}'.format(str(orderbook)))
 
 
     """ private """
@@ -83,7 +83,7 @@ class TradingClient:
                 self.logger.debug('Not enough bytes to decode current message')
                 break
             self.decodeMapping[messageType](self.buffer[headerSize : headerSize + messageLength])
-            print('Buffer length before [{}]'.format(len(self.buffer)))
+            self.logger.debug('Buffer length before [{}]'.format(len(self.buffer)))
             self.buffer = self.buffer[headerSize + messageLength:]
             self.logger.debug('Buffer length after [{}]'.format(len(self.buffer)))
             decodedMessages += decodedMessages + 1
@@ -91,7 +91,7 @@ class TradingClient:
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingClient.log',
-                        level=logging.DEBUG,
+                        level=logging.INFO,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
     client = TradingClient()

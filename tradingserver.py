@@ -40,9 +40,9 @@ class TradingServer:
         for s in self.inputs:
             if s is self.listener:
                 continue
-            print('Adding message to [{}]  message queue'.format(s))
+            self.logger.debug('Adding message to [{}]  message queue'.format(s))
             self.messageStacks[s].append(message)
-            print('Message queue size [{}] for [{}]'.format(len(self.messageStacks[s]), s))
+            self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.messageStacks[s]), s))
 
 
     """ public """
@@ -142,7 +142,7 @@ class TradingServer:
         for s in writable:
             try:
                 next_msg = self.messageStacks[s].pop(0)
-                print('Message stack length [{}]'.format(len(self.messageStacks[s])))
+                self.logger.debug('Message stack length [{}]'.format(len(self.messageStacks[s])))
                 s.send(next_msg)
             except KeyboardInterrupt:
                 raise
@@ -163,7 +163,7 @@ class TradingServer:
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingServer.log',
-                        level=logging.DEBUG,
+                        level=logging.INFO,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
     server = TradingServer()
