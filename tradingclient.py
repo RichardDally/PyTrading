@@ -49,7 +49,7 @@ class TradingClient:
     def handle_readable(self, readable):
         assert(len(readable) <= 1), 'Readable must contain only 1 socket'
         for s in readable:
-            data = s.recv(4096)
+            data = s.recv(8192)
             if data:
                 print('Adding server data ({}) to buffer'.format(len(data)))
                 self.buffer += data

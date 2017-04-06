@@ -120,7 +120,7 @@ class TradingServer:
             else:
                 removeSocket = True
                 try:
-                    data = s.recv(4096)
+                    data = s.recv(8192)
                     if data:
                         removeSocket = False
                 except KeyboardInterrupt:
