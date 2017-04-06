@@ -20,7 +20,6 @@ class TradingClient:
     """ public """
     def start(self):
         serverSocket = None
-
         try:
             serverSocket = socket.socket()
             host = socket.gethostname()
@@ -33,11 +32,9 @@ class TradingClient:
             while self.inputs:
                 readable, writable, exceptional = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
-                while len(self.buffer) > 9:
-                    print('Decoding buffer remaining size [{}]'.format(len(self.buffer)))
-                    if not self.decode_buffer():
-                        break
-                print('---')
+                decodedMessages = self.decode_buffer()
+                if decodedMessages == 0:
+                    print('--- No decoded messages ---')
         except KeyboardInterrupt:
             print('Stopped by user')
         except socket.error:
@@ -75,19 +72,22 @@ class TradingClient:
 
     """ private """
     def decode_buffer(self):
-        # TODO: handle empty messageType case
-        messageLength, messageType = struct.unpack_from('>Qc', self.buffer)
-        headerSize = 9
-        readableBytes = len(self.buffer) - headerSize
-        print('Message length [{}]'.format(messageLength))
-        print('Message type [{}]'.format(messageType))
-        if messageLength <= readableBytes:
+        decodedMessages = 0
+        while len(self.buffer) > 9:
+            messageLength, messageType = struct.unpack_from('>Qc', self.buffer)
+            headerSize = 9
+            readableBytes = len(self.buffer) - headerSize
+            self.logger.debug('Message length [{}]'.format(messageLength))
+            self.logger.debug('Message type [{}]'.format(messageType))
+            if messageLength > readableBytes:
+                self.logger.debug('Not enough bytes to decode current message')
+                break
             self.decodeMapping[messageType](self.buffer[headerSize : headerSize + messageLength])
             print('Buffer length before [{}]'.format(len(self.buffer)))
             self.buffer = self.buffer[headerSize + messageLength:]
-            print('Buffer length after [{}]'.format(len(self.buffer)))
-            return True
-        return False
+            self.logger.debug('Buffer length after [{}]'.format(len(self.buffer)))
+            decodedMessages += decodedMessages + 1
+        return decodedMessages
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingClient.log',
