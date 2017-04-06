@@ -35,8 +35,10 @@ class TradingServer:
         for s in self.inputs:
             if s is self.listener:
                 continue
-            print('Adding message to ', s, ' message queue')
+            print('Adding message to [{}]  message queue'.format(s))
             self.messageStacks[s].append(message)
+            print('Message queue size [{}] for [{}]'.format(len(self.messageStacks[s]), s))
+
 
     """ public """
     def start(self):
@@ -48,7 +50,7 @@ class TradingServer:
             self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.listener.bind((host, port))
 
-            print('Listening')
+            print('Listening port [{}]'.format(port))
             self.listener.listen(5)
             self.inputs.append(self.listener)
 
@@ -91,10 +93,11 @@ class TradingServer:
             self.orderBooks[instrument.id] = OrderBook(instrument)
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
+
     """ private """
     def accept_connection(self):
         connection, client_address = self.listener.accept()
-        print('Got connection from', client_address)
+        print('Got connection from [{}]'.format(client_address))
         connection.setblocking(0)
         self.inputs.append(connection)
 
@@ -138,6 +141,7 @@ class TradingServer:
                     self.inputs.remove(s)
                     s.close()
                     del self.messageStacks[s]
+
 
     """ private """
     def handle_writable(self, writable):

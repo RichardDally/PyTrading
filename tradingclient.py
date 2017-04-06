@@ -26,7 +26,7 @@ class TradingClient:
             host = socket.gethostname()
             port = 12345
 
-            print('Connecting')
+            print('Connecting on [{0}:{1}]'.format(host, port))
             serverSocket.connect((host, port))
 
             self.inputs.append(serverSocket)
@@ -53,6 +53,7 @@ class TradingClient:
         for s in readable:
             data = s.recv(4096)
             if data:
+                print('Adding server data ({}) to buffer'.format(len(data)))
                 self.buffer += data
             else:
                 print('Server closed its socket')
