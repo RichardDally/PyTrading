@@ -30,6 +30,8 @@ class TradingServer:
         self.startTime = time.time()
         self.stopTime = self.startTime + 10
 
+
+    """ private """
     def broadcast(self):
         orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
         orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
@@ -56,8 +58,6 @@ class TradingServer:
             print('Listening port [{}]'.format(port))
             self.listener.listen(5)
             self.inputs.append(self.listener)
-
-            counter = 0
 
             while self.inputs:
                 readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs, 1)
@@ -109,8 +109,6 @@ class TradingServer:
         messageStack.append(message)
 
         self.messageStacks[connection] = messageStack
-
-        # Adding client socket to write list
         self.outputs.append(connection)
 
 
