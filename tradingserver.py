@@ -1,3 +1,4 @@
+import time
 import logging
 import socket
 import select
@@ -26,6 +27,8 @@ class TradingServer:
         self.inputs = []
         self.outputs = []
         self.messageStacks = {}
+        self.startTime = time.time()
+        self.stopTime = self.startTime + 10
 
     def broadcast(self):
         orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
@@ -62,8 +65,7 @@ class TradingServer:
                 self.handle_writable(writable)
                 self.handle_exceptional(exceptional)
 
-                if len(self.inputs) > 0 and counter < 10:
-                    counter += 1
+                if time.time() < self.stopTime:
                     self.broadcast()
 
         except KeyboardInterrupt, exception:
