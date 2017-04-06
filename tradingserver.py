@@ -68,12 +68,11 @@ class TradingServer:
 
         except KeyboardInterrupt, exception:
             print('Stopped by user')
-        except Exception, exception:
-            print(exception)
-
-        if self.listener:
-            self.listener.close()
-
+        except socket.error, exception:
+            print('Socket error [{}]'.format(exception))
+        finally:
+            if self.listener:
+                self.listener.close()
         print('Ok')
 
 
@@ -148,12 +147,14 @@ class TradingServer:
         for s in writable:
             try:
                 next_msg = self.messageStacks[s].pop(0)
-                print('Message stack length:', len(self.messageStacks[s]))
-            except Exception, exception:
+                print('Message stack length [{}]'.format(len(self.messageStacks[s])))
+                s.send(next_msg)
+            except KeyboardInterrupt:
+                raise
+            except:
                 if s in self.outputs:
                     self.outputs.remove(s)
-            else:
-                s.send(next_msg)
+
 
     """ private """
     def handle_exceptional(self, exceptional):

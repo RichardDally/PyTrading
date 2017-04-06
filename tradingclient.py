@@ -40,12 +40,11 @@ class TradingClient:
                 print('---')
         except KeyboardInterrupt:
             print('Stopped by user')
-        except Exception, exception:
-            print(exception)
-
-        if serverSocket:
-            serverSocket.close()
-
+        except socket.error:
+            print('Unable to connect to [{0}:{1}]'.format(host, port))
+        finally:
+            if serverSocket:
+                serverSocket.close()
         print('Ok')
 
 
