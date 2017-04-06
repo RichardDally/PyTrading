@@ -34,7 +34,9 @@ class TradingClient:
                 readable, writable, exceptional = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
                 while len(self.buffer) > 9:
-                    self.decode_buffer()
+                    print('Decoding buffer remaining size [{}]'.format(len(self.buffer)))
+                    if not self.decode_buffer():
+                        break
                 print('---')
         except KeyboardInterrupt:
             print('Stopped by user')
@@ -85,6 +87,8 @@ class TradingClient:
             print('Buffer length before [{}]'.format(len(self.buffer)))
             self.buffer = self.buffer[headerSize + messageLength:]
             print('Buffer length after [{}]'.format(len(self.buffer)))
+            return True
+        return False
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingClient.log',
