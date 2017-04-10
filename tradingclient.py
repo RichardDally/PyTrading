@@ -73,9 +73,9 @@ class TradingClient:
     """ private """
     def decode_buffer(self):
         decodedMessages = 0
-        while len(self.buffer) > 9:
+        headerSize = 9
+        while len(self.buffer) > headerSize:
             messageLength, messageType = struct.unpack_from('>Qc', self.buffer)
-            headerSize = 9
             readableBytes = len(self.buffer) - headerSize
             self.logger.debug('Message length [{}]'.format(messageLength))
             self.logger.debug('Message type [{}]'.format(messageType))
