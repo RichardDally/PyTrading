@@ -2,9 +2,10 @@ from instrument import Instrument
 from referential import Referential
 
 currencies = {0 : 'EUR', 1 : 'USD'}
-instruments = {0 : Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0),
-               1 : Instrument(id=1, name='Societe Generale', isin='FR0000130809', currencyId=0)
+instruments = {0 : Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0),
+               1 : Instrument(identifier=1, name='Societe Generale', isin='FR0000130809', currency_identifier=0)
                }
+
 
 class StaticData:
     @staticmethod

@@ -2,6 +2,7 @@ from way import Way
 from staticdata import StaticData
 import logging
 
+
 class OrderBook:
     logger = logging.getLogger(__name__)
     bids = None
@@ -16,10 +17,10 @@ class OrderBook:
         self.asks = []
         self.bids = []
 
-    # TODO: improve string formating
+    # TODO: improve string formatting
     def __str__(self):
         string = '\n--- [{}] order book ---\n'.format(self.instrument.name)
-        currency = StaticData.get_currency(self.instrument.currencyId)
+        currency = StaticData.get_currency(self.instrument.currency_identifier)
         string += 'Last: {1} {0}\nHigh: {2} {0}\nLow: {3} {0}\n'.format(currency, self.last, self.high, self.low)
         if len(self.bids):
             string += 'Bid side ({}):\n'.format(len(self.bids))
@@ -83,8 +84,9 @@ class OrderBook:
             return sorted([x for x in self.bids if x.price >= attackingOrder.price], key=lambda o: o.timestamp)
         raise Exception('Way is invalid')
 
-    def is_attacked_order_full_executed(self, attackingOrder, attackedOrder):
-        return attackingOrder.get_remaining_quantity() >= attackedOrder.get_remaining_quantity()
+    @staticmethod
+    def is_attacked_order_full_executed(attacking_order, attacked_order):
+        return attacking_order.get_remaining_quantity() >= attacked_order.get_remaining_quantity()
 
     def get_orders(self, way):
         if way == Way.BUY:
@@ -93,21 +95,21 @@ class OrderBook:
             return self.asks
         raise Exception('Way is invalid')
 
-    def match_order(self, attackingOrder):
-        self.logger.debug('Find a matching order for [{}]'.format(attackingOrder))
-        matchingTradingBookOrders = self.get_matching_orders(attackingOrder)
+    def match_order(self, attacking_order):
+        self.logger.debug('Find a matching order for [{}]'.format(attacking_order))
+        matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
-        for attackedOrder in matchingTradingBookOrders:
-            if self.is_attacked_order_full_executed(attackingOrder, attackedOrder):
-                self.logger.debug('[{}] has been totally executed'.format(attackedOrder))
-                attackingOrder.executedquantity += attackedOrder.get_remaining_quantity()
-                attackedOrder.executedquantity += attackedOrder.get_remaining_quantity()
-                self.on_new_deal(attackedOrder)
-                self.get_orders(attackedOrder.way).remove(attackedOrder)
+        for attacked_order in matching_trading_book_orders:
+            if self.is_attacked_order_full_executed(attacking_order, attacked_order):
+                self.logger.debug('[{}] has been totally executed'.format(attacked_order))
+                attacking_order.executed_quantity += attacked_order.get_remaining_quantity()
+                attacked_order.executed_quantity += attacked_order.get_remaining_quantity()
+                self.on_new_deal(attacked_order)
+                self.get_orders(attacked_order.way).remove(attacked_order)
             else:
-                self.logger.debug('[{}] has been partially executed ({})'.format(attackedOrder))
-                attackingOrder.executedquantity += attackingOrder.get_remaining_quantity()
-                attackedOrder.executedquantity += attackingOrder.get_remaining_quantity()
-                self.on_new_deal(attackingOrder)
-            if attackingOrder.get_remaining_quantity() == 0.0:
+                self.logger.debug('[{}] has been partially executed ({})'.format(attacked_order))
+                attacking_order.executedquantity += attacking_order.get_remaining_quantity()
+                attacked_order.executedquantity += attacking_order.get_remaining_quantity()
+                self.on_new_deal(attacking_order)
+            if attacking_order.get_remaining_quantity() == 0.0:
                 break

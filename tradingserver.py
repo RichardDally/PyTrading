@@ -4,9 +4,6 @@ import socket
 import select
 import struct
 from staticdata import StaticData
-from referential import Referential
-from instrument import Instrument
-from currency import Currency
 from orderbook import OrderBook
 from serialization import Serialization
 
@@ -91,7 +88,7 @@ class TradingServer:
         self.orderBooks = {}
         # TODO: use generator
         for instrument in self.referential.instruments:
-            self.orderBooks[instrument.id] = OrderBook(instrument)
+            self.orderBooks[instrument.identifier] = OrderBook(instrument)
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
 

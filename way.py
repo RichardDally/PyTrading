@@ -2,7 +2,8 @@ class Way:
     BUY = 0
     SELL = 1
 
-    def get_opposite_way(self, way):
+    @staticmethod
+    def get_opposite_way(way):
         if way == Way.BUY:
             return Way.SELL
         elif way == Way.SELL:

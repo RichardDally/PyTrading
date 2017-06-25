@@ -1,16 +1,16 @@
 import unittest
 from way import Way
 from order import Order
-from currency import Currency
 from orderbook import OrderBook
 from instrument import Instrument
+
 
 class TestOrderBook(unittest.TestCase):
     book = None
     instrument = None
 
     def setUp(self):
-        self.instrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
+        self.instrument = Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0)
         self.book = OrderBook(self.instrument)
 
     def test_count_bids(self):

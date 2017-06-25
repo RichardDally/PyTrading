@@ -2,7 +2,6 @@ import logging
 import socket
 import struct
 import select
-from instrument import Instrument
 from referential import Referential
 from serialization import Serialization
 

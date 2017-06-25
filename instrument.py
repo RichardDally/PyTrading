@@ -1,14 +1,14 @@
 class Instrument:
-    id = None
+    identifier = None
     name = None
     isin = None
-    currencyId = None
+    currency_identifier = None
 
-    def __init__(self, id, name, isin, currencyId):
-        self.id = id
+    def __init__(self, identifier, name, isin, currency_identifier):
+        self.identifier = identifier
         self.name = name
         self.isin = isin
-        self.currencyId = currencyId
+        self.currency_identifier = currency_identifier
 
     def __str__(self):
-        return '{} {} {} {}'.format(self.id, self.name, self.currencyId, self.isin)
+        return '{} {} {} {}'.format(self.identifier, self.name, self.currency_identifier, self.isin)

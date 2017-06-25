@@ -1,14 +1,14 @@
 import unittest
-from currency import Currency
 from instrument import Instrument
 from staticdata import StaticData
 from referential import Referential
+
 
 class TestReferential(unittest.TestCase):
     instrument = None
 
     def setUp(self):
-        self.instrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
+        self.instrument = Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0)
 
     def test_length(self):
         referential = Referential()

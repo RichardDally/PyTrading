@@ -1,6 +1,5 @@
 import logging
-from currency import Currency
-from instrument import Instrument
+
 
 class Referential:
     logger = logging.getLogger(__name__)

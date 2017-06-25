@@ -1,16 +1,16 @@
 import unittest
 from way import Way
 from order import Order
-from currency import Currency
 from orderbook import OrderBook
 from instrument import Instrument
+
 
 class TestOrderMatching(unittest.TestCase):
     book = None
     instrument = None
 
     def setUp(self):
-        self.instrument = Instrument(id=0, name='Carrefour', isin='FR0000120172', currencyId=0)
+        self.instrument = Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0)
         self.book = OrderBook(self.instrument)
 
     def validate_one_matching(self, attackingOrder, attackedOrder):
@@ -48,8 +48,8 @@ class TestOrderMatching(unittest.TestCase):
         self.book.on_new_order(attackingOrder)
         self.assertEqual(self.book.count_bids(), 0)
         self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(attackingOrder.executedquantity, quantity)
-        self.assertEqual(attackedOrder.executedquantity, quantity)
+        self.assertEqual(attackingOrder.executed_quantity, quantity)
+        self.assertEqual(attackedOrder.executed_quantity, quantity)
         self.assertEqual(attackingOrder.get_remaining_quantity(), 0)
         self.assertEqual(attackedOrder.get_remaining_quantity(), 0)
 
@@ -63,8 +63,8 @@ class TestOrderMatching(unittest.TestCase):
         self.book.on_new_order(attackingOrder)
         self.assertEqual(self.book.count_bids(), 1)
         self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(attackingOrder.executedquantity, attackingQuantity - attackedQuantity)
-        self.assertEqual(attackedOrder.executedquantity, attackedQuantity)
+        self.assertEqual(attackingOrder.executed_quantity, attackingQuantity - attackedQuantity)
+        self.assertEqual(attackedOrder.executed_quantity, attackedQuantity)
         self.assertEqual(attackingOrder.get_remaining_quantity(), attackingQuantity - attackedQuantity)
         self.assertEqual(attackedOrder.get_remaining_quantity(), 0)
 
@@ -81,7 +81,7 @@ class TestOrderMatching(unittest.TestCase):
         self.book.on_new_order(attackingOrder)
         self.assertEqual(self.book.count_bids(), 0)
         self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(attackingOrder.executedquantity, attackingQuantity)
+        self.assertEqual(attackingOrder.executed_quantity, attackingQuantity)
         self.assertEqual(attackingOrder.get_remaining_quantity(), 0)
         for attackedOrder in attackedOrders:
             self.assertEqual(attackedOrder.executedquantity, attackedQuantity)
