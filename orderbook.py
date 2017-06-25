@@ -77,11 +77,11 @@ class OrderBook:
         else:
             raise Exception('Way is invalid')
 
-    def get_matching_orders(self, attackingOrder):
-        if attackingOrder.way == Way.BUY:
-            return sorted([x for x in self.asks if x.price <= attackingOrder.price], key=lambda o: o.timestamp)
-        elif attackingOrder.way == Way.SELL:
-            return sorted([x for x in self.bids if x.price >= attackingOrder.price], key=lambda o: o.timestamp)
+    def get_matching_orders(self, attacking_order):
+        if attacking_order.way == Way.BUY:
+            return sorted([x for x in self.asks if x.price <= attacking_order.price], key=lambda o: o.timestamp)
+        elif attacking_order.way == Way.SELL:
+            return sorted([x for x in self.bids if x.price >= attacking_order.price], key=lambda o: o.timestamp)
         raise Exception('Way is invalid')
 
     @staticmethod
