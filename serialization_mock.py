@@ -97,4 +97,5 @@ class SerializationMock(Serialization):
         order_book.last = tokens[1]
         order_book.high = tokens[2]
         order_book.low = tokens[3]
+        # TODO: decode orders
         return order_book
