@@ -70,10 +70,10 @@ class TradingServer:
         except socket.error, exception:
             print('Socket error [{}]'.format(exception))
         finally:
-            if self.listener:
-                self.listener.close()
-        print('Ok')
-
+            for input_socket in self.inputs:
+                if input_socket:
+                    input_socket.close()
+        print('Server ends')
 
     """ private """
     def initialize_referential(self):
