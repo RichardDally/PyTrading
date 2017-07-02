@@ -15,18 +15,10 @@ counter = Counter()
 
 
 class Order:
-    identifier = None
-    way = None
-    quantity = None
-    price = None
-    instrument = None
-    counter_party = None
-    timestamp = None
-
-    def __init__(self, way, instrument, quantity, price, counter_party, identifier = counter.get_value(), timestamp=time.time()):
+    def __init__(self, way, instrument_identifier, quantity, price, counter_party, identifier=counter.get_value(), timestamp=time.time()):
         self.identifier = identifier
         self.way = way
-        self.instrument = instrument
+        self.instrument_identifier = instrument_identifier
         self.quantity = quantity
         self.canceled_quantity = 0.0
         self.executed_quantity = 0.0
@@ -45,10 +37,11 @@ class Order:
             way = 'BUY'
         elif self.way == Way.SELL:
             way = 'SELL'
-
-        currency = StaticData.get_currency(self.instrument.currency_identifier)
+        # TODO: fix it
+        #currency = StaticData.get_currency(self.instrument.currency_identifier)
+        currency = 'EUR'
         return '{} {} {} {} @ {} ({})'.format(way,
-                                              self.instrument.name,
+                                              self.instrument_identifier,
                                               self.get_remaining_quantity(),
                                               currency,
                                               self.price,

@@ -4,23 +4,18 @@ import logging
 
 
 class OrderBook:
-    logger = logging.getLogger(__name__)
-    bids = None
-    asks = None
-    last = 0.0
-    high = 0.0
-    low = 0.0
-    instrument = None
-
-    def __init__(self, instrument):
-        self.instrument = instrument
+    def __init__(self, instrument_identifier):
+        self.logger = logging.getLogger(__name__)
+        self.instrument_identifier = instrument_identifier
         self.asks = []
         self.bids = []
 
     # TODO: improve string formatting
     def __str__(self):
-        string = '\n--- [{}] order book ---\n'.format(self.instrument.name)
-        currency = StaticData.get_currency(self.instrument.currency_identifier)
+        string = '\n--- [{}] order book ---\n'.format(self.instrument_identifier)
+        # TODO: fix it
+        currency = 'FIXIT'
+        #currency = StaticData.get_currency(self.instrument.currency_identifier)
         string += 'Last: {1} {0}\nHigh: {2} {0}\nLow: {3} {0}\n'.format(currency, self.last, self.high, self.low)
         if len(self.bids):
             string += 'Bid side ({}):\n'.format(len(self.bids))
@@ -45,7 +40,8 @@ class OrderBook:
         return len(self.asks)
 
     def on_new_order(self, order):
-        assert (order.instrument == self.instrument), 'Order instrument must match order book instrument'
+        assert (order.instrument_identifier == self.instrument_identifier),\
+            'Order instrument must match order book instrument'
         self.match_order(order)
         if order.get_remaining_quantity() > 0.0:
             self.logger.debug('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
