@@ -2,10 +2,8 @@ import logging
 
 
 class Referential:
-    logger = logging.getLogger(__name__)
-    instruments = None
-
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
         self.instruments = []
 
     def __iter__(self):

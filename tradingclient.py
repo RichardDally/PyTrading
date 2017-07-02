@@ -18,16 +18,16 @@ class TradingClient:
     def start(self):
         serverSocket = None
         try:
-            serverSocket = socket.socket()
+            server_socket = socket.socket()
             host = socket.gethostname()
             port = 12345
 
-            print('Connecting on [{0}:{1}]'.format(host, port))
-            serverSocket.connect((host, port))
+            print('Connecting on [{0}:{1}]'.format(host, self.port))
+            server_socket.connect((host, self.port))
 
-            self.inputs.append(serverSocket)
+            self.inputs.append(server_socket)
             while self.inputs:
-                readable, writable, exceptional = select.select(self.inputs, [], [], 1)
+                readable, _, exceptional = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
                 decodedMessages = self.decode_buffer()
                 if decodedMessages == 0:
@@ -35,12 +35,11 @@ class TradingClient:
         except KeyboardInterrupt:
             print('Stopped by user')
         except socket.error:
-            print('Unable to connect to [{0}:{1}]'.format(host, port))
+            print('Unable to connect to [{0}:{1}]'.format(host, self.port))
         finally:
-            if serverSocket:
-                serverSocket.close()
-        print('Ok')
-
+            if server_socket:
+                server_socket.close()
+        print('Client ends')
 
     def handle_readable(self, readable):
         assert(len(readable) <= 1), 'Readable must contain only 1 socket'

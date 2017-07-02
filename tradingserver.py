@@ -9,24 +9,22 @@ from serialization import Serialization
 
 
 class TradingServer:
-    logger = logging.getLogger(__name__)
-    referential = None
-    orderBooks = None
-    inputs = None
-    outputs = None
-    listener = None
-    messageStacks = None
-
-
-    def __init__(self):
-        self.initialize_referential()
-        self.initialize_order_books()
+    def __init__(self, s, uptime_in_seconds=None):
+        self.s = s
+        self.logger = logging.getLogger(__name__)
+        self.referential = None
+        self.order_books = {}
         self.inputs = []
         self.outputs = []
-        self.messageStacks = {}
-        self.startTime = time.time()
-        self.stopTime = self.startTime + 10
-
+        self.listener = None
+        self.message_stacks = {}
+        self.initialize_referential()
+        self.initialize_order_books()
+        self.startTime = None
+        self.stopTime = None
+        if uptime_in_seconds:
+            self.startTime = time.time()
+            self.stopTime = self.startTime + uptime_in_seconds
 
     def broadcast(self):
         orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
@@ -49,7 +47,11 @@ class TradingServer:
             self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.listener.bind((host, port))
 
-            print('Listening port [{}]'.format(port))
+            if self.startTime and self.stopTime:
+                print('Listening port [{}] for [{}] seconds'.format(port, self.stopTime - self.startTime))
+            else:
+                print('Listening port [{}]'.format(port))
+
             self.listener.listen(5)
             self.inputs.append(self.listener)
 
@@ -59,18 +61,26 @@ class TradingServer:
                 self.handle_writable(writable)
                 self.handle_exceptional(exceptional)
 
-                if time.time() < self.stopTime:
-                    self.broadcast()
+                self.broadcast()
 
-        except KeyboardInterrupt, exception:
+                if self.reached_uptime():
+                    print('Time is up')
+                    break
+
+        except KeyboardInterrupt:
             print('Stopped by user')
-        except socket.error, exception:
+        except socket.error as exception:
             print('Socket error [{}]'.format(exception))
         finally:
             for input_socket in self.inputs:
                 if input_socket:
                     input_socket.close()
         print('Server ends')
+
+    def reached_uptime(self):
+        if self.stopTime:
+            return time.time() >= self.stopTime
+        return False
 
     def initialize_referential(self):
         self.logger.debug('Loading referential')
@@ -79,10 +89,9 @@ class TradingServer:
 
     def initialize_order_books(self):
         self.logger.debug('Initializing order books')
-        self.orderBooks = {}
         # TODO: use generator
         for instrument in self.referential.instruments:
-            self.orderBooks[instrument.identifier] = OrderBook(instrument)
+            self.order_books[instrument.identifier] = OrderBook(instrument.identifier)
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
     def accept_connection(self):
@@ -105,33 +114,34 @@ class TradingServer:
             if s is self.listener:
                 self.accept_connection()
             else:
-                removeSocket = True
+                remove_socket = True
                 try:
                     data = s.recv(8192)
                     if data:
-                        removeSocket = False
+                        remove_socket = False
                 except KeyboardInterrupt:
                     raise
-                except:
-                    pass
+                except Exception as exception:
+                    print(exception)
 
-                if removeSocket:
+                if remove_socket:
                     print('Client closed its socket')
                     if s in self.outputs:
                         self.outputs.remove(s)
                     self.inputs.remove(s)
                     s.close()
-                    del self.messageStacks[s]
+                    del self.message_stacks[s]
 
     def handle_writable(self, writable):
         for s in writable:
             try:
-                next_msg = self.messageStacks[s].pop(0)
-                self.logger.debug('Message stack length [{}]'.format(len(self.messageStacks[s])))
-                s.send(next_msg)
+                next_message = self.message_stacks[s].pop(0)
+                self.logger.debug('Message stack length [{}]'.format(len(self.message_stacks[s])))
+                s.send(next_message)
             except KeyboardInterrupt:
                 raise
-            except:
+            except Exception as exception:
+                print('handle_writable: {}'.format(exception))
                 if s in self.outputs:
                     self.outputs.remove(s)
 
@@ -141,7 +151,7 @@ class TradingServer:
             if s in self.outputs:
                 self.outputs.remove(s)
             s.close()
-            del self.messageStacks[s]
+            del self.message_stacks[s]
 
 
 if __name__ == '__main__':

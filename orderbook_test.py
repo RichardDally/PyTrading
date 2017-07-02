@@ -14,15 +14,15 @@ class TestOrderBook(unittest.TestCase):
         self.book = OrderBook(self.instrument)
 
     def test_count_bids(self):
-        buyorder = Order(Way.BUY, self.instrument, 50, 42.0, 'Trader1')
+        buy_order = Order(Way.BUY, self.instrument, 50, 42.0, 'Trader1')
         self.assertEqual(self.book.count_bids(), 0)
-        self.book.on_new_order(buyorder)
+        self.book.on_new_order(buy_order)
         self.assertEqual(self.book.count_bids(), 1)
 
     def test_count_asks(self):
-        sellorder = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader1')
+        sell_order = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader1')
         self.assertEqual(self.book.count_asks(), 0)
-        self.book.on_new_order(sellorder)
+        self.book.on_new_order(sell_order)
         self.assertEqual(self.book.count_asks(), 1)
 
     def test_get_bids(self):
@@ -34,10 +34,10 @@ class TestOrderBook(unittest.TestCase):
         self.assertEqual(len(asks), 0)
 
     def test_two_orders_no_match(self):
-        buyorder = Order(Way.BUY, self.instrument, 50, 40.0, 'Trader1')
-        sellorder = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader2')
-        self.book.on_new_order(buyorder)
-        self.book.on_new_order(sellorder)
+        buy_order = Order(Way.BUY, self.instrument, 50, 40.0, 'Trader1')
+        sell_order = Order(Way.SELL, self.instrument, 50, 42.0, 'Trader2')
+        self.book.on_new_order(buy_order)
+        self.book.on_new_order(sell_order)
         self.assertEqual(self.book.count_bids(), 1)
         self.assertEqual(self.book.count_asks(), 1)
 

@@ -9,6 +9,9 @@ class OrderBook:
         self.instrument_identifier = instrument_identifier
         self.asks = []
         self.bids = []
+        self.last = 0.0
+        self.high = 0.0
+        self.low = 0.0
 
     # TODO: improve string formatting
     def __str__(self):
@@ -19,7 +22,7 @@ class OrderBook:
         string += 'Last: {1} {0}\nHigh: {2} {0}\nLow: {3} {0}\n'.format(currency, self.last, self.high, self.low)
         if len(self.bids):
             string += 'Bid side ({}):\n'.format(len(self.bids))
-            string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse = True)])
+            string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse=True)])
         if len(self.asks):
             if len(self.bids):
                 string += '\n'
