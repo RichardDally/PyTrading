@@ -50,9 +50,9 @@ class SerializationMock(Serialization):
         return bytearray(encoded_referential, 'utf-8')
 
     @staticmethod
-    def decode_referential(referential_string):
+    def decode_referential(encoded_referential):
         referential = Referential()
-        tokens = list(filter(None, referential_string.split('|')))
+        tokens = list(filter(None, encoded_referential.split('|')))
         for x in range(0, len(tokens), 4):
             referential.add_instrument(Instrument(identifier=int(tokens[x]),
                                                   name=tokens[x + 1],
@@ -92,8 +92,8 @@ class SerializationMock(Serialization):
         return bytearray(encoded_order_book, 'utf-8')
 
     @staticmethod
-    def decode_order_book(order_book_string):
-        tokens = list(filter(None, order_book_string.split('|')))
+    def decode_order_book(encoded_order_book):
+        tokens = list(filter(None, encoded_order_book.split('|')))
         order_book = OrderBook(tokens[0])
         order_book.last = tokens[1]
         order_book.high = tokens[2]

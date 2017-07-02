@@ -1,6 +1,6 @@
 class Serialization:
     @staticmethod
-    def decode_buffer(buffer, decode_callbacks):
+    def decode_buffer(buffer, handle_callbacks):
         pass
 
     @staticmethod
@@ -16,5 +16,5 @@ class Serialization:
         pass
 
     @staticmethod
-    def decode_order_book_snapshot(order_book_snapshot):
+    def decode_order_book(encoded_order_book):
         pass
