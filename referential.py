@@ -9,15 +9,13 @@ class Referential:
     def __iter__(self):
         return self
 
-    # TODO: implement correctly
-    #def next(self):
-    #     for instrument in self.instruments:
-    #         yield instrument
+    def __next__(self):
+        for instrument in self.instruments:
+            yield instrument
 
-    # TODO: implement correctly
-    # def __next__(self):
-    #     for instrument in self.instruments:
-    #         yield instrument
+    def next(self):
+        for instrument in self.instruments:
+            yield instrument
 
     def __str__(self):
         return '\n'.join([str(instrument) for instrument in self.instruments])
