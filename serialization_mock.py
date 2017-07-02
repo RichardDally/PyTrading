@@ -1,4 +1,3 @@
-import struct
 from orderbook import OrderBook
 from referential import Referential
 from serialization import Serialization
