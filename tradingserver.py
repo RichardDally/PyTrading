@@ -28,7 +28,6 @@ class TradingServer:
         self.stopTime = self.startTime + 10
 
 
-    """ private """
     def broadcast(self):
         orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
         orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
@@ -41,8 +40,6 @@ class TradingServer:
             self.messageStacks[s].append(message)
             self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.messageStacks[s]), s))
 
-
-    """ public """
     def start(self):
         try:
             self.listener = socket.socket()
@@ -75,14 +72,11 @@ class TradingServer:
                     input_socket.close()
         print('Server ends')
 
-    """ private """
     def initialize_referential(self):
         self.logger.debug('Loading referential')
         self.referential = StaticData.get_default_referential()
         self.logger.debug('Referential is loaded')
 
-
-    """ private """
     def initialize_order_books(self):
         self.logger.debug('Initializing order books')
         self.orderBooks = {}
@@ -91,8 +85,6 @@ class TradingServer:
             self.orderBooks[instrument.identifier] = OrderBook(instrument)
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
-
-    """ private """
     def accept_connection(self):
         connection, client_address = self.listener.accept()
         print('Got connection from [{}]'.format(client_address))
@@ -108,8 +100,6 @@ class TradingServer:
         self.messageStacks[connection] = messageStack
         self.outputs.append(connection)
 
-
-    """ private """
     def handle_readable(self, readable):
         for s in readable:
             if s is self.listener:
@@ -133,8 +123,6 @@ class TradingServer:
                     s.close()
                     del self.messageStacks[s]
 
-
-    """ private """
     def handle_writable(self, writable):
         for s in writable:
             try:
@@ -147,8 +135,6 @@ class TradingServer:
                 if s in self.outputs:
                     self.outputs.remove(s)
 
-
-    """ private """
     def handle_exceptional(self, exceptional):
         for s in exceptional:
             self.inputs.remove(s)

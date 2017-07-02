@@ -1,9 +1,4 @@
 class Instrument:
-    identifier = None
-    name = None
-    isin = None
-    currency_identifier = None
-
     def __init__(self, identifier, name, isin, currency_identifier):
         self.identifier = identifier
         self.name = name

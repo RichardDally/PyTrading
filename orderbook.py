@@ -32,23 +32,18 @@ class OrderBook:
             string += '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
         return string
 
-    """ public """
     def get_bids(self):
         return self.bids
 
-    """ public """
     def get_asks(self):
         return self.asks
 
-    """ public """
     def count_bids(self):
         return len(self.bids)
 
-    """ public """
     def count_asks(self):
         return len(self.asks)
 
-    """ public """
     def on_new_order(self, order):
         assert (order.instrument == self.instrument), 'Order instrument must match order book instrument'
         self.match_order(order)
@@ -58,7 +53,7 @@ class OrderBook:
         else:
             self.logger.debug('Attacking order [{}] has been totally executed'.format(order))
 
-    # TODO: implement
+    # TODO: finish implementation
     def on_new_deal(self, deal):
         self.last = deal.price
         if not self.high and not self.low:
@@ -68,7 +63,6 @@ class OrderBook:
         elif deal.price < self.low:
             self.low = deal.price
 
-    """ private """
     def add_order(self, order):
         if order.way == Way.BUY:
             self.bids.append(order)

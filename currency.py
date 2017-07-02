@@ -8,4 +8,3 @@ class Currency:
 
     def __str__(self):
         return self.iso_code
-

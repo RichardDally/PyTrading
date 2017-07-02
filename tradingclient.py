@@ -15,8 +15,6 @@ class TradingClient:
         self.referential = Referential()
         self.decodeMapping = { 'R' : self.handle_referential, 'S' : self.handle_orderbookfullsnapshot }
 
-
-    """ public """
     def start(self):
         serverSocket = None
         try:
@@ -44,7 +42,6 @@ class TradingClient:
         print('Ok')
 
 
-    """ private """
     def handle_readable(self, readable):
         assert(len(readable) <= 1), 'Readable must contain only 1 socket'
         for s in readable:
