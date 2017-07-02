@@ -1,6 +1,5 @@
 import unittest
 from instrument import Instrument
-from staticdata import StaticData
 from referential import Referential
 
 
@@ -15,10 +14,6 @@ class TestReferential(unittest.TestCase):
         self.assertEqual(len(referential), 0)
         referential.add_instrument(self.instrument)
         self.assertEqual(len(referential), 1)
-
-    def test_get_default_is_not_empty(self):
-        referential = StaticData.get_default_referential()
-        self.assertGreater(len(referential), 0)
 
 if __name__ == '__main__':
     unittest.main()

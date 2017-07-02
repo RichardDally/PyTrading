@@ -1,9 +1,11 @@
 from instrument import Instrument
 from referential import Referential
 
-currencies = {0 : 'EUR', 1 : 'USD'}
-instruments = {0 : Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0),
-               1 : Instrument(identifier=1, name='Societe Generale', isin='FR0000130809', currency_identifier=0)
+currencies = {0: 'EUR',
+              1: 'USD'}
+
+instruments = {0: Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0),
+               1: Instrument(identifier=1, name='Societe Generale', isin='FR0000130809', currency_identifier=0)
                }
 
 

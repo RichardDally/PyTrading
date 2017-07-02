@@ -3,24 +3,25 @@ import socket
 import struct
 import select
 from referential import Referential
-from serialization import Serialization
 
 
 class TradingClient:
-    def __init__(self):
+    def __init__(self, s):
+        self.s = s
+        self.logger = logging.getLogger(__name__)
+        self.port = 12345
         self.inputs = []
         self.buffer = ''
         self.orderBooks = {}
-        self.logger = logging.getLogger(__name__)
         self.referential = Referential()
-        self.decodeMapping = { 'R' : self.handle_referential, 'S' : self.handle_orderbookfullsnapshot }
+        self.handle_callbacks = {'R': self.handle_referential,
+                                 'O': self.handle_order_book}
 
     def start(self):
-        serverSocket = None
+        server_socket = None
         try:
             server_socket = socket.socket()
             host = socket.gethostname()
-            port = 12345
 
             print('Connecting on [{0}:{1}]'.format(host, self.port))
             server_socket.connect((host, self.port))
@@ -29,8 +30,8 @@ class TradingClient:
             while self.inputs:
                 readable, _, exceptional = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
-                decodedMessages = self.decode_buffer()
-                if decodedMessages == 0:
+                decoded_messages_count, self.buffer = self.s.decode_buffer(self.buffer, self.handle_callbacks)
+                if decoded_messages_count == 0:
                     print('--- No decoded messages ---')
         except KeyboardInterrupt:
             print('Stopped by user')
@@ -47,47 +48,27 @@ class TradingClient:
             data = s.recv(8192)
             if data:
                 self.logger.debug('Adding server data ({}) to buffer'.format(len(data)))
-                self.buffer += data
+                self.buffer += data.decode('utf-8')
             else:
                 print('Server closed its socket')
                 self.inputs.remove(s)
 
-
-    """ private """
-    def handle_referential(self, buffer):
-        self.referential = Serialization.decode_referential(buffer)
+    def handle_referential(self, new_referential):
+        self.referential = new_referential
         self.logger.debug('Referential received:\n{}'.format(str(self.referential)))
 
+    def handle_order_book(self, order_book):
+        self.logger.debug('Order book received:{}'.format(str(order_book)))
 
-    """ private """
-    def handle_orderbookfullsnapshot(self, buffer):
-        orderbook = Serialization.decode_orderbookfullsnapshot(buffer)
-        self.logger.debug('Order book received:{}'.format(str(orderbook)))
-
-
-    """ private """
-    def decode_buffer(self):
-        decodedMessages = 0
-        headerSize = 9
-        while len(self.buffer) > headerSize:
-            messageLength, messageType = struct.unpack_from('>Qc', self.buffer)
-            readableBytes = len(self.buffer) - headerSize
-            self.logger.debug('Message length [{}]'.format(messageLength))
-            self.logger.debug('Message type [{}]'.format(messageType))
-            if messageLength > readableBytes:
-                self.logger.debug('Not enough bytes to decode current message')
-                break
-            self.decodeMapping[messageType](self.buffer[headerSize : headerSize + messageLength])
-            self.logger.debug('Buffer length before [{}]'.format(len(self.buffer)))
-            self.buffer = self.buffer[headerSize + messageLength:]
-            self.logger.debug('Buffer length after [{}]'.format(len(self.buffer)))
-            decodedMessages += decodedMessages + 1
-        return decodedMessages
 
 if __name__ == '__main__':
     logging.basicConfig(filename='TradingClient.log',
                         level=logging.INFO,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
-    client = TradingClient()
-    client.start()
+    try:
+        from capnpserialization import CapnpSerialization
+        client = TradingClient(CapnpSerialization)
+        client.start()
+    except ImportError as error:
+        print('Unable to start trading client. [{}]'.format(error))

@@ -37,12 +37,8 @@ class Order:
             way = 'BUY'
         elif self.way == Way.SELL:
             way = 'SELL'
-        # TODO: fix it
-        #currency = StaticData.get_currency(self.instrument.currency_identifier)
-        currency = 'EUR'
-        return '{} {} {} {} @ {} ({})'.format(way,
-                                              self.instrument_identifier,
-                                              self.get_remaining_quantity(),
-                                              currency,
-                                              self.price,
-                                              self.timestamp)
+        return '{} {} {} @ {} ({})'.format(way,
+                                           self.instrument_identifier,
+                                           self.get_remaining_quantity(),
+                                           self.price,
+                                           self.timestamp)

@@ -2,10 +2,8 @@ import time
 import logging
 import socket
 import select
-import struct
 from staticdata import StaticData
 from orderbook import OrderBook
-from serialization import Serialization
 
 
 class TradingServer:
@@ -27,16 +25,17 @@ class TradingServer:
             self.stopTime = self.startTime + uptime_in_seconds
 
     def broadcast(self):
-        orderBookFullSnapshotMessage = Serialization.encode_orderbookfullsnapshot(self.orderBooks[0])
-        orderBookFullSnapshotBytes = orderBookFullSnapshotMessage.to_bytes()
-        message = struct.pack('>Qc', len(orderBookFullSnapshotBytes), 'S') + orderBookFullSnapshotBytes
+        encoded_order_books = []
+        for _, order_book in self.order_books.items():
+            encoded_order_books.append(self.s.encode_order_book(order_book))
 
         for s in self.inputs:
             if s is self.listener:
                 continue
             self.logger.debug('Adding message to [{}]  message queue'.format(s))
-            self.messageStacks[s].append(message)
-            self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.messageStacks[s]), s))
+            for encoded_order_book in encoded_order_books:
+                self.message_stacks[s].append(encoded_order_book)
+            self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.message_stacks[s]), s))
 
     def start(self):
         try:
@@ -100,13 +99,11 @@ class TradingServer:
         connection.setblocking(0)
         self.inputs.append(connection)
 
-        messageStack = []
-        referentialMessage = Serialization.encode_referential(self.referential)
-        referentialBytes = referentialMessage.to_bytes()
-        message = struct.pack('>Qc', len(referentialBytes), 'R') + referentialBytes
-        messageStack.append(message)
+        message_stack = []
+        message = self.s.encode_referential(self.referential)
+        message_stack.append(message)
 
-        self.messageStacks[connection] = messageStack
+        self.message_stacks[connection] = message_stack
         self.outputs.append(connection)
 
     def handle_readable(self, readable):
@@ -159,5 +156,9 @@ if __name__ == '__main__':
                         level=logging.INFO,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
-    server = TradingServer()
-    server.start()
+    try:
+        from capnpserialization import CapnpSerialization
+        server = TradingServer(CapnpSerialization)
+        server.start()
+    except ImportError as error:
+        print('Unable to start trading server. [{}]'.format(error))
