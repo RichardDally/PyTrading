@@ -92,6 +92,7 @@ class SerializationMock(Serialization):
 
     @staticmethod
     def decode_order_book(encoded_order_book):
+        print(encoded_order_book)
         tokens = list(filter(None, encoded_order_book.split('|')))
 
         try:
