@@ -93,9 +93,16 @@ class SerializationMock(Serialization):
     @staticmethod
     def decode_order_book(encoded_order_book):
         tokens = list(filter(None, encoded_order_book.split('|')))
-        order_book = OrderBook(tokens[0])
-        order_book.last = tokens[1]
-        order_book.high = tokens[2]
-        order_book.low = tokens[3]
-        # TODO: decode orders
-        return order_book
+
+        try:
+            order_book = OrderBook(tokens[0])
+            order_book.last = tokens[1]
+            order_book.high = tokens[2]
+            order_book.low = tokens[3]
+            # TODO: decode orders
+            return order_book
+        except IndexError:
+            print('Index error !')
+            print('Encoded order book [{}]'.format(encoded_order_book))
+            print('Tokens length [{}]'.format(len(tokens)))
+        return None
