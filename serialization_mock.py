@@ -20,8 +20,8 @@ class SerializationMock(Serialization):
                 message_type_separator_index = message.index('|')
                 message_type = message[:message_type_separator_index]
 
-                #print('Message length {}'.format(message_length))
-                #print('Message type {}'.format(message_type))
+                print('Message length {}'.format(message_length))
+                print('Message type {}'.format(message_type))
 
                 # TODO: Handle unsupported message type
                 decoded_object = decode_callbacks[message_type](message[message_type_separator_index + 1:])
