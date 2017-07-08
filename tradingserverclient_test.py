@@ -1,6 +1,7 @@
 import sys
 import unittest
 import logging
+import traceback
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
@@ -12,6 +13,7 @@ def start_server():
         server = TradingServer(s=SerializationMock, uptime_in_seconds=3.0)
         server.start()
     except Exception as exception:
+        print(traceback.print_exc())
         return exception
     return None
 
@@ -21,6 +23,7 @@ def start_client():
         server = TradingClient(SerializationMock)
         server.start()
     except Exception as exception:
+        print(traceback.print_exc())
         return exception
     return None
 
