@@ -132,9 +132,9 @@ class TradingServer:
     def handle_writable(self, writable):
         for s in writable:
             try:
-                next_message = self.message_stacks[s].pop(0)
-                self.logger.debug('Message stack length [{}]'.format(len(self.message_stacks[s])))
-                s.send(next_message)
+                while len(self.message_stacks[s]) > 0:
+                    next_message = self.message_stacks[s].pop(0)
+                    s.send(next_message)
             except KeyboardInterrupt:
                 raise
             except Exception as exception:
