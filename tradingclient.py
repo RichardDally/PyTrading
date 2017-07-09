@@ -1,6 +1,5 @@
 import logging
 import socket
-import struct
 import select
 from referential import Referential
 
@@ -29,7 +28,7 @@ class TradingClient:
 
             self.inputs.append(server_socket)
             while self.inputs:
-                readable, _, exceptional = select.select(self.inputs, [], [], 1)
+                readable, _, _ = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
                 decoded_messages_count, self.buffer = self.s.decode_buffer(self.buffer, self.handle_callbacks)
                 if decoded_messages_count == 0:
