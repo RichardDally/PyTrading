@@ -28,7 +28,8 @@ class Order:
 
     def get_remaining_quantity(self):
         remaining_quantity = self.quantity - self.executed_quantity - self.canceled_quantity
-        assert (remaining_quantity >= 0.0), 'Remaining quantity cannot be negative'
+        if remaining_quantity < 0.0:
+            raise Exception('Remaining quantity cannot be negative')
         return remaining_quantity
 
     def __str__(self):

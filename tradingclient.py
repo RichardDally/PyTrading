@@ -44,7 +44,9 @@ class TradingClient:
         print('Client ends')
 
     def handle_readable(self, readable):
-        assert(len(readable) <= 1), 'Readable must contain only 1 socket'
+        if len(readable) > 1:
+            raise Exception('Readable must contain only 1 socket')
+
         for s in readable:
             data = s.recv(8192)
             if data:
