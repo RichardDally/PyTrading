@@ -20,7 +20,7 @@ class TradingClient:
         server_socket = None
         try:
             server_socket = socket.socket()
-            server_socket.settimeout(3)
+            server_socket.settimeout(10)
             host = socket.gethostname()
 
             print('Connecting on [{0}:{1}]'.format(host, self.port))
