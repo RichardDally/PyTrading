@@ -17,6 +17,10 @@ class SerializationMock(Serialization):
                 message_length = int(buffer[:message_length_separator_index])
                 message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index]
 
+                if len(message) != message_length - 1:
+                    print('Message length does not match current message length')
+                    break
+
                 message_type_separator_index = message.index('|')
                 message_type = message[:message_type_separator_index]
 
