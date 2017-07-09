@@ -1,6 +1,5 @@
 import time
 from way import Way
-from staticdata import StaticData
 
 
 class Counter:
