@@ -17,6 +17,10 @@ class SerializationMock(Serialization):
                 message_length = int(buffer[:message_length_separator_index])
                 message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index]
 
+                #print('Message length {}'.format(message_length))
+                #print('Message actual length [{}]'.format(len(message)))
+                #print('Message [{}]'.format(message))
+
                 if len(message) != message_length - 1:
                     print('Message length does not match current message length')
                     break
@@ -24,8 +28,7 @@ class SerializationMock(Serialization):
                 message_type_separator_index = message.index('|')
                 message_type = message[:message_type_separator_index]
 
-                print('Message length {}'.format(message_length))
-                print('Message type {}'.format(message_type))
+                #print('Message type {}'.format(message_type))
 
                 # TODO: Handle unsupported message type
                 decoded_object = decode_callbacks[message_type](message[message_type_separator_index + 1:])
@@ -96,18 +99,11 @@ class SerializationMock(Serialization):
 
     @staticmethod
     def decode_order_book(encoded_order_book):
-        print(encoded_order_book)
         tokens = list(filter(None, encoded_order_book.split('|')))
 
-        try:
-            order_book = OrderBook(tokens[0])
-            order_book.last = tokens[1]
-            order_book.high = tokens[2]
-            order_book.low = tokens[3]
-            # TODO: decode orders
-            return order_book
-        except IndexError:
-            print('Index error !')
-            print('Encoded order book [{}]'.format(encoded_order_book))
-            print('Tokens length [{}]'.format(len(tokens)))
-        return None
+        order_book = OrderBook(tokens[0])
+        order_book.last = tokens[1]
+        order_book.high = tokens[2]
+        order_book.low = tokens[3]
+        # TODO: decode orders
+        return order_book
