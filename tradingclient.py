@@ -10,7 +10,7 @@ class TradingClient:
         self.logger = logging.getLogger(__name__)
         self.port = 12345
         self.inputs = []
-        self.buffer = ''
+        self.buffer = bytearray()
         self.orderBooks = {}
         self.referential = Referential()
         self.handle_callbacks = {'R': self.handle_referential,

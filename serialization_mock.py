@@ -13,9 +13,10 @@ class SerializationMock(Serialization):
 
         try:
             while True:
-                message_length_separator_index = buffer.index('|')
+                message_length_separator_index = buffer.decode('utf-8').index('|')
                 message_length = int(buffer[:message_length_separator_index])
-                message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index]
+                message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
+                #print('decode buffer, message type [{}]'.format(type(message)))
 
                 #print('Message length {}'.format(message_length))
                 #print('Message actual length [{}]'.format(len(message)))
@@ -34,8 +35,8 @@ class SerializationMock(Serialization):
                 decoded_object = decode_callbacks[message_type](message[message_type_separator_index + 1:])
                 handle_callbacks[message_type](decoded_object)
 
-                decoded_messages_count += 1
                 buffer = buffer[message_length_separator_index + message_length:]
+                decoded_messages_count += 1
         except ValueError:
             pass
 
