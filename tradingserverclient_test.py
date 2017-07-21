@@ -2,6 +2,7 @@ import sys
 import unittest
 import logging
 import traceback
+import time
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
@@ -20,6 +21,7 @@ def start_server():
 
 def start_client():
     try:
+        time.sleep(1)
         client = TradingClient(SerializationMock)
         client.start()
     except Exception as exception:
