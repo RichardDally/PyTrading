@@ -1,7 +1,7 @@
+from instrument import Instrument
 from orderbook import OrderBook
 from referential import Referential
 from serialization import Serialization
-from instrument import Instrument
 
 
 class SerializationMock(Serialization):
