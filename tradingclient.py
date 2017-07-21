@@ -50,7 +50,7 @@ class TradingClient:
             data = s.recv(8192)
             if data:
                 self.logger.debug('Adding server data ({}) to buffer'.format(len(data)))
-                self.buffer += data.decode('utf-8')
+                self.buffer += data
             else:
                 print('Server closed its socket')
                 self.inputs.remove(s)

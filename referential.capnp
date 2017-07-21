@@ -7,7 +7,7 @@ struct Referential
      identifier @0 :UInt8;
      name @1 :Text;
      isin @2 :Text;
-     currencyidentifier @3 :UInt8;
+     currencyIdentifier @3 :UInt8;
    }
 
   instruments @0 :List(Instrument);

@@ -158,7 +158,7 @@ if __name__ == '__main__':
                         datefmt='%d/%m/%Y %I:%M:%S %p')
     try:
         from capnpserialization import CapnpSerialization
-        server = TradingServer(CapnpSerialization)
+        server = TradingServer(CapnpSerialization, uptime_in_seconds=None)
         server.start()
     except ImportError as error:
         print('Unable to start trading server. [{}]'.format(error))

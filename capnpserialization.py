@@ -1,3 +1,5 @@
+import struct
+import traceback
 import capnp
 import referential_capnp
 import orderbookfullsnapshot_capnp
@@ -7,28 +9,36 @@ from referential import Referential
 from staticdata import StaticData
 from serialization import Serialization
 
-# TODO: fix Cap n Proto implementation
+
 class CapnpSerialization(Serialization):
     @staticmethod
-    def decode_buffer(buffer, decode_callbacks):
-        decoded_messages = 0
+    def decode_buffer(buffer, handle_callbacks):
+        decode_callbacks = {'R': CapnpSerialization.decode_referential,
+                            'O': CapnpSerialization.decode_order_book}
+        decoded_messages_count = 0
         header_size = 9
-        while len(buffer) > header_size:
-            message_length, message_type = struct.unpack_from('>Qc', buffer)
-            readable_bytes = len(self.buffer) - header_size
-            # TODO: bring back the logs
-            #self.logger.debug('Message length [{}]'.format(message_length))
-            #self.logger.debug('Message type [{}]'.format(message_type))
-            if message_length > readable_bytes:
-                #self.logger.debug('Not enough bytes to decode current message')
-                break
-            # TODO: Handle unsupported message type
-            self.decode_mapping[message_type](self.buffer[header_size: header_size + message_length])
-            self.logger.debug('Buffer length before [{}]'.format(len(self.buffer)))
-            self.buffer = self.buffer[header_size + message_length:]
-            self.logger.debug('Buffer length after [{}]'.format(len(self.buffer)))
-            decoded_messages += decoded_messages + 1
-        return decoded_messages
+        try:
+            while len(buffer) > header_size:
+                message_length, message_type = struct.unpack_from('>Qc', buffer)
+                readable_bytes = len(buffer) - header_size
+                # TODO: bring back the logs
+                #print('Message length [{}]'.format(message_length))
+                #print('Message type [{}]'.format(message_type))
+                if message_length > readable_bytes:
+                    #print('Not enough bytes ({}) to decode current message ({})'.format(readable_bytes, message_length))
+                    break
+                encoded_message = buffer[header_size: header_size + message_length]
+
+                # TODO: Handle unsupported message type
+                decoded_object = decode_callbacks[message_type](encoded_message)
+                handle_callbacks[message_type](decoded_object)
+
+                buffer = buffer[header_size + message_length:]
+                decoded_messages_count += 1
+        except Exception as exception:
+            print('decode_buffer: {}'.format(exception))
+            print(traceback.print_exc())
+        return decoded_messages_count, buffer
 
     @staticmethod
     def encode_referential(referential):
@@ -40,8 +50,11 @@ class CapnpSerialization(Serialization):
                 instrument_list[index].identifier = instrument.identifier
                 instrument_list[index].name = instrument.name
                 instrument_list[index].isin = instrument.isin
-                instrument_list[index].currency_identifier = instrument.currency_identifier
-        return referential_message.to_bytes()
+                instrument_list[index].currencyIdentifier = instrument.currency_identifier
+        referential_bytes = referential_message.to_bytes()
+        encoded_referential = struct.pack('>Qc', len(referential_bytes), 'R') + referential_bytes
+        return encoded_referential
+
 
     @staticmethod
     def decode_referential(encoded_referential):
@@ -51,7 +64,7 @@ class CapnpSerialization(Serialization):
             instrument = Instrument(identifier=decodedInstrument.identifier,
                                     name=decodedInstrument.name,
                                     isin=decodedInstrument.isin,
-                                    currency_identifier=decodedInstrument.currency_identifier)
+                                    currency_identifier=decodedInstrument.currencyIdentifier)
             referential.add_instrument(instrument)
         return referential
 
@@ -70,13 +83,16 @@ class CapnpSerialization(Serialization):
     @staticmethod
     def encode_order_book(order_book):
         order_book_message = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.new_message()
-        order_book_message.instrument_identifier = order_book.instrument.identifier
+        order_book_message.instrumentIdentifier = order_book.instrument_identifier
         order_book_message.statistics.lastPrice = order_book.last
         order_book_message.statistics.highPrice = order_book.high
         order_book_message.statistics.lowPrice = order_book.low
-        __class__.encode_orders(order_book_message, order_book, 'bids')
-        __class__.encode_orders(order_book_message, order_book, 'asks')
-        return order_book_message
+        CapnpSerialization.encode_orders(order_book_message, order_book, 'bids')
+        CapnpSerialization.encode_orders(order_book_message, order_book, 'asks')
+
+        order_book_bytes = order_book_message.to_bytes()
+        encoded_order_book = struct.pack('>Qc', len(order_book_bytes), 'O') + order_book_bytes
+        return encoded_order_book
 
     @staticmethod
     def decode_orders(decoded_order_book, order_book, side):
@@ -91,12 +107,13 @@ class CapnpSerialization(Serialization):
             eval('order_book.{}.append(order)'.format(side))
 
     @staticmethod
-    def decode_order_book_snapshot(order_book_snapshot):
-        decoded_order_book = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.from_bytes(order_book_snapshot)
-        order_book = OrderBook(StaticData.get_instrument(decoded_order_book.instrument_identifier))
+    def decode_order_book(encoded_order_book):
+        decoded_order_book = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.from_bytes(encoded_order_book)
+        order_book = OrderBook(StaticData.get_instrument(decoded_order_book.instrumentIdentifier))
         order_book.last = decoded_order_book.statistics.lastPrice
         order_book.high = decoded_order_book.statistics.highPrice
         order_book.low = decoded_order_book.statistics.lowPrice
-        Serialization.decode_orders(decoded_order_book, order_book, 'bids')
-        Serialization.decode_orders(decoded_order_book, order_book, 'asks')
+        CapnpSerialization.decode_orders(decoded_order_book, order_book, 'bids')
+        CapnpSerialization.decode_orders(decoded_order_book, order_book, 'asks')
+        #print(order_book)
         return order_book
