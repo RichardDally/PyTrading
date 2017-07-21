@@ -20,8 +20,8 @@ def start_server():
 
 def start_client():
     try:
-        server = TradingClient(SerializationMock)
-        server.start()
+        client = TradingClient(SerializationMock)
+        client.start()
     except Exception as exception:
         print(traceback.print_exc())
         return exception
