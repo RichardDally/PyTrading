@@ -2,6 +2,7 @@ import time
 import logging
 import socket
 import select
+import traceback
 from staticdata import StaticData
 from orderbook import OrderBook
 
@@ -119,15 +120,16 @@ class TradingServer:
                 except KeyboardInterrupt:
                     raise
                 except Exception as exception:
-                    print(exception)
-
-                if remove_socket:
-                    print('Client closed its socket')
-                    if s in self.outputs:
-                        self.outputs.remove(s)
-                    self.inputs.remove(s)
-                    s.close()
-                    del self.message_stacks[s]
+                    print('handle_readable: {}'.format(exception))
+                    print(traceback.print_exc())
+                finally:
+                    if remove_socket:
+                        print('Client closed its socket')
+                        if s in self.outputs:
+                            self.outputs.remove(s)
+                        self.inputs.remove(s)
+                        s.close()
+                        del self.message_stacks[s]
 
     def handle_writable(self, writable):
         for s in writable:
@@ -137,8 +139,13 @@ class TradingServer:
                     s.send(next_message)
             except KeyboardInterrupt:
                 raise
+            except KeyError:
+                # TODO: handle this case (socket index does not exist)
+                if s in self.outputs:
+                    self.outputs.remove(s)
             except Exception as exception:
                 print('handle_writable: {}'.format(exception))
+                print(traceback.print_exc())
                 if s in self.outputs:
                     self.outputs.remove(s)
 
