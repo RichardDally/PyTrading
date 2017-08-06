@@ -1,4 +1,5 @@
 import time
+import errno
 import logging
 import socket
 import select
@@ -56,10 +57,11 @@ class TradingServer:
             self.inputs.append(self.listener)
 
             while self.inputs:
-                readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs, 1)
-                self.handle_readable(readable)
-                self.handle_writable(writable)
-                self.handle_exceptional(exceptional)
+                timeout_in_seconds = 1
+                r, w, e = select.select(self.inputs, self.outputs, self.inputs, timeout_in_seconds)
+                self.handle_readable(r)
+                self.handle_writable(w)
+                self.handle_exceptional(e)
 
                 self.broadcast()
 
@@ -71,6 +73,7 @@ class TradingServer:
             print('Stopped by user')
         except socket.error as exception:
             print('Socket error [{}]'.format(exception))
+            print(traceback.print_exc())
         finally:
             for input_socket in self.inputs:
                 if input_socket:
@@ -95,67 +98,76 @@ class TradingServer:
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
     def accept_connection(self):
-        connection, client_address = self.listener.accept()
+        sock, client_address = self.listener.accept()
         print('Got connection from [{}]'.format(client_address))
-        connection.setblocking(0)
-        self.inputs.append(connection)
+        sock.setblocking(0)
+        self.inputs.append(sock)
 
         message_stack = []
         message = self.s.encode_referential(self.referential)
         message_stack.append(message)
 
-        self.message_stacks[connection] = message_stack
-        self.outputs.append(connection)
+        self.message_stacks[sock] = message_stack
+        self.outputs.append(sock)
+
+    def remove_client_socket(self, sock):
+        if sock in self.outputs:
+            self.outputs.remove(sock)
+        if sock in self.inputs:
+            self.inputs.remove(sock)
+        sock.close()
+        if sock in self.message_stacks:
+            del self.message_stacks[sock]
 
     def handle_readable(self, readable):
-        for s in readable:
-            if s is self.listener:
+        for sock in readable:
+            if sock is self.listener:
                 self.accept_connection()
             else:
                 remove_socket = True
                 try:
-                    data = s.recv(8192)
+                    data = sock.recv(8192)
                     if data:
                         remove_socket = False
                 except KeyboardInterrupt:
                     raise
+                except socket.error as exception:
+                    if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+                        print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
+                        print(traceback.print_exc())
                 except Exception as exception:
-                    print('handle_readable: {}'.format(exception))
+                    print('handle_readable: {}'.format(__name__, exception))
                     print(traceback.print_exc())
                 finally:
                     if remove_socket:
-                        print('Client closed its socket')
-                        if s in self.outputs:
-                            self.outputs.remove(s)
-                        self.inputs.remove(s)
-                        s.close()
-                        del self.message_stacks[s]
+                        self.remove_client_socket(sock)
 
     def handle_writable(self, writable):
-        for s in writable:
+        for sock in writable:
+            remove_socket = True
             try:
-                while len(self.message_stacks[s]) > 0:
-                    next_message = self.message_stacks[s].pop(0)
-                    s.send(next_message)
+                while len(self.message_stacks[sock]) > 0:
+                    next_message = self.message_stacks[sock].pop(0)
+                    sock.send(next_message)
+                remove_socket = False
             except KeyboardInterrupt:
                 raise
             except KeyError:
-                # TODO: handle this case (socket index does not exist)
-                if s in self.outputs:
-                    self.outputs.remove(s)
+                pass
+            except socket.error as exception:
+                if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+                    print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
+                    print(traceback.print_exc())
             except Exception as exception:
                 print('handle_writable: {}'.format(exception))
                 print(traceback.print_exc())
-                if s in self.outputs:
-                    self.outputs.remove(s)
+            finally:
+                if remove_socket:
+                    self.remove_client_socket(sock)
 
     def handle_exceptional(self, exceptional):
-        for s in exceptional:
-            self.inputs.remove(s)
-            if s in self.outputs:
-                self.outputs.remove(s)
-            s.close()
-            del self.message_stacks[s]
+        for sock in exceptional:
+            self.remove_client_socket(sock)
 
 
 if __name__ == '__main__':
