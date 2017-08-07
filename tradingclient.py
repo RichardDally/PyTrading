@@ -8,7 +8,7 @@ class TradingClient:
     def __init__(self, s):
         self.s = s
         self.logger = logging.getLogger(__name__)
-        self.port = 12345
+        self.port = 42001
         self.inputs = []
         self.buffer = bytearray()
         self.orderBooks = {}
@@ -70,7 +70,7 @@ if __name__ == '__main__':
                         datefmt='%d/%m/%Y %I:%M:%S %p')
     try:
         from capnpserialization import CapnpSerialization
-        client = TradingClient(CapnpSerialization)
+        client = TradingClient(s=CapnpSerialization)
         client.start()
     except ImportError as error:
         print('Unable to start trading client. [{}]'.format(error))
