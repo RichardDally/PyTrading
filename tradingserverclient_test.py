@@ -6,12 +6,12 @@ import time
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
-from serialization_mock import SerializationMock
+from serialization_mock import SimpleSerialization
 
 
 def start_server():
     try:
-        server = TradingServer(marshaller=SerializationMock,
+        server = TradingServer(marshaller=SimpleSerialization,
                                feeder_port=60000,
                                matching_engine_port=60001,
                                uptime_in_seconds=3.0)
@@ -25,7 +25,7 @@ def start_server():
 def start_client():
     try:
         time.sleep(1)
-        client = TradingClient(marshaller=SerializationMock, feeder_port=60000)
+        client = TradingClient(marshaller=SimpleSerialization, feeder_port=60000)
         client.start()
     except Exception as exception:
         print(traceback.print_exc())

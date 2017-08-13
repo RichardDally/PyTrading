@@ -4,11 +4,11 @@ from referential import Referential
 from serialization import Serialization
 
 
-class SerializationMock(Serialization):
+class SimpleSerialization(Serialization):
     @staticmethod
     def decode_buffer(buffer, handle_callbacks):
-        decode_callbacks = {'R': SerializationMock.decode_referential,
-                            'O': SerializationMock.decode_order_book}
+        decode_callbacks = {'R': SimpleSerialization.decode_referential,
+                            'O': SimpleSerialization.decode_order_book}
         decoded_messages_count = 0
 
         try:
