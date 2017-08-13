@@ -11,7 +11,10 @@ from serialization_mock import SerializationMock
 
 def start_server():
     try:
-        server = TradingServer(s=SerializationMock, uptime_in_seconds=3.0)
+        server = TradingServer(marshaller=SerializationMock,
+                               feeder_port=60000,
+                               matching_engine_port=60001,
+                               uptime_in_seconds=3.0)
         server.start()
     except Exception as exception:
         print(traceback.print_exc())
@@ -22,7 +25,7 @@ def start_server():
 def start_client():
     try:
         time.sleep(1)
-        client = TradingClient(SerializationMock)
+        client = TradingClient(marshaller=SerializationMock, feeder_port=60000)
         client.start()
     except Exception as exception:
         print(traceback.print_exc())

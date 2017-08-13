@@ -13,6 +13,7 @@ class SerializationMock(Serialization):
 
         try:
             while True:
+                #print('buffer [{}]'.format(buffer))
                 message_length_separator_index = buffer.decode('utf-8').index('|')
                 message_length = int(buffer[:message_length_separator_index])
                 message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
