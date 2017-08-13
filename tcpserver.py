@@ -118,7 +118,6 @@ class TcpServer:
 
     def handle_exceptional(self, exceptional):
         for sock in exceptional:
-            print('HANDLE EXCEPTIONAL CALLED & REMOVE SOCK')
             self.remove_client_socket(sock)
 
     def listen(self):
