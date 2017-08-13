@@ -6,7 +6,7 @@ import time
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
-from serialization_mock import SimpleSerialization
+from simpleserialization import SimpleSerialization
 
 
 def start_server():
