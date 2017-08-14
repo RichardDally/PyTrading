@@ -103,9 +103,24 @@ class SimpleSerialization(Serialization):
     def decode_order_book(encoded_order_book):
         tokens = list(filter(None, encoded_order_book.split('|')))
 
-        order_book = OrderBook(tokens[0])
-        order_book.last = tokens[1]
-        order_book.high = tokens[2]
-        order_book.low = tokens[3]
-        # TODO: decode orders
+        instrument_identifier = int(tokens[0])
+        order_book = OrderBook(instrument_identifier)
+        order_book.last = float(tokens[1])
+        order_book.high = float(tokens[2])
+        order_book.low = float(tokens[3])
+
+        order_tokens = tokens[4:]
+        for x in range(0, len(order_tokens), 8):
+            order_book.add_order(
+                Order(instrument_identifier=instrument_identifier,
+                      identifier=int(order_tokens[x]),
+                      way=int(order_tokens[x + 1]),
+                      quantity=float(order_tokens[x + 2]),
+                      canceled_quantity=float(order_tokens[x + 3]),
+                      executed_quantity=float(order_tokens[x + 4]),
+                      price=float(order_tokens[x + 5]),
+                      counter_party=order_tokens[x + 6],
+                      timestamp=order_tokens[x + 7])
+            )
+
         return order_book
