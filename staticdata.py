@@ -1,6 +1,11 @@
 from instrument import Instrument
 from referential import Referential
 
+
+class MessageTypes:
+    Referential = 'R'
+    OrderBook = 'O'
+
 currencies = {0: 'EUR',
               1: 'USD'}
 

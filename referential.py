@@ -6,6 +6,12 @@ class Referential:
         self.logger = logging.getLogger(__name__)
         self.instruments = []
 
+    def __cmp__(self, other):
+        return self.__dict__ == other.__dict__
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
     def __iter__(self):
         return self
 

@@ -7,14 +7,15 @@ from orderbook import OrderBook
 from instrument import Instrument
 from referential import Referential
 from staticdata import StaticData
+from staticdata import MessageTypes
 from serialization import Serialization
 
 
 class CapnpSerialization(Serialization):
     @staticmethod
     def decode_buffer(buffer, handle_callbacks):
-        decode_callbacks = {'R': CapnpSerialization.decode_referential,
-                            'O': CapnpSerialization.decode_order_book}
+        decode_callbacks = {MessageTypes.Referential: CapnpSerialization.decode_referential,
+                            MessageTypes.OrderBook: CapnpSerialization.decode_order_book}
         decoded_messages_count = 0
         header_size = 9
         try:
@@ -52,7 +53,7 @@ class CapnpSerialization(Serialization):
                 instrument_list[index].isin = instrument.isin
                 instrument_list[index].currencyIdentifier = instrument.currency_identifier
         referential_bytes = referential_message.to_bytes()
-        encoded_referential = struct.pack('>Qc', len(referential_bytes), 'R') + referential_bytes
+        encoded_referential = struct.pack('>Qc', len(referential_bytes), MessageTypes.Referential) + referential_bytes
         return encoded_referential
 
 
@@ -91,7 +92,7 @@ class CapnpSerialization(Serialization):
         CapnpSerialization.encode_orders(order_book_message, order_book, 'asks')
 
         order_book_bytes = order_book_message.to_bytes()
-        encoded_order_book = struct.pack('>Qc', len(order_book_bytes), 'O') + order_book_bytes
+        encoded_order_book = struct.pack('>Qc', len(order_book_bytes), MessageTypes.OrderBook) + order_book_bytes
         return encoded_order_book
 
     @staticmethod

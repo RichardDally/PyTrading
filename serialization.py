@@ -1,5 +1,9 @@
 class Serialization:
     @staticmethod
+    def decode_header(buffer):
+        pass
+
+    @staticmethod
     def decode_buffer(buffer, handle_callbacks):
         pass
 
