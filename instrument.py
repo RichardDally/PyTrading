@@ -7,3 +7,9 @@ class Instrument:
 
     def __str__(self):
         return '{} {} {} {}'.format(self.identifier, self.name, self.currency_identifier, self.isin)
+
+    def __cmp__(self, other):
+        return self.__dict__ == other.__dict__
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
