@@ -1,5 +1,6 @@
-from instrument import Instrument
+from order import Order
 from orderbook import OrderBook
+from instrument import Instrument
 from referential import Referential
 from serialization import Serialization
 
