@@ -4,7 +4,36 @@ from referential import Referential
 from serialization import Serialization
 
 
+class NotEnoughBytes(BaseException):
+    """ Unable to decode message, available bytes are less than required """
+
+
 class SimpleSerialization(Serialization):
+    @staticmethod
+    def decode_header(buffer):
+        """ Decode header (total length + message type)"""
+        # print('buffer [{}]'.format(buffer))
+        message_length_separator_index = buffer.decode('utf-8').index('|')
+        message_length = int(buffer[:message_length_separator_index])
+        message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode(
+            'utf-8')
+        # print('decode buffer, message type [{}]'.format(type(message)))
+
+        # print('Message length {}'.format(message_length))
+        # print('Message actual length [{}]'.format(len(message)))
+        # print('Message [{}]'.format(message))
+
+        if len(message) != message_length - 1:
+            print('Message length does not match current message length')
+            raise NotEnoughBytes
+
+        message_type_separator_index = message.index('|')
+        message_type = message[:message_type_separator_index]
+        body = message[message_type_separator_index + 1:]
+        new_offset = message_length_separator_index + message_length
+
+        return message_type, body, new_offset
+
     @staticmethod
     def decode_buffer(buffer, handle_callbacks):
         decode_callbacks = {'R': SimpleSerialization.decode_referential,
@@ -13,32 +42,17 @@ class SimpleSerialization(Serialization):
 
         try:
             while True:
-                #print('buffer [{}]'.format(buffer))
-                message_length_separator_index = buffer.decode('utf-8').index('|')
-                message_length = int(buffer[:message_length_separator_index])
-                message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
-                #print('decode buffer, message type [{}]'.format(type(message)))
-
-                #print('Message length {}'.format(message_length))
-                #print('Message actual length [{}]'.format(len(message)))
-                #print('Message [{}]'.format(message))
-
-                if len(message) != message_length - 1:
-                    print('Message length does not match current message length')
-                    break
-
-                message_type_separator_index = message.index('|')
-                message_type = message[:message_type_separator_index]
-
-                #print('Message type {}'.format(message_type))
+                message_type, body, new_offset = SimpleSerialization.decode_header(buffer)
 
                 # TODO: Handle unsupported message type
-                decoded_object = decode_callbacks[message_type](message[message_type_separator_index + 1:])
+                decoded_object = decode_callbacks[message_type](body)
                 handle_callbacks[message_type](decoded_object)
 
-                buffer = buffer[message_length_separator_index + message_length:]
+                buffer = buffer[new_offset:]
                 decoded_messages_count += 1
         except ValueError:
+            pass
+        except NotEnoughBytes:
             pass
 
         return decoded_messages_count, buffer
