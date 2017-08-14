@@ -2,6 +2,7 @@ import logging
 import socket
 import select
 from referential import Referential
+from staticdata import MessageTypes
 
 
 class TradingClient:
@@ -13,8 +14,8 @@ class TradingClient:
         self.buffer = bytearray()
         self.orderBooks = {}
         self.referential = Referential()
-        self.handle_callbacks = {'R': self.handle_referential,
-                                 'O': self.handle_order_book}
+        self.handle_callbacks = {MessageTypes.Referential: self.handle_referential,
+                                 MessageTypes.OrderBook: self.handle_order_book}
 
     def start(self):
         server_socket = None

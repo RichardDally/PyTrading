@@ -2,6 +2,7 @@ from order import Order
 from orderbook import OrderBook
 from instrument import Instrument
 from referential import Referential
+from staticdata import MessageTypes
 from serialization import Serialization
 
 
@@ -37,8 +38,8 @@ class SimpleSerialization(Serialization):
 
     @staticmethod
     def decode_buffer(buffer, handle_callbacks):
-        decode_callbacks = {'R': SimpleSerialization.decode_referential,
-                            'O': SimpleSerialization.decode_order_book}
+        decode_callbacks = {MessageTypes.Referential: SimpleSerialization.decode_referential,
+                            MessageTypes.OrderBook: SimpleSerialization.decode_order_book}
         decoded_messages_count = 0
 
         try:
@@ -61,7 +62,7 @@ class SimpleSerialization(Serialization):
     @staticmethod
     def encode_referential(referential):
         separator = '|'
-        message_type = 'R'
+        message_type = MessageTypes.Referential
         instruments = ''
         for instrument in referential.get_instruments():
             instruments += str(instrument.identifier) + separator
@@ -87,7 +88,7 @@ class SimpleSerialization(Serialization):
     @staticmethod
     def encode_order_book(order_book):
         separator = '|'
-        message_type = 'O'
+        message_type = MessageTypes.OrderBook
 
         statistics = '{}|{}|{}|{}'.format(
             str(order_book.instrument_identifier),
