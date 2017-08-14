@@ -6,9 +6,6 @@ from instrument import Instrument
 
 
 class TestOrderBook(unittest.TestCase):
-    book = None
-    instrument = None
-
     def setUp(self):
         self.instrument = Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0)
         self.book = OrderBook(self.instrument)
