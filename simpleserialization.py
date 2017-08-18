@@ -92,9 +92,9 @@ class SimpleSerialization(Serialization):
 
         statistics = '{}|{}|{}|{}'.format(
             str(order_book.instrument_identifier),
-            str(order_book.last),
-            str(order_book.high),
-            str(order_book.low))
+            str(order_book.last_price),
+            str(order_book.high_price),
+            str(order_book.low_price))
 
         orders_string = ''
         orders = order_book.get_all_orders()
@@ -121,9 +121,9 @@ class SimpleSerialization(Serialization):
 
         instrument_identifier = int(tokens[0])
         order_book = OrderBook(instrument_identifier)
-        order_book.last = float(tokens[1])
-        order_book.high = float(tokens[2])
-        order_book.low = float(tokens[3])
+        order_book.last_price = float(tokens[1])
+        order_book.high_price = float(tokens[2])
+        order_book.low_price = float(tokens[3])
 
         order_tokens = tokens[4:]
         for x in range(0, len(order_tokens), 8):

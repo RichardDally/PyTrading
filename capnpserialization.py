@@ -84,9 +84,9 @@ class CapnpSerialization(Serialization):
     def encode_order_book(order_book):
         order_book_message = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.new_message()
         order_book_message.instrumentIdentifier = order_book.instrument_identifier
-        order_book_message.statistics.lastPrice = order_book.last
-        order_book_message.statistics.highPrice = order_book.high
-        order_book_message.statistics.lowPrice = order_book.low
+        order_book_message.statistics.lastPrice = order_book.last_price
+        order_book_message.statistics.highPrice = order_book.high_price
+        order_book_message.statistics.lowPrice = order_book.low_price
         CapnpSerialization.encode_orders(order_book_message, order_book, 'bids')
         CapnpSerialization.encode_orders(order_book_message, order_book, 'asks')
 
@@ -110,9 +110,9 @@ class CapnpSerialization(Serialization):
     def decode_order_book(encoded_order_book):
         decoded_order_book = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.from_bytes(encoded_order_book)
         order_book = OrderBook(StaticData.get_instrument(decoded_order_book.instrumentIdentifier))
-        order_book.last = decoded_order_book.statistics.lastPrice
-        order_book.high = decoded_order_book.statistics.highPrice
-        order_book.low = decoded_order_book.statistics.lowPrice
+        order_book.last_price = decoded_order_book.statistics.lastPrice
+        order_book.high_price = decoded_order_book.statistics.highPrice
+        order_book.low_price = decoded_order_book.statistics.lowPrice
         CapnpSerialization.decode_orders(decoded_order_book, order_book, 'bids')
         CapnpSerialization.decode_orders(decoded_order_book, order_book, 'asks')
         #print(order_book)

@@ -8,14 +8,14 @@ class OrderBook:
         self.instrument_identifier = instrument_identifier
         self.asks = []
         self.bids = []
-        self.last = 0.0
-        self.high = 0.0
-        self.low = 0.0
+        self.last_price = 0.0
+        self.high_price = 0.0
+        self.low_price = 0.0
 
     # TODO: improve string formatting
     def __str__(self):
         string = '\n--- [{}] order book ---\n'.format(self.instrument_identifier)
-        string += 'Last: {} \nHigh: {} \nLow: {} \n'.format(self.last, self.high, self.low)
+        string += 'Last: {} \nHigh: {} \nLow: {} \n'.format(self.last_price, self.high_price, self.low_price)
         if len(self.bids):
             string += 'Bid side ({}):\n'.format(len(self.bids))
             string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse=True)])
@@ -50,14 +50,14 @@ class OrderBook:
             self.logger.debug('Attacking order [{}] has been totally executed'.format(order))
 
     # TODO: finish implementation
-    def on_new_deal(self, deal):
-        self.last = deal.price
-        if not self.high and not self.low:
-            self.high = self.low = deal.price
-        elif deal.price > self.high:
-            self.high = deal.price
-        elif deal.price < self.low:
-            self.low = deal.price
+    def on_new_deal(self, order):
+        self.last_price = order.price
+        if not self.high_price and not self.low_price:
+            self.high_price = self.low_price = order.price
+        elif order.price > self.high_price:
+            self.high_price = order.price
+        elif order.price < self.low_price:
+            self.low_price = order.price
 
     def add_order(self, order):
         if order.way == Way.BUY:
