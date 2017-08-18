@@ -3,14 +3,14 @@ from referential import Referential
 
 
 class MessageTypes:
-    Referential = 'R'
-    OrderBook = 'O'
+    Referential = 1
+    OrderBook = 2
 
-currencies = {0: 'EUR',
-              1: 'USD'}
+currencies = {1: 'EUR',
+              2: 'USD'}
 
-instruments = {0: Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0),
-               1: Instrument(identifier=1, name='Societe Generale', isin='FR0000130809', currency_identifier=0)
+instruments = {1: Instrument(identifier=1, name='Carrefour', isin='FR0000120172', currency_identifier=1),
+               2: Instrument(identifier=2, name='Societe Generale', isin='FR0000130809', currency_identifier=1)
                }
 
 
@@ -22,8 +22,8 @@ class StaticData:
     @staticmethod
     def get_default_referential():
         referential = Referential()
-        referential.add_instrument(instruments[0])
-        referential.add_instrument(instruments[1])
+        for _, instrument in instruments.items():
+            referential.add_instrument(instrument)
         return referential
 
     @staticmethod

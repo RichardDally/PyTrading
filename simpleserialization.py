@@ -26,7 +26,7 @@ class SimpleSerialization(Serialization):
             raise NotEnoughBytes
 
         message_type_separator_index = message.index('|')
-        message_type = message[:message_type_separator_index]
+        message_type = int(message[:message_type_separator_index])
         body = message[message_type_separator_index + 1:]
         new_offset = message_length_separator_index + message_length
 
@@ -58,7 +58,7 @@ class SimpleSerialization(Serialization):
     @staticmethod
     def encode_referential(referential):
         separator = '|'
-        message_type = MessageTypes.Referential
+        message_type = str(MessageTypes.Referential)
         instruments = ''
         for instrument in referential.get_instruments():
             instruments += str(instrument.identifier) + separator
@@ -84,7 +84,7 @@ class SimpleSerialization(Serialization):
     @staticmethod
     def encode_order_book(order_book):
         separator = '|'
-        message_type = MessageTypes.OrderBook
+        message_type = str(MessageTypes.OrderBook)
 
         statistics = '{}|{}|{}|{}'.format(
             str(order_book.instrument_identifier),

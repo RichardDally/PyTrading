@@ -10,7 +10,7 @@ from simpleserialization import SimpleSerialization
 
 class TestSimpleSerialization(unittest.TestCase):
     def setUp(self):
-        self.instrument = StaticData.get_instrument(0)
+        self.instrument_identifier = 1
 
     def test_empty_referential(self):
         empty_referential = Referential()
@@ -29,7 +29,7 @@ class TestSimpleSerialization(unittest.TestCase):
         self.assertEqual(referential.__dict__, decoded_referential.__dict__)
 
     def test_empty_order_book(self):
-        empty_order_book = OrderBook(StaticData.get_instrument(0).identifier)
+        empty_order_book = OrderBook(self.instrument_identifier)
         encoded_order_book = SimpleSerialization.encode_order_book(empty_order_book)
         message_type, body, _ = SimpleSerialization.decode_header(encoded_order_book)
         decoded_order_book = SimpleSerialization.decode_order_book(body)
