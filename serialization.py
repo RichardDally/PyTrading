@@ -1,3 +1,7 @@
+class NotEnoughBytes(BaseException):
+    """ Unable to decode message, available bytes are less than required """
+
+
 class Serialization:
     @staticmethod
     def decode_header(buffer):

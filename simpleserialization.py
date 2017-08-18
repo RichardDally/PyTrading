@@ -3,11 +3,7 @@ from orderbook import OrderBook
 from instrument import Instrument
 from referential import Referential
 from staticdata import MessageTypes
-from serialization import Serialization
-
-
-class NotEnoughBytes(BaseException):
-    """ Unable to decode message, available bytes are less than required """
+from serialization import Serialization, NotEnoughBytes
 
 
 class SimpleSerialization(Serialization):
