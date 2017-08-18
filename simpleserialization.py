@@ -106,7 +106,7 @@ class SimpleSerialization(Serialization):
                 str(order.canceled_quantity),
                 str(order.executed_quantity),
                 str(order.price),
-                str(order.counter_party),
+                str(order.counterparty),
                 str(order.timestamp)
             )
 
@@ -135,7 +135,7 @@ class SimpleSerialization(Serialization):
                       canceled_quantity=float(order_tokens[x + 3]),
                       executed_quantity=float(order_tokens[x + 4]),
                       price=float(order_tokens[x + 5]),
-                      counter_party=order_tokens[x + 6],
+                      counterparty=order_tokens[x + 6],
                       timestamp=order_tokens[x + 7])
             )
 

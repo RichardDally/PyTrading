@@ -36,9 +36,9 @@ class TestSimpleSerialization(unittest.TestCase):
         self.assertEqual(message_type, MessageTypes.OrderBook)
         self.assertEqual(empty_order_book.__dict__, decoded_order_book.__dict__)
 
-    def test_simple_order_book(self):
-        simple_order_book = OrderBook(self.instrument.identifier)
-        buy_order = Order(Way.BUY, self.instrument.identifier, 100.0, 10.0, 'Trader1')
+    def test_one_buy_order_book(self):
+        simple_order_book = OrderBook(self.instrument_identifier)
+        buy_order = Order(Way.BUY, self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader1')
         simple_order_book.add_order(buy_order)
         encoded_order_book = SimpleSerialization.encode_order_book(simple_order_book)
         message_type, body, _ = SimpleSerialization.decode_header(encoded_order_book)

@@ -56,7 +56,6 @@ class CapnpSerialization(Serialization):
         encoded_referential = struct.pack('>Qc', len(referential_bytes), MessageTypes.Referential) + referential_bytes
         return encoded_referential
 
-
     @staticmethod
     def decode_referential(encoded_referential):
         referential = Referential()

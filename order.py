@@ -14,8 +14,8 @@ counter = Counter()
 
 
 class Order:
-    def __init__(self, way, instrument_identifier, quantity, price, counter_party,
-                 identifier=counter.get_value(), timestamp=time.time(),
+    def __init__(self, way, instrument_identifier, quantity, price, counterparty,
+                 identifier=counter.get_value(), timestamp=int(time.time()),
                  canceled_quantity=0.0, executed_quantity=0.0):
         self.identifier = identifier
         self.way = way
@@ -24,7 +24,7 @@ class Order:
         self.canceled_quantity = canceled_quantity
         self.executed_quantity = executed_quantity
         self.price = price
-        self.counter_party = counter_party
+        self.counterparty = counterparty
         self.timestamp = timestamp
 
     def get_remaining_quantity(self):
