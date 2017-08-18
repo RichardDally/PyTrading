@@ -12,6 +12,13 @@ class OrderBook:
         self.high_price = 0.0
         self.low_price = 0.0
 
+    def __iter__(self):
+        for order in self.asks:
+            yield order
+        for order in self.bids:
+            yield order
+
+
     # TODO: improve string formatting
     def __str__(self):
         string = '\n--- [{}] order book ---\n'.format(self.instrument_identifier)
