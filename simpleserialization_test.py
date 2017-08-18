@@ -46,5 +46,17 @@ class TestSimpleSerialization(unittest.TestCase):
         self.assertEqual(message_type, MessageTypes.OrderBook)
         self.assertEqual(encoded_order_book, SimpleSerialization.encode_order_book(decoded_order_book))
 
+    def test_two_opposite_orders_in_order_book(self):
+        order_book = OrderBook(self.instrument_identifier)
+        orders = [Order(Way.BUY, self.instrument_identifier, quantity=100.0, price=9.0, counterparty='Trader1'),
+                  Order(Way.SELL, self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader2')]
+        for order in orders:
+            order_book.add_order(order)
+        encoded_order_book = SimpleSerialization.encode_order_book(order_book)
+        message_type, body, _ = SimpleSerialization.decode_header(encoded_order_book)
+        decoded_order_book = SimpleSerialization.decode_order_book(body)
+        self.assertEqual(message_type, MessageTypes.OrderBook)
+        self.assertEqual(encoded_order_book, SimpleSerialization.encode_order_book(decoded_order_book))
+
 if __name__ == '__main__':
     unittest.main()
