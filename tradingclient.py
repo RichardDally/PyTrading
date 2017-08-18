@@ -72,7 +72,8 @@ if __name__ == '__main__':
                         datefmt='%d/%m/%Y %I:%M:%S %p')
     try:
         from capnpserialization import CapnpSerialization
+    except ImportError as error:
+        print('Unable to start trading client. Reason [{}]'.format(error))
+    else:
         client = TradingClient(marshaller=CapnpSerialization, feeder_port=50000)
         client.start()
-    except ImportError as error:
-        print('Unable to start trading client. [{}]'.format(error))
