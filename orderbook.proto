@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+message OrderBook
+{
+   enum Way
+   {
+      buy = 0;
+      sell = 1;
+   }
+
+    message Statistics
+    {
+        double last_price = 1;
+        double high_price = 2;
+        double low_price  = 3;
+    }
+
+   message Order
+   {
+      int32 identifier         = 1;
+      Way way                  = 2;
+      double quantity          = 3;
+      double canceled_quantity = 4;
+      double executed_quantity = 5;
+      double price             = 6;
+      string counterparty      = 7;
+      int32 timestamp          = 8;
+   }
+
+   uint64 instrument_identifier = 1;
+   Statistics statistics        = 2;
+   repeated Order orders        = 3;
+}

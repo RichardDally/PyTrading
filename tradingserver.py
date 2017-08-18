@@ -58,12 +58,12 @@ if __name__ == '__main__':
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %I:%M:%S %p')
     try:
-        from capnpserialization import CapnpSerialization
+        from protobufserialization import ProtobufSerialization
     except ImportError as error:
         print('Unable to start trading server. Reason [{}]'.format(error))
     else:
         server = TradingServer(feeder_port=50000,
                                matching_engine_port=50001,
-                               marshaller=CapnpSerialization,
+                               marshaller=ProtobufSerialization,
                                uptime_in_seconds=None)
         server.start()
