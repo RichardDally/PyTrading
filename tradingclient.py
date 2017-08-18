@@ -1,3 +1,4 @@
+import time
 import logging
 import socket
 import select
@@ -6,7 +7,7 @@ from staticdata import MessageTypes
 
 
 class TradingClient:
-    def __init__(self, marshaller, feeder_port):
+    def __init__(self, marshaller, feeder_port, uptime_in_seconds):
         self.marshaller = marshaller
         self.logger = logging.getLogger(__name__)
         self.feeder_port = feeder_port
@@ -16,6 +17,16 @@ class TradingClient:
         self.referential = Referential()
         self.handle_callbacks = {MessageTypes.Referential: self.handle_referential,
                                  MessageTypes.OrderBook: self.handle_order_book}
+        self.start_time = None
+        self.stop_time = None
+        if uptime_in_seconds:
+            self.start_time = time.time()
+            self.stop_time = self.start_time + uptime_in_seconds
+
+    def reached_uptime(self):
+        if self.stop_time:
+            return time.time() >= self.stop_time
+        return False
 
     def start(self):
         server_socket = None
@@ -28,7 +39,7 @@ class TradingClient:
             server_socket.connect((host, self.feeder_port))
 
             self.inputs.append(server_socket)
-            while self.inputs:
+            while not self.reached_uptime():
                 readable, _, _ = select.select(self.inputs, [], [], 1)
                 self.handle_readable(readable)
                 decoded_messages_count, self.buffer = self.marshaller.decode_buffer(self.buffer, self.handle_callbacks)
@@ -75,5 +86,7 @@ if __name__ == '__main__':
     except ImportError as error:
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
-        client = TradingClient(marshaller=CapnpSerialization, feeder_port=50000)
+        client = TradingClient(marshaller=CapnpSerialization,
+                               feeder_port=50000,
+                               uptime_in_seconds=None)
         client.start()

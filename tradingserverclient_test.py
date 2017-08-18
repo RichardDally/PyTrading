@@ -25,7 +25,9 @@ def start_server():
 def start_client():
     try:
         time.sleep(1)
-        client = TradingClient(marshaller=SimpleSerialization, feeder_port=60000)
+        client = TradingClient(marshaller=SimpleSerialization,
+                               feeder_port=60000,
+                               uptime_in_seconds=3.0)
         client.start()
     except Exception as exception:
         print(traceback.print_exc())
