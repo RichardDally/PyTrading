@@ -14,6 +14,7 @@ python:
 install:
   - sudo pip install -r requirements.txt
   - sudo apt-get install protobuf-compiler
+  - protoc --version
   - protoc --python_out=. *.proto
 
 script:
