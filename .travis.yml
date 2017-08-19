@@ -18,4 +18,4 @@ install:
   - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
 
 script:
-  - sudo python -m unittest discover -p '*_test.py'
+  - python -m unittest discover -p '*_test.py'
