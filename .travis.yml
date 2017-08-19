@@ -9,14 +9,13 @@ python:
   - "3.5"
   - "3.5-dev" # 3.5 development branch
   - "3.6-dev" # 3.6 development branch
-  - "nightly" # currently points to 3.7-dev
+  - "nightly"
 
 install:
   - pip install -r requirements.txt
-  - pip install protobuf --user $USER
   - wget https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-linux-x86_64.zip
   - unzip protoc-3.4.0-linux-x86_64.zip -d protoc-3.4.0-linux-x86_64
   - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
 
 script:
-  - python -m unittest discover -p '*_test.py'
+  - sudo python -m unittest discover -p '*_test.py'
