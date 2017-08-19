@@ -102,7 +102,7 @@ class ProtobufSerialization(Serialization):
     @staticmethod
     def decode_order_book(encoded_order_book):
         order_book_message = orderbook_pb2.OrderBook()
-        order_book_message.ParseFromString(serialized=encoded_order_book)
+        order_book_message.ParseFromString(encoded_order_book)
         order_book = OrderBook(order_book_message.instrument_identifier)
         order_book.last_price = order_book_message.statistics.last_price
         order_book.high_price = order_book_message.statistics.high_price
