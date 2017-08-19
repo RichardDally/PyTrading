@@ -24,8 +24,6 @@ class TestProtobufSerialization(unittest.TestCase):
         referential = StaticData.get_default_referential()
         encoded_referential = ProtobufSerialization.encode_referential(referential)
         message_type, body, _ = ProtobufSerialization.decode_header(encoded_referential)
-        print(message_type)
-        print(body)
         decoded_referential = ProtobufSerialization.decode_referential(body)
         self.assertEqual(message_type, MessageTypes.Referential)
         self.assertEqual(referential.__dict__, decoded_referential.__dict__)
