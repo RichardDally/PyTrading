@@ -12,8 +12,8 @@ python:
   - "nightly" # currently points to 3.7-dev
 
 install:
-  - sudo pip install --upgrade pip
-  - sudo pip install -r requirements.txt
+  - pip install -r requirements.txt
+  - pip install protobuf --user $USER
   - wget https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-linux-x86_64.zip
   - unzip protoc-3.4.0-linux-x86_64.zip -d protoc-3.4.0-linux-x86_64
   - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
