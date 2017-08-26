@@ -3,8 +3,6 @@ compiler: gcc
 
 python:
   - "2.7"
-  - "3.2"
-  - "3.3"
   - "3.4"
   - "3.5"
   - "3.5-dev" # 3.5 development branch
@@ -13,9 +11,9 @@ python:
 
 install:
   - pip install -r requirements.txt
-  - wget https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
-  - unzip protoc-3.3.0-linux-x86_64.zip -d protoc-3.3.0-linux-x86_64
-  - protoc-3.3.0-linux-x86_64/bin/protoc --python_out=. *.proto
+  - wget https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-linux-x86_64.zip
+  - unzip protoc-3.4.0-linux-x86_64.zip -d protoc-3.4.0-linux-x86_64
+  - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
 
 script:
   - python -m unittest discover -p '*_test.py'
