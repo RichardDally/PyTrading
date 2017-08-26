@@ -15,7 +15,7 @@ install:
   - pip install -r requirements.txt
   - wget https://github.com/google/protobuf/releases/download/v3.3.0/protoc-3.3.0-linux-x86_64.zip
   - unzip protoc-3.3.0-linux-x86_64.zip -d protoc-3.3.0-linux-x86_64
-  - protoc-3.3atu.0-linux-x86_64/bin/protoc --python_out=. *.proto
+  - protoc-3.3.0-linux-x86_64/bin/protoc --python_out=. *.proto
 
 script:
   - python -m unittest discover -p '*_test.py'
