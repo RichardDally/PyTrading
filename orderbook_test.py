@@ -48,5 +48,6 @@ class TestOrderBook(unittest.TestCase):
         self.assertEqual(self.book.count_bids(), 2)
         self.assertEqual(self.book.count_asks(), 2)
 
+
 if __name__ == '__main__':
     unittest.main()
