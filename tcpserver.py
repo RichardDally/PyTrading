@@ -21,6 +21,8 @@ class TcpServer:
         self.inputs = []
         self.outputs = []
         self.message_stacks = {}
+        self.r = None
+        self.w = None
 
     @staticmethod
     def close_sockets(socket_container):
@@ -42,6 +44,10 @@ class TcpServer:
         sock.close()
         if sock in self.message_stacks:
             del self.message_stacks[sock]
+        if sock in self.r:
+            self.r.remove(sock)
+        if sock in self.w:
+            self.w.remove(sock)
 
     def accept_connection(self):
         sock, _ = self.listener.accept()
@@ -59,66 +65,43 @@ class TcpServer:
         pass
 
     def process_sockets(self):
-        r, w, e = select.select(self.inputs, self.outputs, self.inputs, self.select_timeout)
-        self.handle_readable(r)
-        self.handle_writable(w)
-        self.handle_exceptional(e)
+        self.r, self.w, _ = select.select(self.inputs, self.outputs, self.inputs, self.select_timeout)
 
-    # FLAG SOCKETS TO REMOVE
-    def handle_readable(self, readable):
-        for sock in readable:
+        for sock in self.r:
             if sock is self.listener:
                 self.accept_connection()
             else:
-                remove_socket = True
-                try:
-                    self.handle_readable_client(sock)
-                    remove_socket = False
-                except ClosedConnection:
-                    pass
-                except KeyboardInterrupt:
-                    raise
-                except socket.error as exception:
-                    if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
-                        print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
-                        print(traceback.print_exc())
-                except Exception as exception:
-                    print('handle_readable: {}'.format(exception))
-                    print(traceback.print_exc())
-                finally:
-                    if remove_socket:
-                        self.remove_client_socket(sock)
+                self.handle_generic(self.handle_readable_client, sock)
 
-    def handle_writable(self, writable):
-        for sock in writable:
-            remove_socket = True
-            try:
-                sent_messages = 0
-                while len(self.message_stacks[sock]) > 0:
-                    next_message = self.message_stacks[sock].pop(0)
-                    sock.send(next_message)
-                    sent_messages += 1
-                    #print('DEBUG {}'.format(next_message))
-                #print('[{}] messages were sent to [{}]'.format(sent_messages, sock.getpeername()))
-                remove_socket = False
-            except KeyboardInterrupt:
-                raise
-            except KeyError:
-                pass
-            except socket.error as exception:
-                if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
-                    print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
-                    print(traceback.print_exc())
-            except Exception as exception:
-                print('handle_writable: {}'.format(exception))
+        for sock in self.w:
+            self.handle_generic(self.handle_writable, sock)
+
+    def handle_generic(self, handler, sock):
+        try:
+            handler(sock)
+            return
+        except KeyboardInterrupt:
+            raise
+        except KeyError:
+            pass
+        except socket.error as exception:
+            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+                print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
                 print(traceback.print_exc())
-            finally:
-                if remove_socket:
-                    self.remove_client_socket(sock)
+        except Exception as exception:
+            print('handle_generic: {}'.format(exception))
+            print(traceback.print_exc())
 
-    def handle_exceptional(self, exceptional):
-        for sock in exceptional:
-            self.remove_client_socket(sock)
+        self.remove_client_socket(sock)
+
+    def handle_writable(self, sock):
+        # sent_messages = 0
+        while len(self.message_stacks[sock]) > 0:
+            next_message = self.message_stacks[sock].pop(0)
+            sock.send(next_message)
+            # sent_messages += 1
+            # print('DEBUG {}'.format(next_message))
+        # print('[{}] messages were sent to [{}]'.format(sent_messages, sock.getpeername()))
 
     def listen(self):
         self.listener = socket.socket()
