@@ -27,7 +27,7 @@ class Feeder(TcpServer):
         if not data:
             raise ClosedConnection
 
-    def distribute_order_books(self, order_books):
+    def send_order_books(self, order_books):
         encoded_order_books = []
         for _, order_book in order_books.items():
             encoded_order_books.append(self.marshaller.encode_order_book(order_book))
