@@ -31,7 +31,6 @@ class TcpServer:
                 sock.close()
 
     def cleanup(self):
-        self.listener.close()
         TcpServer.close_sockets(self.inputs)
         TcpServer.close_sockets(self.outputs)
 
