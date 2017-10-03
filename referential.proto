@@ -4,10 +4,10 @@ message Referential
 {
    message Instrument
    {
-     int32 identifier           = 1;
+     uint64 identifier          = 1;
      string name                = 2;
      string isin                = 3;
-     int32 currency_identifier  = 4;
+     uint64 currency_identifier = 4;
    }
 
   repeated Instrument instruments = 1;

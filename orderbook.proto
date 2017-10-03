@@ -17,14 +17,14 @@ message OrderBook
 
    message Order
    {
-      int32 identifier         = 1;
+      uint64 identifier        = 1;
       Way way                  = 2;
       double quantity          = 3;
       double canceled_quantity = 4;
       double executed_quantity = 5;
       double price             = 6;
       string counterparty      = 7;
-      int32 timestamp          = 8;
+      uint64 timestamp         = 8;
    }
 
    uint64 instrument_identifier = 1;
