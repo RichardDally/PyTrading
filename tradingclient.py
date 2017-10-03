@@ -1,22 +1,16 @@
 import time
 import logging
 import socket
-import select
-from referential import Referential
-from staticdata import MessageTypes
+import traceback
+import errno
+from feederhandler import FeederHandler
+#from orderhandler import OrderHandler
 
 
 class TradingClient:
-    def __init__(self, marshaller, feeder_port, uptime_in_seconds):
-        self.marshaller = marshaller
-        self.logger = logging.getLogger(__name__)
-        self.feeder_port = feeder_port
-        self.inputs = []
-        self.buffer = bytearray()
-        self.orderBooks = {}
-        self.referential = Referential()
-        self.handle_callbacks = {MessageTypes.Referential: self.handle_referential,
-                                 MessageTypes.OrderBook: self.handle_order_book}
+    def __init__(self, marshaller, host, feeder_port, matching_engine_port, uptime_in_seconds):
+        self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
+        #self.orderhandler = OrderHandler(referential=self.feeder.get_referential(), marshaller=marshaller, port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
@@ -29,51 +23,20 @@ class TradingClient:
         return False
 
     def start(self):
-        server_socket = None
         try:
-            server_socket = socket.socket()
-            server_socket.settimeout(10)
-            host = socket.gethostname()
-
-            print('Connecting on Feeder [{0}:{1}]'.format(host, self.feeder_port))
-            server_socket.connect((host, self.feeder_port))
-
-            self.inputs.append(server_socket)
-            while not self.reached_uptime():
-                readable, _, _ = select.select(self.inputs, [], [], 1)
-                self.handle_readable(readable)
-                decoded_messages_count, self.buffer = self.marshaller.decode_buffer(self.buffer, self.handle_callbacks)
-                if decoded_messages_count == 0:
-                    print('--- No decoded messages ---')
+            self.feedhandler.connect()
+            while not self.reached_uptime() and self.feedhandler.is_connected():
+                self.feedhandler.process_sockets()
         except KeyboardInterrupt:
             print('Stopped by user')
-        except socket.error:
-            # TODO: client can be connected and raise this exception...
-            print('Unable to connect to [{0}:{1}]'.format(host, self.feeder_port))
+        except socket.error as exception:
+            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+                print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
+                print(traceback.print_exc())
         finally:
-            if server_socket:
-                server_socket.close()
+            self.feedhandler.cleanup()
+            #self.orderhandler.cleanup()
         print('Client ends')
-
-    def handle_readable(self, readable):
-        if len(readable) > 1:
-            raise Exception('Readable must contain only 1 socket')
-
-        for sock in readable:
-            data = sock.recv(8192)
-            if data:
-                self.logger.debug('Adding server data ({}) to buffer'.format(len(data)))
-                self.buffer += data
-            else:
-                print('Server closed its socket')
-                self.inputs.remove(sock)
-
-    def handle_referential(self, new_referential):
-        self.referential = new_referential
-        self.logger.debug('Referential received:\n{}'.format(str(self.referential)))
-
-    def handle_order_book(self, order_book):
-        self.logger.debug('Order book received:{}'.format(str(order_book)))
 
 
 if __name__ == '__main__':
@@ -87,6 +50,8 @@ if __name__ == '__main__':
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
         client = TradingClient(marshaller=ProtobufSerialization,
+                               host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=50000,
+                               matching_engine_port=50001,
                                uptime_in_seconds=None)
         client.start()

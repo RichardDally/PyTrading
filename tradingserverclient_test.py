@@ -1,4 +1,5 @@
 import sys
+import socket
 import unittest
 import logging
 import traceback
@@ -26,7 +27,9 @@ def start_client():
     try:
         time.sleep(1)
         client = TradingClient(marshaller=SimpleSerialization,
+                               host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=60000,
+                               matching_engine_port=60001,
                                uptime_in_seconds=3.0)
         client.start()
     except Exception as exception:
