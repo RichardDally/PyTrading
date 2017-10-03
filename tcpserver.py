@@ -70,12 +70,12 @@ class TcpServer:
             if sock is self.listener:
                 self.accept_connection()
             else:
-                self.handle_generic(self.handle_readable_client, sock)
+                self.generic_handle(self.handle_readable_client, sock)
 
         for sock in self.w:
-            self.handle_generic(self.handle_writable, sock)
+            self.generic_handle(self.handle_writable, sock)
 
-    def handle_generic(self, handler, sock):
+    def generic_handle(self, handler, sock):
         try:
             handler(sock)
             return
@@ -88,7 +88,7 @@ class TcpServer:
                 print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
                 print(traceback.print_exc())
         except Exception as exception:
-            print('handle_generic: {}'.format(exception))
+            print('generic_handle: {}'.format(exception))
             print(traceback.print_exc())
 
         self.remove_client_socket(sock)
