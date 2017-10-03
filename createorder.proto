@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+message CreateOrder
+{
+   enum Way
+   {
+      buy = 0;
+      sell = 1;
+   }
+
+    Way way                      = 1;
+    double quantity              = 2;
+    double price                 = 3;
+    uint64 instrument_identifier = 4;
+}
