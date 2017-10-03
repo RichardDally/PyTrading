@@ -22,6 +22,7 @@ class MatchingEngine(TcpServer):
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
     def on_accept_connection(self, sock):
+        self.message_stacks[sock] = []
         print('Matching engine got connection from [{}]'.format(sock.getpeername()))
 
     def handle_readable_client(self, sock):

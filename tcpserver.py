@@ -35,7 +35,7 @@ class TcpServer:
         TcpServer.close_sockets(self.outputs)
 
     def remove_client_socket(self, sock):
-        print('Removing client [{}]'.format(sock.getpeername()))
+        print('Removing client socket [{}]'.format(sock.getpeername()))
         if sock in self.outputs:
             self.outputs.remove(sock)
         if sock in self.inputs:
@@ -81,10 +81,8 @@ class TcpServer:
             return
         except KeyboardInterrupt:
             raise
-        except KeyError:
-            pass
         except socket.error as exception:
-            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.EWOULDBLOCK):
                 print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
                 print(traceback.print_exc())
         except Exception as exception:

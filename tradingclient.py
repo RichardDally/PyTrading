@@ -4,13 +4,13 @@ import socket
 import traceback
 import errno
 from feederhandler import FeederHandler
-#from orderhandler import OrderHandler
+from orderhandler import OrderHandler
 
 
 class TradingClient:
     def __init__(self, marshaller, host, feeder_port, matching_engine_port, uptime_in_seconds):
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
-        #self.orderhandler = OrderHandler(referential=self.feeder.get_referential(), marshaller=marshaller, port=matching_engine_port)
+        self.orderhandler = OrderHandler(marshaller=marshaller, host=host, port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
@@ -25,8 +25,10 @@ class TradingClient:
     def start(self):
         try:
             self.feedhandler.connect()
-            while not self.reached_uptime() and self.feedhandler.is_connected():
+            self.orderhandler.connect()
+            while not self.reached_uptime() and self.feedhandler.is_connected() and self.orderhandler.is_connected():
                 self.feedhandler.process_sockets()
+                self.orderhandler.process_sockets()
         except KeyboardInterrupt:
             print('Stopped by user')
         except socket.error as exception:
@@ -35,7 +37,7 @@ class TradingClient:
                 print(traceback.print_exc())
         finally:
             self.feedhandler.cleanup()
-            #self.orderhandler.cleanup()
+            self.orderhandler.cleanup()
         print('Client ends')
 
 
