@@ -40,12 +40,12 @@ class TradingServer:
             while not self.reached_uptime():
                 self.matching_engine.process_sockets()
                 self.feeder.process_sockets()
-                self.feeder.send_order_books(self.matching_engine.get_order_books())
+                self.feeder.send_all_order_books(self.matching_engine.get_order_books())
 
         except KeyboardInterrupt:
             print('Stopped by user')
         except socket.error as exception:
-            print('Socket error [{}]'.format(exception))
+            print('Trading server socket error [{}]'.format(exception))
             print(traceback.print_exc())
         finally:
             self.feeder.cleanup()

@@ -35,7 +35,7 @@ class TcpServer:
         TcpServer.close_sockets(self.outputs)
 
     def remove_client_socket(self, sock):
-        print('Removing client socket [{}]'.format(sock.getpeername()))
+        print('Removing client socket [{}]'.format(sock.getsockname()))
         if sock in self.outputs:
             self.outputs.remove(sock)
         if sock in self.inputs:
@@ -53,14 +53,14 @@ class TcpServer:
         sock.setblocking(0)
         self.inputs.append(sock)
         self.outputs.append(sock)
-        self.on_accept_connection(sock)
+        self.on_accept_connection(sock=sock)
 
     @abstractmethod
-    def on_accept_connection(self, sock):
+    def on_accept_connection(self, **kwargs):
         pass
 
     @abstractmethod
-    def handle_readable_client(self, sock):
+    def handle_readable_client(self, **kwargs):
         pass
 
     def process_sockets(self):
@@ -70,17 +70,19 @@ class TcpServer:
             if sock is self.listener:
                 self.accept_connection()
             else:
-                self.generic_handle(self.handle_readable_client, sock)
+                self.generic_handle(handler=self.handle_readable_client, sock=sock)
 
         for sock in self.w:
-            self.generic_handle(self.handle_writable, sock)
+            self.generic_handle(handler=self.handle_writable, sock=sock)
 
-    def generic_handle(self, handler, sock):
+    def generic_handle(self, **kwargs):
         try:
-            handler(sock)
+            kwargs['handler'](**kwargs)
             return
         except KeyboardInterrupt:
             raise
+        except ClosedConnection:
+            pass
         except socket.error as exception:
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.EWOULDBLOCK):
                 print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
@@ -88,10 +90,10 @@ class TcpServer:
         except Exception as exception:
             print('generic_handle: {}'.format(exception))
             print(traceback.print_exc())
+        self.remove_client_socket(kwargs['sock'])
 
-        self.remove_client_socket(sock)
-
-    def handle_writable(self, sock):
+    def handle_writable(self, **kwargs):
+        sock = kwargs.get('sock')
         # sent_messages = 0
         while len(self.message_stacks[sock]) > 0:
             next_message = self.message_stacks[sock].pop(0)
@@ -108,4 +110,3 @@ class TcpServer:
         self.listener.bind((host, self.port))
         self.listener.listen(5)
         self.inputs.append(self.listener)
-
