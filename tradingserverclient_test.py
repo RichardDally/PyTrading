@@ -12,7 +12,7 @@ from simpleserialization import SimpleSerialization
 
 def start_server():
     try:
-        server = TradingServer(marshaller=SimpleSerialization,
+        server = TradingServer(marshaller=SimpleSerialization(),
                                feeder_port=60000,
                                matching_engine_port=60001,
                                uptime_in_seconds=3.0)
@@ -26,7 +26,7 @@ def start_server():
 def start_client():
     try:
         time.sleep(1)
-        client = TradingClient(marshaller=SimpleSerialization,
+        client = TradingClient(marshaller=SimpleSerialization(),
                                host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=60000,
                                matching_engine_port=60001,

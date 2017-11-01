@@ -7,14 +7,16 @@ from serialization import Serialization, NotEnoughBytes
 
 
 class SimpleSerialization(Serialization):
-    @staticmethod
-    def decode_header(buffer):
+    def __init__(self):
+        self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
+                                 MessageTypes.OrderBook: self.decode_order_book}
+
+    def decode_header(self, buffer):
         """ Decode header (total length + message type)"""
         # print('buffer [{}]'.format(buffer))
         message_length_separator_index = buffer.decode('utf-8').index('|')
         message_length = int(buffer[:message_length_separator_index])
-        message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode(
-            'utf-8')
+        message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
         # print('decode buffer, message type [{}]'.format(type(message)))
 
         # print('Message length {}'.format(message_length))
@@ -32,18 +34,15 @@ class SimpleSerialization(Serialization):
 
         return message_type, body, new_offset
 
-    @staticmethod
-    def decode_buffer(buffer, handle_callbacks):
-        decode_callbacks = {MessageTypes.Referential: SimpleSerialization.decode_referential,
-                            MessageTypes.OrderBook: SimpleSerialization.decode_order_book}
+    def decode_buffer(self, buffer, handle_callbacks):
         decoded_messages_count = 0
 
         try:
             while True:
-                message_type, body, new_offset = SimpleSerialization.decode_header(buffer)
+                message_type, body, new_offset = self.decode_header(buffer)
 
                 # TODO: Handle unsupported message type
-                decoded_object = decode_callbacks[message_type](body)
+                decoded_object = self.decode_callbacks[message_type](body)
                 handle_callbacks[message_type](decoded_object)
 
                 buffer = buffer[new_offset:]
@@ -55,8 +54,7 @@ class SimpleSerialization(Serialization):
 
         return decoded_messages_count, buffer
 
-    @staticmethod
-    def encode_referential(referential):
+    def encode_referential(self, referential):
         separator = '|'
         message_type = str(MessageTypes.Referential)
         instruments = ''
@@ -69,8 +67,7 @@ class SimpleSerialization(Serialization):
         encoded_referential = str(len(referential_string)) + referential_string
         return bytearray(encoded_referential, 'utf-8')
 
-    @staticmethod
-    def decode_referential(encoded_referential):
+    def decode_referential(self, encoded_referential):
         referential = Referential()
         tokens = list(filter(None, encoded_referential.split('|')))
         for x in range(0, len(tokens), 4):
@@ -81,8 +78,7 @@ class SimpleSerialization(Serialization):
 
         return referential
 
-    @staticmethod
-    def encode_order_book(order_book):
+    def encode_order_book(self, order_book):
         separator = '|'
         message_type = str(MessageTypes.OrderBook)
 
@@ -111,8 +107,7 @@ class SimpleSerialization(Serialization):
 
         return bytearray(encoded_order_book, 'utf-8')
 
-    @staticmethod
-    def decode_order_book(encoded_order_book):
+    def decode_order_book(self, encoded_order_book):
         tokens = list(filter(None, encoded_order_book.split('|')))
 
         instrument_identifier = int(tokens[0])

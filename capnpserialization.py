@@ -12,10 +12,11 @@ from serialization import Serialization
 
 
 class CapnpSerialization(Serialization):
-    @staticmethod
-    def decode_buffer(buffer, handle_callbacks):
-        decode_callbacks = {MessageTypes.Referential: CapnpSerialization.decode_referential,
-                            MessageTypes.OrderBook: CapnpSerialization.decode_order_book}
+    def __init__(self):
+        self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
+                                 MessageTypes.OrderBook: self.decode_order_book}
+
+    def decode_buffer(self, buffer, handle_callbacks):
         decoded_messages_count = 0
         header_size = 9
         try:
@@ -31,7 +32,7 @@ class CapnpSerialization(Serialization):
                 encoded_message = buffer[header_size: header_size + message_length]
 
                 # TODO: Handle unsupported message type
-                decoded_object = decode_callbacks[message_type](encoded_message)
+                decoded_object = self.decode_callbacks[message_type](encoded_message)
                 handle_callbacks[message_type](decoded_object)
 
                 buffer = buffer[header_size + message_length:]
@@ -41,8 +42,7 @@ class CapnpSerialization(Serialization):
             print(traceback.print_exc())
         return decoded_messages_count, buffer
 
-    @staticmethod
-    def encode_referential(referential):
+    def encode_referential(self, referential):
         referential_message = referential_capnp.Referential.new_message()
         instruments_size = len(referential)
         if instruments_size:
@@ -56,8 +56,7 @@ class CapnpSerialization(Serialization):
         encoded_referential = struct.pack('>Qc', len(referential_bytes), MessageTypes.Referential) + referential_bytes
         return encoded_referential
 
-    @staticmethod
-    def decode_referential(encoded_referential):
+    def decode_referential(self, encoded_referential):
         referential = Referential()
         referential_message = referential_capnp.Referential.from_bytes(encoded_referential)
         for decodedInstrument in referential_message.instruments:
@@ -69,7 +68,7 @@ class CapnpSerialization(Serialization):
         return referential
 
     @staticmethod
-    def encode_orders(order_book_message, order_book, side):
+    def encode_orders(self, order_book_message, order_book, side):
         orders_count = eval('order_book.count_{}()'.format(side))
         if orders_count:
             orders = order_book_message.init(side, orders_count)
@@ -80,8 +79,7 @@ class CapnpSerialization(Serialization):
                 orders[index].price = order.price
                 orders[index].timestamp = order.timestamp
 
-    @staticmethod
-    def encode_order_book(order_book):
+    def encode_order_book(self, order_book):
         order_book_message = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.new_message()
         order_book_message.instrumentIdentifier = order_book.instrument_identifier
         order_book_message.statistics.lastPrice = order_book.last_price
@@ -106,8 +104,7 @@ class CapnpSerialization(Serialization):
                           timestamp=decoded_order.timestamp)
             eval('order_book.{}.append(order)'.format(side))
 
-    @staticmethod
-    def decode_order_book(encoded_order_book):
+    def decode_order_book(self, encoded_order_book):
         decoded_order_book = orderbookfullsnapshot_capnp.OrderBookFullSnapshot.from_bytes(encoded_order_book)
         order_book = OrderBook(StaticData.get_instrument(decoded_order_book.instrumentIdentifier))
         order_book.last_price = decoded_order_book.statistics.lastPrice

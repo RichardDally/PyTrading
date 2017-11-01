@@ -51,7 +51,7 @@ if __name__ == '__main__':
     except ImportError as error:
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
-        client = TradingClient(marshaller=ProtobufSerialization,
+        client = TradingClient(marshaller=ProtobufSerialization(),
                                host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=50000,
                                matching_engine_port=50001,

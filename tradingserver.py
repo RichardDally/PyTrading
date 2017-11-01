@@ -64,6 +64,6 @@ if __name__ == '__main__':
     else:
         server = TradingServer(feeder_port=50000,
                                matching_engine_port=50001,
-                               marshaller=ProtobufSerialization,
+                               marshaller=ProtobufSerialization(),
                                uptime_in_seconds=None)
         server.start()

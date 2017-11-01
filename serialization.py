@@ -1,28 +1,33 @@
+from abc import ABCMeta, abstractmethod
+
+
 class NotEnoughBytes(BaseException):
     """ Unable to decode message, available bytes are less than required """
 
 
 class Serialization:
-    @staticmethod
-    def decode_header(buffer):
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def decode_header(self, buffer):
         pass
 
-    @staticmethod
-    def decode_buffer(buffer, handle_callbacks):
+    @abstractmethod
+    def decode_buffer(self, buffer, handle_callbacks):
         pass
 
-    @staticmethod
-    def encode_referential(referential):
+    @abstractmethod
+    def encode_referential(self, referential):
         pass
 
-    @staticmethod
-    def decode_referential(encoded_referential):
+    @abstractmethod
+    def decode_referential(self, encoded_referential):
         pass
 
-    @staticmethod
-    def encode_order_book(order_book):
+    @abstractmethod
+    def encode_order_book(self, order_book):
         pass
 
-    @staticmethod
-    def decode_order_book(encoded_order_book):
+    @abstractmethod
+    def decode_order_book(self, encoded_order_book):
         pass

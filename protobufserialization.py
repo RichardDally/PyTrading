@@ -10,8 +10,11 @@ from serialization import Serialization, NotEnoughBytes
 
 
 class ProtobufSerialization(Serialization):
-    @staticmethod
-    def decode_header(buffer):
+    def __init__(self):
+        self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
+                                 MessageTypes.OrderBook: self.decode_order_book}
+
+    def decode_header(self, buffer):
         fmt = '>QB'
         header_size = struct.calcsize(fmt)
         message_length, message_type = struct.unpack_from(fmt, buffer)
@@ -24,17 +27,14 @@ class ProtobufSerialization(Serialization):
         new_offset = header_size + message_length
         return message_type, body, new_offset
 
-    @staticmethod
-    def decode_buffer(buffer, handle_callbacks):
-        decode_callbacks = {MessageTypes.Referential: ProtobufSerialization.decode_referential,
-                            MessageTypes.OrderBook: ProtobufSerialization.decode_order_book}
+    def decode_buffer(self, buffer, handle_callbacks):
         decoded_messages_count = 0
         try:
             while True:
-                message_type, body, new_offset = ProtobufSerialization.decode_header(buffer)
+                message_type, body, new_offset = self.decode_header(buffer)
 
                 # TODO: Handle unsupported message type
-                decoded_object = decode_callbacks[message_type](body)
+                decoded_object = self.decode_callbacks[message_type](body)
                 handle_callbacks[message_type](decoded_object)
 
                 buffer = buffer[new_offset:]
@@ -47,8 +47,7 @@ class ProtobufSerialization(Serialization):
             pass
         return decoded_messages_count, buffer
 
-    @staticmethod
-    def encode_referential(referential):
+    def encode_referential(self, referential):
         referential_message = referential_pb2.Referential()
         instruments_size = len(referential)
         if instruments_size:
@@ -65,8 +64,7 @@ class ProtobufSerialization(Serialization):
         encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential) + referential_bytes
         return encoded_referential
 
-    @staticmethod
-    def decode_referential(encoded_referential):
+    def decode_referential(self, encoded_referential):
         referential = Referential()
         referential_message = referential_pb2.Referential()
         referential_message.ParseFromString(encoded_referential)
@@ -78,8 +76,7 @@ class ProtobufSerialization(Serialization):
             referential.add_instrument(instrument)
         return referential
 
-    @staticmethod
-    def encode_order_book(order_book):
+    def encode_order_book(self, order_book):
         order_book_message = orderbook_pb2.OrderBook()
         order_book_message.instrument_identifier = order_book.instrument_identifier
         order_book_message.statistics.last_price = order_book.last_price
@@ -99,8 +96,7 @@ class ProtobufSerialization(Serialization):
         encoded_order_book = struct.pack('>QB', len(order_book_bytes), MessageTypes.OrderBook) + order_book_bytes
         return encoded_order_book
 
-    @staticmethod
-    def decode_order_book(encoded_order_book):
+    def decode_order_book(self, encoded_order_book):
         order_book_message = orderbook_pb2.OrderBook()
         order_book_message.ParseFromString(encoded_order_book)
         order_book = OrderBook(order_book_message.instrument_identifier)
