@@ -5,6 +5,8 @@ from referential import Referential
 class MessageTypes:
     Referential = 1
     OrderBook = 2
+    CreateOrder = 3
+
 
 currencies = {1: 'EUR',
               2: 'USD'}

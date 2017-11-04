@@ -1,7 +1,9 @@
 import struct
 import orderbook_pb2
 import referential_pb2
+import createorder_pb2
 from order import Order
+from createorder import CreateOrder
 from orderbook import OrderBook
 from instrument import Instrument
 from referential import Referential
@@ -116,3 +118,22 @@ class ProtobufSerialization(Serialization):
             order_book.add_order(order)
         #print(order_book)
         return order_book
+
+    def encode_create_order(self, create_order):
+        create_order_message = createorder_pb2.CreateOrder()
+        create_order_message.way = create_order.way
+        create_order_message.quantity = create_order.quantity
+        create_order_message.price = create_order.price
+        create_order_message.instrument_identifier = create_order.instrument_identifier
+        create_order_bytes = create_order_message.SerializeToString()
+        encoded_create_order = struct.pack('>QB', len(create_order_bytes), MessageTypes.CreateOrder) + create_order_bytes
+        return encoded_create_order
+
+    def decode_create_order(self, encoded_create_order):
+        create_order_message = createorder_pb2.CreateOrder()
+        create_order_message.ParseFromString(encoded_create_order)
+        create_order = CreateOrder(way=create_order_message.way,
+                                   quantity=create_order_message.quantity,
+                                   price=create_order_message.price,
+                                   instrument_identifier=create_order_message.instrument_identifier)
+        return create_order

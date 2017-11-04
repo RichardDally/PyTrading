@@ -31,3 +31,11 @@ class Serialization:
     @abstractmethod
     def decode_order_book(self, encoded_order_book):
         pass
+
+    @abstractmethod
+    def encode_create_order(self, create_order):
+        pass
+
+    @abstractmethod
+    def decode_create_order(self, encoded_create_order):
+        pass

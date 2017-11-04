@@ -1,6 +1,7 @@
 import unittest
 from way import Way
 from order import Order
+from createorder import CreateOrder
 from orderbook import OrderBook
 from staticdata import StaticData
 from referential import Referential
@@ -58,6 +59,14 @@ class TestProtobufSerialization(unittest.TestCase):
         decoded_order_book = self.marshaller.decode_order_book(body)
         self.assertEqual(message_type, MessageTypes.OrderBook)
         self.assertEqual(encoded_order_book, self.marshaller.encode_order_book(decoded_order_book))
+
+    def test_simple_create_order(self):
+        create_order = CreateOrder(way=Way.BUY, price=42.0, quantity=10.0, instrument_identifier=1)
+        encoded_create_order = self.marshaller.encode_create_order(create_order=create_order)
+        message_type, body, _ = self.marshaller.decode_header(encoded_create_order)
+        decoded_create_order = self.marshaller.decode_create_order(body)
+        self.assertEqual(message_type, MessageTypes.CreateOrder)
+        self.assertEqual(create_order.__dict__, decoded_create_order.__dict__)
 
 
 if __name__ == '__main__':

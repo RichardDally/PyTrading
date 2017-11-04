@@ -1,4 +1,5 @@
 from order import Order
+from createorder import CreateOrder
 from orderbook import OrderBook
 from instrument import Instrument
 from referential import Referential
@@ -132,3 +133,23 @@ class SimpleSerialization(Serialization):
             )
 
         return order_book
+
+    def encode_create_order(self, create_order):
+        message_type = MessageTypes.CreateOrder
+        create_order_string = "{0}{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}"\
+            .format(self.separator,
+                    str(message_type),
+                    str(create_order.way),
+                    str(create_order.price),
+                    str(create_order.quantity),
+                    str(create_order.instrument_identifier))
+        encoded_create_order = str(len(create_order_string)) + create_order_string
+        return bytearray(encoded_create_order, 'utf-8')
+
+    def decode_create_order(self, encoded_create_order):
+        tokens = list(filter(None, encoded_create_order.split(self.separator)))
+        create_order = CreateOrder(way=int(tokens[0]),
+                                   price=float(tokens[1]),
+                                   quantity=float(tokens[2]),
+                                   instrument_identifier=int(tokens[3]))
+        return create_order
