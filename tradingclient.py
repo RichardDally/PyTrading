@@ -49,6 +49,7 @@ if __name__ == '__main__':
     try:
         from protobufserialization import ProtobufSerialization
     except ImportError as error:
+        ProtobufSerialization = None
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
         client = TradingClient(marshaller=ProtobufSerialization(),

@@ -10,6 +10,8 @@ class Counter:
         value = self.value
         self.value += 1
         return value
+
+
 counter = Counter()
 
 

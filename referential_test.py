@@ -15,5 +15,6 @@ class TestReferential(unittest.TestCase):
         referential.add_instrument(self.instrument)
         self.assertEqual(len(referential), 1)
 
+
 if __name__ == '__main__':
     unittest.main()

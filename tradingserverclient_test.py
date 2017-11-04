@@ -59,5 +59,6 @@ class TestTradingServerClient(unittest.TestCase):
         if client_failed:
             self.fail(client_failed)
 
+
 if __name__ == '__main__':
     unittest.main()

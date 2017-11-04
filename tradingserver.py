@@ -60,6 +60,7 @@ if __name__ == '__main__':
     try:
         from protobufserialization import ProtobufSerialization
     except ImportError as error:
+        ProtobufSerialization = None
         print('Unable to start trading server. Reason [{}]'.format(error))
     else:
         server = TradingServer(feeder_port=50000,
