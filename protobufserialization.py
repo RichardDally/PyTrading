@@ -3,6 +3,7 @@ import orderbook_pb2
 import referential_pb2
 import createorder_pb2
 from order import Order
+from orderway import OrderWay
 from createorder import CreateOrder
 from orderbook import OrderBook
 from instrument import Instrument
@@ -87,7 +88,7 @@ class ProtobufSerialization(Serialization):
         for order_to_serialize in order_book:
             order = order_book_message.orders.add()
             order.identifier = order_to_serialize.identifier
-            order.way = order_to_serialize.way
+            order.way = order_to_serialize.way.way
             order.quantity = order_to_serialize.quantity
             order.canceled_quantity = order_to_serialize.canceled_quantity
             order.executed_quantity = order_to_serialize.executed_quantity
@@ -107,7 +108,7 @@ class ProtobufSerialization(Serialization):
         order_book.low_price = order_book_message.statistics.low_price
         for decoded_order in order_book_message.orders:
             order = Order(identifier=decoded_order.identifier,
-                          way=decoded_order.way,
+                          way=OrderWay(decoded_order.way),
                           instrument_identifier=order_book_message.instrument_identifier,
                           quantity=decoded_order.quantity,
                           canceled_quantity=decoded_order.canceled_quantity,
@@ -121,7 +122,7 @@ class ProtobufSerialization(Serialization):
 
     def encode_create_order(self, create_order):
         create_order_message = createorder_pb2.CreateOrder()
-        create_order_message.way = create_order.way
+        create_order_message.way = create_order.way.way
         create_order_message.quantity = create_order.quantity
         create_order_message.price = create_order.price
         create_order_message.instrument_identifier = create_order.instrument_identifier
@@ -132,7 +133,7 @@ class ProtobufSerialization(Serialization):
     def decode_create_order(self, encoded_create_order):
         create_order_message = createorder_pb2.CreateOrder()
         create_order_message.ParseFromString(encoded_create_order)
-        create_order = CreateOrder(way=create_order_message.way,
+        create_order = CreateOrder(way=OrderWay(create_order_message.way),
                                    quantity=create_order_message.quantity,
                                    price=create_order_message.price,
                                    instrument_identifier=create_order_message.instrument_identifier)

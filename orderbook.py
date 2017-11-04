@@ -1,4 +1,4 @@
-from way import Way
+from orderway import Buy, Sell, InvalidWay
 import logging
 
 
@@ -17,7 +17,6 @@ class OrderBook:
             yield order
         for order in self.bids:
             yield order
-
 
     # TODO: improve string formatting
     def __str__(self):
@@ -67,19 +66,19 @@ class OrderBook:
             self.low_price = order.price
 
     def add_order(self, order):
-        if order.way == Way.BUY:
+        if order.way == Buy():
             self.bids.append(order)
-        elif order.way == Way.SELL:
+        elif order.way == Sell():
             self.asks.append(order)
         else:
-            raise Exception('Way [{}] is invalid'.format(order.way))
+            raise InvalidWay(order.way)
 
     def get_matching_orders(self, attacking_order):
-        if attacking_order.way == Way.BUY:
+        if attacking_order.way == Buy():
             return sorted([x for x in self.asks if x.price <= attacking_order.price], key=lambda o: o.timestamp)
-        elif attacking_order.way == Way.SELL:
+        if attacking_order.way == Sell():
             return sorted([x for x in self.bids if x.price >= attacking_order.price], key=lambda o: o.timestamp)
-        raise Exception('Way is invalid')
+        raise InvalidWay(attacking_order.way)
 
     @staticmethod
     def is_attacked_order_full_executed(attacking_order, attacked_order):
@@ -89,11 +88,11 @@ class OrderBook:
         return self.bids + self.asks
 
     def get_orders(self, way):
-        if way == Way.BUY:
+        if way == Buy():
             return self.bids
-        elif way == Way.SELL:
+        if way == Sell():
             return self.asks
-        raise Exception('Way is invalid')
+        raise InvalidWay
 
     def match_order(self, attacking_order):
         self.logger.debug('Find a matching order for [{}]'.format(attacking_order))

@@ -1,5 +1,4 @@
 import time
-from way import Way
 
 
 class Counter:
@@ -36,12 +35,7 @@ class Order:
         return remaining_quantity
 
     def __str__(self):
-        way = None
-        if self.way == Way.BUY:
-            way = 'BUY'
-        elif self.way == Way.SELL:
-            way = 'SELL'
-        return '{} {} {} @ {} ({})'.format(way,
+        return '{} {} {} @ {} ({})'.format(str(self.way),
                                            self.instrument_identifier,
                                            self.get_remaining_quantity(),
                                            self.price,

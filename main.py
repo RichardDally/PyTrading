@@ -1,5 +1,5 @@
 import logging
-from way import Way
+from orderway import Way
 from order import Order
 from orderbook import OrderBook
 from instrument import Instrument

@@ -1,4 +1,5 @@
 from order import Order
+from orderway import OrderWay
 from createorder import CreateOrder
 from orderbook import OrderBook
 from instrument import Instrument
@@ -95,7 +96,7 @@ class SimpleSerialization(Serialization):
             # TODO: replace pipe by self.separator
             orders_string += '{}|{}|{}|{}|{}|{}|{}|{}|'.format(
                 str(order.identifier),
-                str(order.way),
+                str(order.way.way),
                 str(order.quantity),
                 str(order.canceled_quantity),
                 str(order.executed_quantity),
@@ -123,7 +124,7 @@ class SimpleSerialization(Serialization):
             order_book.add_order(
                 Order(instrument_identifier=instrument_identifier,
                       identifier=int(order_tokens[x]),
-                      way=int(order_tokens[x + 1]),
+                      way=OrderWay(int(order_tokens[x + 1])),
                       quantity=float(order_tokens[x + 2]),
                       canceled_quantity=float(order_tokens[x + 3]),
                       executed_quantity=float(order_tokens[x + 4]),
@@ -139,7 +140,7 @@ class SimpleSerialization(Serialization):
         create_order_string = "{0}{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}"\
             .format(self.separator,
                     str(message_type),
-                    str(create_order.way),
+                    str(create_order.way.way),
                     str(create_order.price),
                     str(create_order.quantity),
                     str(create_order.instrument_identifier))
@@ -148,7 +149,7 @@ class SimpleSerialization(Serialization):
 
     def decode_create_order(self, encoded_create_order):
         tokens = list(filter(None, encoded_create_order.split(self.separator)))
-        create_order = CreateOrder(way=int(tokens[0]),
+        create_order = CreateOrder(way=OrderWay(int(tokens[0])),
                                    price=float(tokens[1]),
                                    quantity=float(tokens[2]),
                                    instrument_identifier=int(tokens[3]))
