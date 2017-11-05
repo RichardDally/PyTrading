@@ -50,10 +50,10 @@ class OrderBook:
 
         self.match_order(order)
         if order.get_remaining_quantity() > 0.0:
-            self.logger.debug('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
+            self.logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
             self.add_order(order)
         else:
-            self.logger.debug('Attacking order [{}] has been totally executed'.format(order))
+            self.logger.info('Attacking order [{}] has been totally executed'.format(order))
 
     # TODO: finish implementation
     def on_new_deal(self, order):
@@ -95,18 +95,18 @@ class OrderBook:
         raise InvalidWay
 
     def match_order(self, attacking_order):
-        self.logger.debug('Find a matching order for [{}]'.format(attacking_order))
+        self.logger.info('Find a matching order for [{}]'.format(attacking_order))
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
         for attacked_order in matching_trading_book_orders:
             if self.is_attacked_order_full_executed(attacking_order, attacked_order):
-                self.logger.debug('[{}] has been totally executed'.format(attacked_order))
+                self.logger.info('[{}] has been totally executed'.format(attacked_order))
                 attacking_order.executed_quantity += attacked_order.get_remaining_quantity()
                 attacked_order.executed_quantity += attacked_order.get_remaining_quantity()
                 self.on_new_deal(attacked_order)
                 self.get_orders(attacked_order.way).remove(attacked_order)
             else:
-                self.logger.debug('[{}] has been partially executed'.format(attacked_order))
+                self.logger.info('[{}] has been partially executed'.format(attacked_order))
                 attacking_order.executedquantity += attacking_order.get_remaining_quantity()
                 attacked_order.executedquantity += attacking_order.get_remaining_quantity()
                 self.on_new_deal(attacking_order)
