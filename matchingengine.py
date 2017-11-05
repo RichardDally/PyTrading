@@ -1,3 +1,4 @@
+from order import Order
 from orderbook import OrderBook
 from tcpserver import TcpServer
 from staticdata import MessageTypes
@@ -13,8 +14,17 @@ class MatchingEngine(TcpServer):
         self.handle_callbacks = {MessageTypes.CreateOrder: self.handle_create_order}
 
     def handle_create_order(self, create_order):
-        # TODO: validate create order request and add it to order book
-        pass
+        try:
+            order_book = self.order_books[create_order.instrument_identifier]
+            new_order = Order(way=create_order.way,
+                              instrument_identifier=create_order.instrument_identifier,
+                              quantity=create_order.quantity,
+                              price=create_order.price,
+                              counterparty='TODO')
+            order_book.on_new_order(new_order)
+        except KeyError:
+            self.logger.warning('Order book related to instrument identifier [{}] does not exist'
+                                .format(create_order.instrument_identifier))
 
     def get_order_books(self):
         return self.order_books
