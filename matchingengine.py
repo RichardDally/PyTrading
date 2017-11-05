@@ -13,9 +13,8 @@ class MatchingEngine(TcpServer):
         self.handle_callbacks = {MessageTypes.CreateOrder: self.handle_create_order}
 
     def handle_create_order(self, create_order):
-        print('HANDLE CREATE ORDER')
-        print(create_order)
         # TODO: validate create order request and add it to order book
+        pass
 
     def get_order_books(self):
         return self.order_books

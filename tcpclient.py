@@ -26,7 +26,6 @@ class TcpClient:
     def close_sockets(socket_container):
         for sock in socket_container:
             if sock:
-                #print('Removing server socket [{}]'.format(sock.getsockname()))
                 sock.close()
 
     def cleanup(self):

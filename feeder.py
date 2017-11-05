@@ -41,7 +41,3 @@ class Feeder(TcpServer):
             if sock is self.listener:
                 continue
             self.generic_handle(handler=self.send_one_peer_order_books, sock=sock, encoded_order_books=encoded_order_books)
-
-        #print('SELF INPUTS {}'.format(len(self.inputs)))
-        #print('ORDER BOOKS {}'.format(len(order_books)))
-        #print('ENCODED ORDER BOOKS {}'.format(len(encoded_order_books)))
