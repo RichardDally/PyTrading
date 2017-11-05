@@ -70,6 +70,9 @@ class TcpClient:
         pass
 
     def process_sockets(self):
+        if len(self.output_message_stacks[self.server_socket]):
+            self.outputs.append(self.server_socket)
+
         self.r, self.w, _ = select.select(self.inputs, self.outputs, self.inputs, self.select_timeout)
 
         for sock in self.r:
