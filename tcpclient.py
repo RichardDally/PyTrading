@@ -65,16 +65,6 @@ class TcpClient:
             self.w.remove(self.server_socket)
         self.server_socket = None
 
-    def read_from_server(self, sock):
-        data = sock.recv(8192)
-        if data:
-            self.logger.debug('Adding server data ({}) to buffer'.format(len(data)))
-            self.server_buffer += data
-            self.on_read_from_server()
-        else:
-            print('Server closed its socket')
-            self.remove_server_socket()
-
     @abstractmethod
     def on_read_from_server(self):
         pass
