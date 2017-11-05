@@ -79,10 +79,6 @@ class TcpClient:
     def on_read_from_server(self):
         pass
 
-    @abstractmethod
-    def on_write_to_server(self, sock):
-        pass
-
     def process_sockets(self):
         self.r, self.w, _ = select.select(self.inputs, self.outputs, self.inputs, self.select_timeout)
 
@@ -90,7 +86,25 @@ class TcpClient:
             self.generic_handle(self.read_from_server, sock)
 
         for sock in self.w:
-            self.generic_handle(self.on_write_to_server, sock)
+            self.generic_handle(handler=self.write_to_server, sock=sock)
+
+    def read_from_server(self, **kwargs):
+        sock = kwargs.get('sock')
+        data = sock.recv(8192)
+        if data:
+            self.logger.debug('Adding server data ({}) to buffer'.format(len(data)))
+            self.received_buffer += data
+            self.on_read_from_server()
+        else:
+            print('Server closed its socket')
+            self.remove_server_socket()
+
+    def write_to_server(self, **kwargs):
+        sock = kwargs.get('sock')
+        while len(self.output_message_stacks[sock]) > 0:
+            next_message = self.output_message_stacks[sock].pop(0)
+            sock.send(next_message)
+        self.outputs.remove(sock)
 
     def generic_handle(self, handler, sock):
         try:

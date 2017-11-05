@@ -25,6 +25,3 @@ class FeederHandler(TcpClient):
                                                                                    self.handle_callbacks)
         if decoded_messages_count == 0:
             print('--- No decoded messages ---')
-
-    def on_write_to_server(self, sock):
-        pass
