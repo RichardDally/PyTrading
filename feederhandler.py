@@ -17,6 +17,9 @@ class FeederHandler(TcpClient):
     def handle_order_book(self, order_book):
         self.logger.debug('Order book received:{}'.format(str(order_book)))
 
+    def on_connect(self):
+        pass
+
     def on_read_from_server(self):
         decoded_messages_count, self.server_buffer = self.marshaller.decode_buffer(self.server_buffer,
                                                                                    self.handle_callbacks)

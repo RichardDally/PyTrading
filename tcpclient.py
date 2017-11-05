@@ -19,6 +19,7 @@ class TcpClient:
         self.listener = None
         self.inputs = []
         self.outputs = []
+        self.output_message_stacks = {}
         self.r = None
         self.w = None
 
@@ -35,6 +36,10 @@ class TcpClient:
     def is_connected(self):
         return self.server_socket is not None
 
+    @abstractmethod
+    def on_connect(self):
+        pass
+
     def connect(self):
         if self.server_socket:
             raise Exception("Already connected...")
@@ -43,6 +48,9 @@ class TcpClient:
         print('Connecting on [{0}:{1}]'.format(self.host, self.port))
         self.server_socket.connect((self.host, self.port))
         self.inputs.append(self.server_socket)
+        # TODO: investigate why this goes to 100% CPU
+        self.output_message_stacks[self.server_socket] = []
+        self.on_connect()
 
     def remove_server_socket(self):
         print('Removing server socket [{}]'.format(self.server_socket.getsockname()))
