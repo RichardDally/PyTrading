@@ -12,7 +12,7 @@ class TcpClient:
     def __init__(self, host, port):
         self.logger = logging.getLogger(__name__)
         self.server_socket = None
-        self.server_buffer = bytearray()
+        self.received_buffer = bytearray()
         self.host = host
         self.port = port
         self.select_timeout = 0.5

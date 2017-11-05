@@ -19,7 +19,7 @@ class OrderHandler(TcpClient):
         self.output_message_stacks[self.server_socket].append(encoded_create_order)
 
     def on_read_from_server(self):
-        decoded_messages_count, self.server_buffer = self.marshaller.decode_buffer(self.server_buffer,
-                                                                                   self.handle_callbacks)
+        decoded_messages_count, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer,
+                                                                                     self.handle_callbacks)
         if decoded_messages_count == 0:
             print('--- No decoded messages ---')
