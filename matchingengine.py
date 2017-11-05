@@ -1,6 +1,6 @@
 from orderbook import OrderBook
 from tcpserver import TcpServer
-from tcpserver import ClosedConnection
+from staticdata import MessageTypes
 
 
 class MatchingEngine(TcpServer):
@@ -10,6 +10,12 @@ class MatchingEngine(TcpServer):
         self.referential = referential
         self.order_books = {}
         self.initialize_order_books()
+        self.handle_callbacks = {MessageTypes.CreateOrder: self.handle_create_order}
+
+    def handle_create_order(self, create_order):
+        print('HANDLE CREATE ORDER')
+        print(create_order)
+        # TODO: validate create order request and add it to order book
 
     def get_order_books(self):
         return self.order_books
@@ -23,11 +29,11 @@ class MatchingEngine(TcpServer):
 
     def on_accept_connection(self, **kwargs):
         sock = kwargs['sock']
-        self.message_stacks[sock] = []
+        self.output_message_stacks[sock] = []
         print('Matching engine got connection from [{}]'.format(sock.getpeername()))
 
     def handle_readable_client(self, **kwargs):
-        sock = kwargs['sock']
-        data = sock.recv(8192)
-        if not data:
-            raise ClosedConnection
+        decoded_messages_count, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer,
+                                                                                     self.handle_callbacks)
+        if decoded_messages_count == 0:
+            print('--- No decoded messages ---')

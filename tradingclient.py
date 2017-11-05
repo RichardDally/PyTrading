@@ -32,7 +32,7 @@ class TradingClient:
         except KeyboardInterrupt:
             print('Stopped by user')
         except socket.error as exception:
-            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.ECONNREFUSED):
                 print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
                 print(traceback.print_exc())
         finally:

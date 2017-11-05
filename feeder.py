@@ -20,7 +20,7 @@ class Feeder(TcpServer):
 
     def on_accept_connection(self, **kwargs):
         sock = kwargs['sock']
-        self.message_stacks[sock] = [self.marshaller.encode_referential(self.referential)]
+        self.output_message_stacks[sock] = [self.marshaller.encode_referential(self.referential)]
         print('Feeder got connection from [{}]'.format(sock.getpeername()))
 
     def handle_readable_client(self, **kwargs):
@@ -33,8 +33,8 @@ class Feeder(TcpServer):
         sock = kwargs.get('sock')
         self.logger.debug('Adding message to [{}]  message queue'.format(sock.getpeername()))
         for encoded_order_book in kwargs['encoded_order_books']:
-            self.message_stacks[sock].append(encoded_order_book)
-        self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.message_stacks[sock]), sock.getpeername()))
+            self.output_message_stacks[sock].append(encoded_order_book)
+        self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.output_message_stacks[sock]), sock.getpeername()))
 
     def send_all_order_books(self, order_books):
         encoded_order_books = []

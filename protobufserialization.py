@@ -15,7 +15,8 @@ from serialization import Serialization, NotEnoughBytes
 class ProtobufSerialization(Serialization):
     def __init__(self):
         self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
-                                 MessageTypes.OrderBook: self.decode_order_book}
+                                 MessageTypes.OrderBook: self.decode_order_book,
+                                 MessageTypes.CreateOrder: self.decode_create_order}
 
     def decode_header(self, buffer):
         fmt = '>QB'

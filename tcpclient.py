@@ -26,7 +26,7 @@ class TcpClient:
     def close_sockets(socket_container):
         for sock in socket_container:
             if sock:
-                print('Removing server socket [{}]'.format(sock.getpeername()))
+                #print('Removing server socket [{}]'.format(sock.getsockname()))
                 sock.close()
 
     def cleanup(self):
@@ -46,7 +46,7 @@ class TcpClient:
         self.inputs.append(self.server_socket)
 
     def remove_server_socket(self):
-        print('Removing server socket [{}]'.format(self.server_socket.getpeername()))
+        print('Removing server socket [{}]'.format(self.server_socket.getsockname()))
         if self.server_socket in self.outputs:
             self.outputs.remove(self.server_socket)
         if self.server_socket in self.inputs:

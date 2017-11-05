@@ -12,7 +12,8 @@ class SimpleSerialization(Serialization):
     def __init__(self):
         self.separator = '|'
         self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
-                                 MessageTypes.OrderBook: self.decode_order_book}
+                                 MessageTypes.OrderBook: self.decode_order_book,
+                                 MessageTypes.CreateOrder: self.decode_create_order}
 
     def decode_header(self, buffer):
         """ Decode header (total length + message type)"""

@@ -20,7 +20,8 @@ class TcpServer:
         self.listener = None
         self.inputs = []
         self.outputs = []
-        self.message_stacks = {}
+        self.output_message_stacks = {}
+        self.received_buffer = bytearray()
         self.r = None
         self.w = None
 
@@ -41,8 +42,8 @@ class TcpServer:
         if sock in self.inputs:
             self.inputs.remove(sock)
         sock.close()
-        if sock in self.message_stacks:
-            del self.message_stacks[sock]
+        if sock in self.output_message_stacks:
+            del self.output_message_stacks[sock]
         if sock in self.r:
             self.r.remove(sock)
         if sock in self.w:
@@ -70,7 +71,7 @@ class TcpServer:
             if sock is self.listener:
                 self.accept_connection()
             else:
-                self.generic_handle(handler=self.handle_readable_client, sock=sock)
+                self.generic_handle(handler=self.handle_readable, sock=sock)
 
         for sock in self.w:
             self.generic_handle(handler=self.handle_writable, sock=sock)
@@ -92,11 +93,19 @@ class TcpServer:
             print(traceback.print_exc())
         self.remove_client_socket(kwargs['sock'])
 
+    def handle_readable(self, **kwargs):
+        sock = kwargs['sock']
+        data = sock.recv(8192)
+        if not data:
+            raise ClosedConnection
+        self.received_buffer += data
+        self.handle_readable_client(**kwargs)
+
     def handle_writable(self, **kwargs):
         sock = kwargs.get('sock')
         # sent_messages = 0
-        while len(self.message_stacks[sock]) > 0:
-            next_message = self.message_stacks[sock].pop(0)
+        while len(self.output_message_stacks[sock]) > 0:
+            next_message = self.output_message_stacks[sock].pop(0)
             sock.send(next_message)
             # sent_messages += 1
             # print('DEBUG {}'.format(next_message))
