@@ -21,6 +21,7 @@ class MatchingEngine(TcpServer):
                               quantity=create_order.quantity,
                               price=create_order.price,
                               counterparty='TODO')
+            # TODO: counterparty should be filled according to socket identifier
             order_book.on_new_order(new_order)
         except KeyError:
             self.logger.warning('Order book related to instrument identifier [{}] does not exist'
