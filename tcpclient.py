@@ -76,7 +76,7 @@ class TcpClient:
         self.r, self.w, _ = select.select(self.inputs, self.outputs, self.inputs, self.select_timeout)
 
         for sock in self.r:
-            self.generic_handle(self.read_from_server, sock)
+            self.generic_handle(handler=self.read_from_server, sock=sock)
 
         for sock in self.w:
             self.generic_handle(handler=self.write_to_server, sock=sock)
@@ -99,9 +99,9 @@ class TcpClient:
             sock.send(next_message)
         self.outputs.remove(sock)
 
-    def generic_handle(self, handler, sock):
+    def generic_handle(self, **kwargs):
         try:
-            handler(sock)
+            kwargs['handler'](**kwargs)
             return
         except KeyboardInterrupt:
             raise
