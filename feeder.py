@@ -24,10 +24,7 @@ class Feeder(TcpServer):
         print('Feeder got connection from [{}]'.format(sock.getpeername()))
 
     def handle_readable_client(self, **kwargs):
-        sock = kwargs['sock']
-        data = sock.recv(8192)
-        if not data:
-            raise ClosedConnection
+        raise NotImplementedError('handle_readable_client')
 
     def send_one_peer_order_books(self, **kwargs):
         sock = kwargs.get('sock')
