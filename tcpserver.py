@@ -103,13 +103,9 @@ class TcpServer:
 
     def handle_writable(self, **kwargs):
         sock = kwargs.get('sock')
-        # sent_messages = 0
         while len(self.output_message_stacks[sock]) > 0:
             next_message = self.output_message_stacks[sock].pop(0)
             sock.send(next_message)
-            # sent_messages += 1
-            # print('DEBUG {}'.format(next_message))
-        # print('[{}] messages were sent to [{}]'.format(sent_messages, sock.getpeername()))
 
     def listen(self):
         self.listener = socket.socket()
