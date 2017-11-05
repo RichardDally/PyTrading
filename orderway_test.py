@@ -18,9 +18,8 @@ class TestOrderWay(unittest.TestCase):
 
     def test_invalid_way(self):
         wrong_way_value = 42
-        with self.assertRaises(InvalidWay) as context:
+        with self.assertRaises(InvalidWay):
             OrderWay(way=wrong_way_value)
-        self.assertTrue(wrong_way_value in context.exception)
 
 
 if __name__ == '__main__':
