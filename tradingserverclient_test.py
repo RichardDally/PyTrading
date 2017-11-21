@@ -40,11 +40,10 @@ def start_client():
 
 class TestTradingServerClient(unittest.TestCase):
     def test_trading_server_and_client(self):
-        # TODO: fix logging to stdout
         logging.basicConfig(stream=sys.stdout,
                             level=logging.INFO,
-                            format='%(asctime)s %(levelname)-8s %(message)s',
-                            datefmt='%d/%m/%Y %I:%M:%S %p')
+                            format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
+                            datefmt='%d/%m/%Y %H:%M:%S')
 
         thread_pool = ThreadPool(processes=2)
         async_server_result = thread_pool.apply_async(start_server)
