@@ -3,6 +3,7 @@ import logging
 import socket
 import traceback
 import errno
+import datetime
 from feederhandler import FeederHandler
 from orderhandler import OrderHandler
 
@@ -42,10 +43,10 @@ class TradingClient:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='TradingClient.log',
-                        level=logging.INFO,
-                        format='%(asctime)s %(levelname)-8s %(message)s',
-                        datefmt='%d/%m/%Y %I:%M:%S %p')
+    logging.basicConfig(filename=datetime.datetime.now().strftime("TradingClient_%Y%m%d_%H%M%S.log"),
+                        level=logging.DEBUG,
+                        format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
+                        datefmt='%d/%m/%Y %H:%M:%S %p')
     try:
         from protobufserialization import ProtobufSerialization
     except ImportError as error:

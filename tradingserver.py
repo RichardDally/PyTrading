@@ -1,6 +1,7 @@
 import time
 import logging
 import socket
+import datetime
 import traceback
 from feeder import Feeder
 from matchingengine import MatchingEngine
@@ -53,10 +54,10 @@ class TradingServer:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='TradingServer.log',
+    logging.basicConfig(filename=datetime.datetime.now().strftime("TradingServer_%Y%m%d_%H%M%S.log"),
                         level=logging.INFO,
-                        format='%(asctime)s %(levelname)-8s %(message)s',
-                        datefmt='%d/%m/%Y %I:%M:%S %p')
+                        format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
+                        datefmt='%d/%m/%Y %H:%M:%S %p')
     try:
         from protobufserialization import ProtobufSerialization
     except ImportError as error:
