@@ -16,7 +16,7 @@ counter = Counter()
 
 class Order:
     def __init__(self, way, instrument_identifier, quantity, price, counterparty,
-                 identifier=counter.get_value(), timestamp=int(time.time()),
+                 identifier=counter.get_value(), timestamp=None,
                  canceled_quantity=0.0, executed_quantity=0.0):
         self.identifier = identifier
         self.way = way
@@ -26,7 +26,11 @@ class Order:
         self.executed_quantity = executed_quantity
         self.price = price
         self.counterparty = counterparty
-        self.timestamp = timestamp
+        if timestamp:
+            self.timestamp = timestamp
+        else:
+            # TODO: improve timestamp precision to milliseconds
+            self.timestamp = int(time.time())
 
     def get_remaining_quantity(self):
         remaining_quantity = self.quantity - self.executed_quantity - self.canceled_quantity
