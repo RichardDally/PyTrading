@@ -1,5 +1,6 @@
 import logging
 from order import Order
+from logon import Logon
 from orderway import OrderWay
 from createorder import CreateOrder
 from orderbook import OrderBook
@@ -13,7 +14,8 @@ class SimpleSerialization(Serialization):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.separator = '|'
-        self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
+        self.decode_callbacks = {MessageTypes.Logon: self.decode_logon,
+                                 MessageTypes.Referential: self.decode_referential,
                                  MessageTypes.OrderBook: self.decode_order_book,
                                  MessageTypes.CreateOrder: self.decode_create_order}
 
@@ -157,3 +159,17 @@ class SimpleSerialization(Serialization):
                                    quantity=float(tokens[2]),
                                    instrument_identifier=int(tokens[3]))
         return create_order
+
+    def encode_logon(self, logon):
+        message_type = MessageTypes.Logon
+        logon_string = "{0}{1}{0}{2}{0}{3}{0}".format(self.separator,
+                                                      message_type,
+                                                      logon.login,
+                                                      logon.password)
+        encoded_logon = str(len(logon_string)) + logon_string
+        return bytearray(encoded_logon, 'utf-8')
+
+    def decode_logon(self, encoded_logon):
+        tokens = list(filter(None, encoded_logon.split(self.separator)))
+        logon = Logon(login=tokens[0], password=tokens[1])
+        return logon

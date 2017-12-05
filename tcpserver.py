@@ -18,9 +18,11 @@ class TcpServer:
         self.port = port
         self.select_timeout = 0.5
         self.listener = None
+        self.client_sessions = {}
         self.inputs = []
         self.outputs = []
         self.output_message_stacks = {}
+        # TODO: only one server buffer for every clients is wrong
         self.received_buffer = bytearray()
         self.r = None
         self.w = None

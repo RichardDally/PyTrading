@@ -6,6 +6,26 @@ from tcpserver import TcpServer
 from staticdata import MessageTypes
 
 
+# TODO: move this code away
+class SessionStatus:
+    Handshaking = 1
+    Authenticated = 2
+    Disconnecting = 3
+
+    def __init__(self, status):
+        self.status = status
+
+
+# TODO: move this code away
+class ClientSession:
+    def __init__(self, status, sock, peer_name):
+        self.status = status
+        self.login = None
+        self.password = None
+        self.sock = sock
+        self.peer_name = peer_name
+
+
 class MatchingEngine(TcpServer):
     def __init__(self, referential, marshaller, port):
         TcpServer.__init__(self, port)
@@ -14,21 +34,40 @@ class MatchingEngine(TcpServer):
         self.referential = referential
         self.order_books = {}
         self.initialize_order_books()
-        self.handle_callbacks = {MessageTypes.CreateOrder: self.handle_create_order}
+        self.handle_callbacks = {MessageTypes.Logon: self.handle_logon,
+                                 MessageTypes.CreateOrder: self.handle_create_order}
 
-    def handle_create_order(self, create_order):
+    def on_accept_connection(self, **kwargs):
+        sock = kwargs['sock']
+        self.output_message_stacks[sock] = []
+        client_session = ClientSession(status=SessionStatus(SessionStatus.Handshaking),
+                                       sock=sock, peer_name=sock.getpeername())
+        self.client_sessions[sock] = client_session
+        self.logger.info('Matching engine got connection from [{}]'.format(client_session.peer_name))
+
+    def handle_logon(self, logon, sock):
+        client_session = self.client_sessions[sock]
+        # TODO: search login among authorized ones
+        client_session.login = logon.login
+        client_session.password = logon.password
+        client_session.status = SessionStatus(SessionStatus.Authenticated)
+        self.logger.info('Logon handled [{}], for [{}]'.format(logon, client_session.peer_name))
+
+    def handle_create_order(self, create_order, sock):
+        client_session = self.client_sessions[sock]
+        # TODO: does client session is allowed to create orders ?
         try:
             order_book = self.order_books[create_order.instrument_identifier]
+        except KeyError:
+            self.logger.warning('Order book related to instrument identifier [{}] does not exist'
+                                .format(create_order.instrument_identifier))
+        else:
             new_order = Order(way=create_order.way,
                               instrument_identifier=create_order.instrument_identifier,
                               quantity=create_order.quantity,
                               price=create_order.price,
-                              counterparty='TODO')
-            # TODO: counterparty should be filled according to socket identifier
+                              counterparty=client_session.peer_name)
             order_book.on_new_order(new_order)
-        except KeyError:
-            self.logger.warning('Order book related to instrument identifier [{}] does not exist'
-                                .format(create_order.instrument_identifier))
 
     def get_order_books(self):
         return self.order_books

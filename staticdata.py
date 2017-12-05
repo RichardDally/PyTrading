@@ -3,9 +3,10 @@ from referential import Referential
 
 
 class MessageTypes:
-    Referential = 1
-    OrderBook = 2
-    CreateOrder = 3
+    Logon = 1
+    Referential = 2
+    OrderBook = 3
+    CreateOrder = 4
 
 
 currencies = {1: 'EUR',

@@ -39,3 +39,11 @@ class Serialization:
     @abstractmethod
     def decode_create_order(self, encoded_create_order):
         pass
+
+    @abstractmethod
+    def encode_logon(self, logon):
+        pass
+
+    @abstractmethod
+    def decode_logon(self, encoded_logon):
+        pass

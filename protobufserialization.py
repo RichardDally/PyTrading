@@ -3,6 +3,8 @@ import logging
 import orderbook_pb2
 import referential_pb2
 import createorder_pb2
+import logon_pb2
+from logon import Logon
 from order import Order
 from orderway import OrderWay
 from createorder import CreateOrder
@@ -15,7 +17,9 @@ from serialization import Serialization, NotEnoughBytes
 
 class ProtobufSerialization(Serialization):
     def __init__(self):
-        self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
+        self.logger = logging.getLogger(__name__)
+        self.decode_callbacks = {MessageTypes.Logon: self.decode_logon,
+                                 MessageTypes.Referential: self.decode_referential,
                                  MessageTypes.OrderBook: self.decode_order_book,
                                  MessageTypes.CreateOrder: self.decode_create_order}
 
@@ -140,3 +144,18 @@ class ProtobufSerialization(Serialization):
                                    price=create_order_message.price,
                                    instrument_identifier=create_order_message.instrument_identifier)
         return create_order
+
+    def encode_logon(self, logon):
+        logon_message = logon_pb2.Logon()
+        logon_message.login = logon.login
+        logon_message.password = logon.password
+        logon_message_bytes = logon_message.SerializeToString()
+        encoded_logon_message = struct.pack('>QB', len(logon_message_bytes), MessageTypes.Logon)
+        encoded_logon_message += logon_message_bytes
+        return encoded_logon_message
+
+    def decode_logon(self, encoded_logon):
+        logon_message = logon_pb2.Logon()
+        logon_message.ParseFromString(encoded_logon)
+        logon = Logon(login=logon_message.login, password=logon_message.password)
+        return logon

@@ -9,9 +9,10 @@ from orderhandler import OrderHandler
 
 
 class TradingClient:
-    def __init__(self, marshaller, host, feeder_port, matching_engine_port, uptime_in_seconds):
+    def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):
+        self.logger = logging.getLogger(__name__)
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
-        self.orderhandler = OrderHandler(marshaller=marshaller, host=host, port=matching_engine_port)
+        self.orderhandler = OrderHandler(login=login, password=password, marshaller=marshaller, host=host, port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:

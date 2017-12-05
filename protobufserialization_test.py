@@ -1,4 +1,5 @@
 import unittest
+from logon import Logon
 from orderway import Buy, Sell
 from order import Order
 from createorder import CreateOrder
@@ -13,6 +14,14 @@ class TestProtobufSerialization(unittest.TestCase):
     def setUp(self):
         self.instrument_identifier = 0
         self.marshaller = ProtobufSerialization()
+
+    def test_logon(self):
+        logon = Logon(login='Richard', password='MyUltraSecretPassword')
+        encoded_logon = self.marshaller.encode_logon(logon=logon)
+        message_type, body, _ = self.marshaller.decode_header(encoded_logon)
+        decoded_logon = self.marshaller.decode_logon(body)
+        self.assertEqual(message_type, MessageTypes.Logon)
+        self.assertEqual(logon.__dict__, decoded_logon.__dict__)
 
     def test_empty_referential(self):
         empty_referential = Referential()

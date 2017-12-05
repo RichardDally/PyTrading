@@ -26,7 +26,9 @@ def start_server():
 def start_client():
     try:
         time.sleep(1)
-        client = TradingClient(marshaller=SimpleSerialization(),
+        client = TradingClient(login='UnitTest',
+                               password='UnitTest',
+                               marshaller=SimpleSerialization(),
                                host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=60000,
                                matching_engine_port=60001,
