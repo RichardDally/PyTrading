@@ -14,7 +14,7 @@ class TestOrderMatching(unittest.TestCase):
         self.book.on_new_order(attacked_order)
         matching_orders = self.book.get_matching_orders(attacking_order)
         self.assertEqual(len(matching_orders), 1)
-        self.assertEqual(matching_orders[0], attacked_order)
+        self.assertEqual(matching_orders[0].__dict__, attacked_order.__dict__)
 
     def test_buy_price_greater_than_sell(self):
         attacking_order = Order(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
