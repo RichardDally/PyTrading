@@ -24,13 +24,20 @@ class TradingClient:
             return time.time() >= self.stop_time
         return False
 
-    def start(self):
+    @staticmethod
+    def all_connected(handlers):
+        for handler in handlers:
+            if not handler.is_connected():
+                return False
+        return True
+
+    def start(self, handlers):
         try:
-            self.feedhandler.connect()
-            self.orderhandler.connect()
-            while not self.reached_uptime() and self.feedhandler.is_connected() and self.orderhandler.is_connected():
-                self.feedhandler.process_sockets()
-                self.orderhandler.process_sockets()
+            for handler in handlers:
+                handler.connect()
+            while not self.reached_uptime() and self.all_connected(handlers):
+                for handler in handlers:
+                    handler.process_sockets()
         except KeyboardInterrupt:
             print('Stopped by user')
         except socket.error as exception:
@@ -38,9 +45,9 @@ class TradingClient:
                 print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
                 print(traceback.print_exc())
         finally:
-            self.feedhandler.cleanup()
-            self.orderhandler.cleanup()
-        print('Client ends')
+            for handler in handlers:
+                handler.cleanup()
+        self.logger.info('Client ends')
 
 
 if __name__ == '__main__':
