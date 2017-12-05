@@ -11,6 +11,7 @@ from staticdata import MessageTypes
 from serialization import Serialization
 
 
+""" NOT UP-TO-DATE for the moment... """
 class CapnpSerialization(Serialization):
     def __init__(self):
         self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
