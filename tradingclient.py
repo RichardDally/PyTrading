@@ -66,4 +66,4 @@ if __name__ == '__main__':
                                feeder_port=50000,
                                matching_engine_port=50001,
                                uptime_in_seconds=None)
-        client.start()
+        client.start([client.feedhandler, client.orderhandler])
