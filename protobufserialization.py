@@ -36,25 +36,24 @@ class ProtobufSerialization(Serialization):
         new_offset = header_size + message_length
         return message_type, body, new_offset
 
-    def decode_buffer(self, buffer, handle_callbacks):
-        decoded_messages_count = 0
+    def decode_buffer(self, buffer):
+        decoded_objects = []
         try:
             while True:
                 message_type, body, new_offset = self.decode_header(buffer)
 
                 # TODO: Handle unsupported message type
                 decoded_object = self.decode_callbacks[message_type](body)
-                handle_callbacks[message_type](decoded_object)
+                decoded_objects.append([message_type, decoded_object])
 
                 buffer = buffer[new_offset:]
-                decoded_messages_count += 1
         except ValueError:
             pass
         except NotEnoughBytes:
             pass
         except struct.error:
             pass
-        return decoded_messages_count, buffer
+        return decoded_objects, buffer
 
     def encode_referential(self, referential):
         referential_message = referential_pb2.Referential()

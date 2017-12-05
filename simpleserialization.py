@@ -19,10 +19,17 @@ class SimpleSerialization(Serialization):
                                  MessageTypes.OrderBook: self.decode_order_book,
                                  MessageTypes.CreateOrder: self.decode_create_order}
 
+    """ Decode header (total length + message type)"""
     def decode_header(self, buffer):
-        """ Decode header (total length + message type)"""
-        # print('buffer [{}]'.format(buffer))
-        message_length_separator_index = buffer.decode('utf-8').index(self.separator)
+        self.logger.debug('Buffer [{}]'.format(buffer))
+
+        decoded_buffer = buffer.decode('utf-8')
+        try:
+            message_length_separator_index = decoded_buffer.index(self.separator)
+        except ValueError:
+            self.logger.warning('No separator in buffer [{}]'.format(decoded_buffer))
+            raise NotEnoughBytes
+
         message_length = int(buffer[:message_length_separator_index])
         message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
         self.logger.debug('Decode buffer, message type [{}]'.format(type(message)))
@@ -42,25 +49,20 @@ class SimpleSerialization(Serialization):
 
         return message_type, body, new_offset
 
-    def decode_buffer(self, buffer, handle_callbacks):
-        decoded_messages_count = 0
-
+    def decode_buffer(self, buffer):
+        decoded_objects = []
         try:
             while True:
                 message_type, body, new_offset = self.decode_header(buffer)
-
-                # TODO: Handle unsupported message type
-                decoded_object = self.decode_callbacks[message_type](body)
-                handle_callbacks[message_type](decoded_object)
-
+                try:
+                    decoded_object = self.decode_callbacks[message_type](body)
+                    decoded_objects.append([message_type, decoded_object])
+                except KeyError:
+                        self.logger.warning('Message type [{}] cannot be decoded'.format(message_type))
                 buffer = buffer[new_offset:]
-                decoded_messages_count += 1
-        except ValueError:
-            pass
         except NotEnoughBytes:
             pass
-
-        return decoded_messages_count, buffer
+        return decoded_objects, buffer
 
     def encode_referential(self, referential):
         message_type = str(MessageTypes.Referential)

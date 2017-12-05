@@ -17,7 +17,8 @@ class CapnpSerialization(Serialization):
         self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
                                  MessageTypes.OrderBook: self.decode_order_book}
 
-    def decode_buffer(self, buffer, handle_callbacks):
+    # TODO: fix implementation
+    def decode_buffer(self, buffer):
         decoded_messages_count = 0
         header_size = 9
         try:

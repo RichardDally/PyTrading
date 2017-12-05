@@ -15,7 +15,7 @@ class Serialization:
 
     # TODO: change buffer variable name
     @abstractmethod
-    def decode_buffer(self, buffer, handle_callbacks):
+    def decode_buffer(self, buffer):
         pass
 
     @abstractmethod

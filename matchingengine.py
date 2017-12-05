@@ -79,13 +79,13 @@ class MatchingEngine(TcpServer):
             self.order_books[instrument.identifier] = OrderBook(instrument.identifier)
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
-    def on_accept_connection(self, **kwargs):
-        sock = kwargs['sock']
-        self.output_message_stacks[sock] = []
-        print('Matching engine got connection from [{}]'.format(sock.getpeername()))
-
     def handle_readable_client(self, **kwargs):
-        decoded_messages_count, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer,
-                                                                                     self.handle_callbacks)
-        if decoded_messages_count == 0:
+        decoded_objects, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer)
+        for decoded_object in decoded_objects:
+            try:
+                self.handle_callbacks[decoded_object[0]](decoded_object[1], kwargs['sock'])
+            except Exception as exception:
+                self.logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
+                self.logger.error(traceback.print_exc())
+        else:
             print('--- No decoded messages ---')
