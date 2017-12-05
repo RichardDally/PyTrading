@@ -1,3 +1,4 @@
+import logging
 from tcpclient import TcpClient
 from staticdata import MessageTypes
 
@@ -5,6 +6,7 @@ from staticdata import MessageTypes
 class FeederHandler(TcpClient):
     def __init__(self, marshaller, host, port):
         TcpClient.__init__(self, host, port)
+        self.logger = logging.getLogger(__name__)
         self.marshaller = marshaller
         self.referential = None
         self.handle_callbacks = {MessageTypes.Referential: self.handle_referential,

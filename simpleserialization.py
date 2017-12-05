@@ -1,3 +1,4 @@
+import logging
 from order import Order
 from orderway import OrderWay
 from createorder import CreateOrder
@@ -10,6 +11,7 @@ from serialization import Serialization, NotEnoughBytes
 
 class SimpleSerialization(Serialization):
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
         self.separator = '|'
         self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
                                  MessageTypes.OrderBook: self.decode_order_book,
@@ -21,14 +23,14 @@ class SimpleSerialization(Serialization):
         message_length_separator_index = buffer.decode('utf-8').index(self.separator)
         message_length = int(buffer[:message_length_separator_index])
         message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
-        # print('decode buffer, message type [{}]'.format(type(message)))
+        self.logger.debug('Decode buffer, message type [{}]'.format(type(message)))
 
-        # print('Message length {}'.format(message_length))
-        # print('Message actual length [{}]'.format(len(message)))
-        # print('Message [{}]'.format(message))
+        self.logger.debug('Message length {}'.format(message_length))
+        self.logger.debug('Message actual length [{}]'.format(len(message)))
+        self.logger.debug('Message [{}]'.format(message))
 
         if len(message) != message_length - 1:
-            print('Message length does not match current message length')
+            self.logger.info('Message length does not match current message length')
             raise NotEnoughBytes
 
         message_type_separator_index = message.index(self.separator)

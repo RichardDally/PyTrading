@@ -1,4 +1,5 @@
 import struct
+import logging
 import orderbook_pb2
 import referential_pb2
 import createorder_pb2
@@ -118,7 +119,7 @@ class ProtobufSerialization(Serialization):
                           counterparty=decoded_order.counterparty,
                           timestamp=decoded_order.timestamp)
             order_book.add_order(order)
-        #print(order_book)
+        self.logger.debug(order_book)
         return order_book
 
     def encode_create_order(self, create_order):
