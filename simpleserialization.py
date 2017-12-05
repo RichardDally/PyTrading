@@ -88,8 +88,8 @@ class SimpleSerialization(Serialization):
     def encode_order_book(self, order_book):
         message_type = str(MessageTypes.OrderBook)
 
-        # TODO: replace pipe by self.separator
-        statistics = '{}|{}|{}|{}'.format(
+        statistics = '{1}{0}{2}{0}{3}{0}{4}'.format(
+            self.separator,
             str(order_book.instrument_identifier),
             str(order_book.last_price),
             str(order_book.high_price),
@@ -98,8 +98,8 @@ class SimpleSerialization(Serialization):
         orders_string = ''
         orders = order_book.get_all_orders()
         for order in orders:
-            # TODO: replace pipe by self.separator
-            orders_string += '{}|{}|{}|{}|{}|{}|{}|{}|'.format(
+            orders_string += '{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}{0}{8}{0}'.format(
+                self.separator,
                 str(order.identifier),
                 str(order.way.way),
                 str(order.quantity),

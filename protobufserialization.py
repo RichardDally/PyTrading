@@ -30,8 +30,8 @@ class ProtobufSerialization(Serialization):
         readable_bytes = len(buffer) - header_size
         if message_length > readable_bytes:
             raise NotEnoughBytes
-        #print('Message type [{}]'.format(message_type))
-        #print('Message length [{}]'.format(message_length))
+        self.logger.debug('Message type [{}]'.format(message_type))
+        self.logger.debug('Message length [{}]'.format(message_length))
         body = bytes(buffer[header_size: header_size + message_length])
         new_offset = header_size + message_length
         return message_type, body, new_offset
@@ -68,9 +68,10 @@ class ProtobufSerialization(Serialization):
                 instrument.currency_identifier = instrument_to_serialize.currency_identifier
         referential_bytes = referential_message.SerializeToString()
 
-        #print('Referential bytes [{}]'.format(referential_bytes))
-        #print('Referential bytes length [{}]'.format(len(referential_bytes)))
-        encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential) + referential_bytes
+        self.logger.debug('Referential bytes [{}]'.format(referential_bytes))
+        self.logger.debug('Referential bytes length [{}]'.format(len(referential_bytes)))
+        encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential)
+        encoded_referential += referential_bytes
         return encoded_referential
 
     def decode_referential(self, encoded_referential):
@@ -102,7 +103,8 @@ class ProtobufSerialization(Serialization):
             order.counterparty = order_to_serialize.counterparty
             order.timestamp = order_to_serialize.timestamp
         order_book_bytes = order_book_message.SerializeToString()
-        encoded_order_book = struct.pack('>QB', len(order_book_bytes), MessageTypes.OrderBook) + order_book_bytes
+        encoded_order_book = struct.pack('>QB', len(order_book_bytes), MessageTypes.OrderBook)
+        encoded_order_book += order_book_bytes
         return encoded_order_book
 
     def decode_order_book(self, encoded_order_book):
@@ -133,7 +135,8 @@ class ProtobufSerialization(Serialization):
         create_order_message.price = create_order.price
         create_order_message.instrument_identifier = create_order.instrument_identifier
         create_order_bytes = create_order_message.SerializeToString()
-        encoded_create_order = struct.pack('>QB', len(create_order_bytes), MessageTypes.CreateOrder) + create_order_bytes
+        encoded_create_order = struct.pack('>QB', len(create_order_bytes), MessageTypes.CreateOrder)
+        encoded_create_order += create_order_bytes
         return encoded_create_order
 
     def decode_create_order(self, encoded_create_order):
