@@ -33,7 +33,7 @@ def start_client():
                                feeder_port=60000,
                                matching_engine_port=60001,
                                uptime_in_seconds=3.0)
-        client.start()
+        client.start([client.feedhandler, client.orderhandler])
     except Exception as exception:
         print(traceback.print_exc())
         return exception
