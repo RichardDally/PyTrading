@@ -39,11 +39,11 @@ class TradingClient:
                 for handler in handlers:
                     handler.process_sockets()
         except KeyboardInterrupt:
-            print('Stopped by user')
+            self.logger.info('Stopped by user')
         except socket.error as exception:
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.ECONNREFUSED):
-                print('Client connection lost, unhandled errno [{}]'.format(exception.errno))
-                print(traceback.print_exc())
+                self.logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
+                self.logger.warning(traceback.print_exc())
         finally:
             for handler in handlers:
                 handler.cleanup()
