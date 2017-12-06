@@ -19,8 +19,9 @@ class SimpleSerialization(Serialization):
                                  MessageTypes.OrderBook: self.decode_order_book,
                                  MessageTypes.CreateOrder: self.decode_create_order}
 
-    """ Decode header (total length + message type)"""
     def decode_header(self, buffer):
+        """ Decode header (total length + message type) """
+
         self.logger.debug('Buffer [{}]'.format(buffer))
 
         decoded_buffer = buffer.decode('utf-8')

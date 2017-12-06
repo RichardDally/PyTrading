@@ -1,5 +1,4 @@
 from tcpserver import TcpServer
-from tcpserver import ClosedConnection
 from staticdata import StaticData
 
 

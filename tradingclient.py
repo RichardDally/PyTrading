@@ -51,8 +51,10 @@ class TradingClient:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename=datetime.datetime.now().strftime("TradingClient_%Y%m%d_%H%M%S.log"),
-                        level=logging.DEBUG,
+    import sys
+    logging.basicConfig(stream=sys.stdout,
+                        #filename=datetime.datetime.now().strftime("TradingClient_%Y%m%d_%H%M%S.log"),
+                        level=logging.INFO,
                         format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %H:%M:%S %p')
     try:
@@ -61,7 +63,9 @@ if __name__ == '__main__':
         ProtobufSerialization = None
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
-        client = TradingClient(marshaller=ProtobufSerialization(),
+        client = TradingClient(login='RichardDally',
+                               password='Password',
+                               marshaller=ProtobufSerialization(),
                                host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=50000,
                                matching_engine_port=50001,

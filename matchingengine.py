@@ -56,6 +56,7 @@ class MatchingEngine(TcpServer):
     def handle_create_order(self, create_order, sock):
         client_session = self.client_sessions[sock]
         # TODO: does client session is allowed to create orders ?
+        # TODO: does client is authenticated ?
         try:
             order_book = self.order_books[create_order.instrument_identifier]
         except KeyError:
@@ -66,7 +67,7 @@ class MatchingEngine(TcpServer):
                               instrument_identifier=create_order.instrument_identifier,
                               quantity=create_order.quantity,
                               price=create_order.price,
-                              counterparty=client_session.peer_name)
+                              counterparty=client_session.login)
             order_book.on_new_order(new_order)
 
     def get_order_books(self):
@@ -87,5 +88,5 @@ class MatchingEngine(TcpServer):
             except Exception as exception:
                 self.logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
                 self.logger.error(traceback.print_exc())
-        else:
-            print('--- No decoded messages ---')
+        if len(decoded_objects) == 0:
+            self.logger.info('--- No decoded messages ---')
