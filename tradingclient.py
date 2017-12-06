@@ -3,7 +3,6 @@ import logging
 import socket
 import traceback
 import errno
-import datetime
 from feederhandler import FeederHandler
 from orderhandler import OrderHandler
 

@@ -1,7 +1,6 @@
 import time
 import logging
 import socket
-import datetime
 import traceback
 from feeder import Feeder
 from matchingengine import MatchingEngine
