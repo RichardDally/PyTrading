@@ -8,14 +8,12 @@ class NotEnoughBytes(BaseException):
 class Serialization:
     __metaclass__ = ABCMeta
 
-    # TODO: change buffer variable name
     @abstractmethod
-    def decode_header(self, buffer):
+    def decode_header(self, encoded_string):
         pass
 
-    # TODO: change buffer variable name
     @abstractmethod
-    def decode_buffer(self, buffer):
+    def decode_buffer(self, encoded_string):
         pass
 
     @abstractmethod

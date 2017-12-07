@@ -109,10 +109,10 @@ class TcpClient:
             pass
         except socket.error as exception:
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
-                print('Server connection lost, unhandled errno [{}]'.format(exception.errno))
-                print(traceback.print_exc())
+                self.logger.error('Server connection lost, unhandled errno [{}]'.format(exception.errno))
+                self.logger.error(traceback.print_exc())
         except Exception as exception:
-            print('generic_handle: {}'.format(exception))
-            print(traceback.print_exc())
+            self.logger.error('generic_handle: {}'.format(exception))
+            self.logger.error(traceback.print_exc())
 
         self.remove_server_socket()

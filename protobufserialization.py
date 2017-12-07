@@ -23,37 +23,37 @@ class ProtobufSerialization(Serialization):
                                  MessageTypes.OrderBook: self.decode_order_book,
                                  MessageTypes.CreateOrder: self.decode_create_order}
 
-    def decode_header(self, buffer):
+    def decode_header(self, encoded_string):
         fmt = '>QB'
         header_size = struct.calcsize(fmt)
-        message_length, message_type = struct.unpack_from(fmt, buffer)
-        readable_bytes = len(buffer) - header_size
+        message_length, message_type = struct.unpack_from(fmt, encoded_string)
+        readable_bytes = len(encoded_string) - header_size
         if message_length > readable_bytes:
             raise NotEnoughBytes
         self.logger.debug('Message type [{}]'.format(message_type))
         self.logger.debug('Message length [{}]'.format(message_length))
-        body = bytes(buffer[header_size: header_size + message_length])
+        body = bytes(encoded_string[header_size: header_size + message_length])
         new_offset = header_size + message_length
         return message_type, body, new_offset
 
-    def decode_buffer(self, buffer):
+    def decode_buffer(self, encoded_string):
         decoded_objects = []
         try:
             while True:
-                message_type, body, new_offset = self.decode_header(buffer)
+                message_type, body, new_offset = self.decode_header(encoded_string)
 
                 # TODO: Handle unsupported message type
                 decoded_object = self.decode_callbacks[message_type](body)
                 decoded_objects.append([message_type, decoded_object])
 
-                buffer = buffer[new_offset:]
+                encoded_string = encoded_string[new_offset:]
         except ValueError:
             pass
         except NotEnoughBytes:
             pass
         except struct.error:
             pass
-        return decoded_objects, buffer
+        return decoded_objects, encoded_string
 
     def encode_referential(self, referential):
         referential_message = referential_pb2.Referential()

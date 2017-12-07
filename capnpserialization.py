@@ -19,31 +19,31 @@ class CapnpSerialization(Serialization):
                                  MessageTypes.OrderBook: self.decode_order_book}
 
     # TODO: fix implementation
-    def decode_buffer(self, buffer):
+    def decode_buffer(self, encoded_string):
         decoded_messages_count = 0
         header_size = 9
         try:
-            while len(buffer) > header_size:
-                message_length, message_type = struct.unpack_from('>Qc', buffer)
-                readable_bytes = len(buffer) - header_size
+            while len(encoded_string) > header_size:
+                message_length, message_type = struct.unpack_from('>Qc', encoded_string)
+                readable_bytes = len(encoded_string) - header_size
                 # TODO: bring back the logs
                 #print('Message length [{}]'.format(message_length))
                 #print('Message type [{}]'.format(message_type))
                 if message_length > readable_bytes:
                     #print('Not enough bytes ({}) to decode current message ({})'.format(readable_bytes, message_length))
                     break
-                encoded_message = buffer[header_size: header_size + message_length]
+                encoded_message = encoded_string[header_size: header_size + message_length]
 
                 # TODO: Handle unsupported message type
                 decoded_object = self.decode_callbacks[message_type](encoded_message)
                 handle_callbacks[message_type](decoded_object)
 
-                buffer = buffer[header_size + message_length:]
+                encoded_string = encoded_string[header_size + message_length:]
                 decoded_messages_count += 1
         except Exception as exception:
-            print('decode_buffer: {}'.format(exception))
+            print('decode_encoded_string: {}'.format(exception))
             print(traceback.print_exc())
-        return decoded_messages_count, buffer
+        return decoded_messages_count, encoded_string
 
     def encode_referential(self, referential):
         referential_message = referential_capnp.Referential.new_message()
