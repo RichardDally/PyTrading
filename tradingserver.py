@@ -8,6 +8,7 @@ from matchingengine import MatchingEngine
 
 class TradingServer:
     def __init__(self, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
+        self.logger = logging.getLogger(__name__)
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)
         self.matching_engine = MatchingEngine(referential=self.feeder.get_referential(), marshaller=marshaller, port=matching_engine_port)
         self.start_time = None
@@ -23,30 +24,27 @@ class TradingServer:
 
     def print_listen_messages(self):
         if self.start_time and self.stop_time:
-            print('Feeder listening on port [{}] for [{}] seconds'.format(self.feeder.port,
-                                                                          self.stop_time - self.start_time))
-            print('Matching engine listening on port [{}] for [{}] seconds'.format(self.matching_engine.port,
-                                                                                   self.stop_time - self.start_time))
+            duration = self.stop_time - self.start_time
+            self.logger.info('Feeder listening on port [{}] for [{}] seconds'.format(self.feeder.port, duration))
+            self.logger.info('Matching engine listening on port [{}] for [{}] seconds'.format(self.matching_engine.port, duration))
         else:
-            print('Feeder listening on port [{}]'.format(self.feeder.port))
-            print('Matching engine listening on port [{}]'.format(self.matching_engine.port))
+            self.logger.info('Feeder listening on port [{}]'.format(self.feeder.port))
+            self.logger.info('Matching engine listening on port [{}]'.format(self.matching_engine.port))
 
     def start(self):
         try:
             self.feeder.listen()
             self.matching_engine.listen()
             self.print_listen_messages()
-
             while not self.reached_uptime():
                 self.matching_engine.process_sockets()
                 self.feeder.process_sockets()
                 self.feeder.send_all_order_books(self.matching_engine.get_order_books())
-
         except KeyboardInterrupt:
-            print('Stopped by user')
+            self.logger.info('Stopped by user')
         except socket.error as exception:
-            print('Trading server socket error [{}]'.format(exception))
-            print(traceback.print_exc())
+            self.logger.error('Trading server socket error [{}]'.format(exception))
+            self.logger.error(traceback.print_exc())
         finally:
             self.feeder.cleanup()
             self.matching_engine.cleanup()

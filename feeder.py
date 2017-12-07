@@ -20,7 +20,7 @@ class Feeder(TcpServer):
     def on_accept_connection(self, **kwargs):
         sock = kwargs['sock']
         self.output_message_stacks[sock] = [self.marshaller.encode_referential(self.referential)]
-        print('Feeder got connection from [{}]'.format(sock.getpeername()))
+        self.logger.info('Feeder got connection from [{}]'.format(sock.getpeername()))
 
     def handle_readable_client(self, **kwargs):
         raise NotImplementedError('handle_readable_client')
