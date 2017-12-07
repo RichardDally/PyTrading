@@ -4,26 +4,8 @@ from order import Order
 from orderbook import OrderBook
 from tcpserver import TcpServer
 from staticdata import MessageTypes
-
-
-# TODO: move this code away
-class SessionStatus:
-    Handshaking = 1
-    Authenticated = 2
-    Disconnecting = 3
-
-    def __init__(self, status):
-        self.status = status
-
-
-# TODO: move this code away
-class ClientSession:
-    def __init__(self, status, sock, peer_name):
-        self.status = status
-        self.login = None
-        self.password = None
-        self.sock = sock
-        self.peer_name = peer_name
+from sessionstatus import SessionStatus
+from clientsession import ClientSession
 
 
 class MatchingEngine(TcpServer):
