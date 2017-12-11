@@ -8,6 +8,12 @@ from sessionstatus import SessionStatus
 from clientsession import ClientSession
 
 
+class LogonRejected(BaseException):
+    """ Client logon attempt is rejected """
+    def __init__(self, reason):
+        self.reason = reason
+
+
 class MatchingEngine(TcpServer):
     def __init__(self, referential, marshaller, port):
         TcpServer.__init__(self, port)
@@ -28,8 +34,14 @@ class MatchingEngine(TcpServer):
         self.logger.info('Matching engine got connection from [{}]'.format(client_session.peer_name))
 
     def handle_logon(self, logon, sock):
-        client_session = self.client_sessions[sock]
+        for client_session in self.client_sessions.itervalues():
+            if client_session.login == logon.login:
+                self.logger.info('Rejecting logon from [{}]'.format(sock.getpeername()))
+                raise LogonRejected(reason='Already connected')
+
         # TODO: search login among authorized ones
+
+        client_session = self.client_sessions[sock]
         client_session.login = logon.login
         client_session.password = logon.password
         client_session.status = SessionStatus(SessionStatus.Authenticated)
