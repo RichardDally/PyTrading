@@ -5,4 +5,5 @@ __pycache__
 *.log
 capnptest.py
 *_pb2.py
+*.db
 Compile.bat
