@@ -19,6 +19,9 @@ instruments = {1: Instrument(identifier=1, name='Carrefour', isin='FR0000120172'
 
 
 class StaticData:
+    def __init__(self):
+        pass
+
     @staticmethod
     def get_currency(index):
         return currencies.get(index)
