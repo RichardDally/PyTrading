@@ -14,9 +14,10 @@ class LogonRejected(BaseException):
 
 
 class MatchingEngine(TcpServer):
-    def __init__(self, referential, marshaller, port):
+    def __init__(self, storage, referential, marshaller, port):
         TcpServer.__init__(self, port)
         self.logger = logging.getLogger(__name__)
+        self.storage = storage
         self.marshaller = marshaller
         self.referential = referential
         self.order_books = {}

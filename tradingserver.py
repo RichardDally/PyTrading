@@ -3,14 +3,19 @@ import logging
 import socket
 import traceback
 from feeder import Feeder
+from database import Database
 from matchingengine import MatchingEngine
 
 
 class TradingServer:
-    def __init__(self, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
+    def __init__(self, storage, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
         self.logger = logging.getLogger(__name__)
+        self.storage = storage
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)
-        self.matching_engine = MatchingEngine(referential=self.feeder.get_referential(), marshaller=marshaller, port=matching_engine_port)
+        self.matching_engine = MatchingEngine(storage=self.storage,
+                                              referential=self.feeder.get_referential(),
+                                              marshaller=marshaller,
+                                              port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
@@ -63,7 +68,14 @@ if __name__ == '__main__':
         ProtobufSerialization = None
         print('Unable to start trading server. Reason [{}]'.format(error))
     else:
-        server = TradingServer(feeder_port=50000,
+        login = 'rick'
+        password = 'pass'
+        db = Database(database_filename='PyTrading.db')
+        db.initialize()
+        if not db.is_valid_user(login=login, password=password):
+            db.insert_user(login=login, password=password)
+        server = TradingServer(storage=db,
+                               feeder_port=50000,
                                matching_engine_port=50001,
                                marshaller=ProtobufSerialization(),
                                uptime_in_seconds=None)
