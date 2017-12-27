@@ -36,18 +36,20 @@ class MatchingEngine(TcpServer):
         self.logger.info('Matching engine got connection from [{}]'.format(client_session.peer_name))
 
     def handle_logon(self, logon, sock):
-        for client_session in self.client_sessions.itervalues():
-            if client_session.login == logon.login:
-                self.logger.info('Rejecting logon from [{}]'.format(sock.getpeername()))
-                raise LogonRejected(reason='Already connected')
-
-        # TODO: search login among authorized ones
-
         client_session = self.client_sessions[sock]
         client_session.login = logon.login
+
+        for cs in self.client_sessions.values():
+            if logon.login == cs.login and cs.status == SessionStatus.Authenticated:
+                self.logger.info('Rejecting logon from [{}]'.format(client_session.peer_name))
+                raise LogonRejected(reason='Already connected')
+
+        if not self.storage.is_valid_user(login=logon.login, password=logon.password):
+            raise LogonRejected(reason='Unknown user')
+
         client_session.password = logon.password
-        client_session.status = SessionStatus(SessionStatus.Authenticated)
-        self.logger.info('Logon handled [{}], for [{}]'.format(logon, client_session.peer_name))
+        client_session.status = SessionStatus.Authenticated
+        self.logger.info('[{}] is now [{}]'.format(logon.login, client_session.status.name))
 
     def handle_create_order(self, create_order, sock):
         client_session = self.client_sessions[sock]
@@ -55,7 +57,7 @@ class MatchingEngine(TcpServer):
             raise OrderRejected('Client is not authenticated')
 
         # TODO: does client session is allowed to create orders ?
-        # TODO: does client is authenticated ?
+
         try:
             self.logger.info('Create order for {}'.format(client_session))
             order_book = self.order_books[create_order.instrument_identifier]
