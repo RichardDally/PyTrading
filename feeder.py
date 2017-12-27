@@ -14,9 +14,9 @@ class Feeder(TcpServer):
         return self.referential
 
     def initialize_referential(self):
-        self.logger.debug('Loading referential')
+        self.logger.info('Loading referential')
         self.referential = StaticData.get_default_referential()
-        self.logger.debug('Referential is loaded')
+        self.logger.info('Referential is loaded')
 
     def on_accept_connection(self, **kwargs):
         client_session = kwargs['client_session']

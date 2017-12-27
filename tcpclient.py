@@ -89,7 +89,7 @@ class TcpClient:
             self.received_buffer += data
             self.on_read_from_server()
         else:
-            self.logger.info('Server closed its socket')
+            self.logger.info('Server [{}] closed its socket'.format(sock.getpeername()))
             self.remove_server_socket()
 
     def write_to_server(self, **kwargs):

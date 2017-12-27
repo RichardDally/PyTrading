@@ -47,6 +47,7 @@ class MatchingEngine(TcpServer):
         # TODO: does client session is allowed to create orders ?
         # TODO: does client is authenticated ?
         try:
+            self.logger.info('Create order for {}'.format(client_session))
             order_book = self.order_books[create_order.instrument_identifier]
         except KeyError:
             self.logger.warning('Order book related to instrument identifier [{}] does not exist'
