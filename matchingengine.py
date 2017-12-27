@@ -7,6 +7,7 @@ from staticdata import MessageTypes
 from sessionstatus import SessionStatus
 
 
+# TODO: move elsewhere exceptions
 class LogonRejected(BaseException):
     """ Client logon attempt is rejected """
     def __init__(self, reason):
