@@ -3,6 +3,8 @@ import select
 import socket
 import logging
 import traceback
+from clientsession import ClientSession
+from sessionstatus import SessionStatus
 from abc import ABCMeta, abstractmethod
 
 
@@ -21,9 +23,6 @@ class TcpServer:
         self.client_sessions = {}
         self.inputs = []
         self.outputs = []
-        self.output_message_stacks = {}
-        # TODO: only one server buffer for every clients is wrong
-        self.received_buffer = bytearray()
         self.r = None
         self.w = None
 
@@ -38,25 +37,29 @@ class TcpServer:
         TcpServer.close_sockets(self.outputs)
 
     def remove_client_socket(self, sock):
-        print('Removing client socket [{}]'.format(sock.getsockname()))
+        client_session = self.client_sessions.pop(sock)
+        self.logger.info('Removing client socket [{}] from port [{}]'.format(client_session.peer_name,
+                                                                             self.port))
         if sock in self.outputs:
             self.outputs.remove(sock)
         if sock in self.inputs:
             self.inputs.remove(sock)
-        sock.close()
-        if sock in self.output_message_stacks:
-            del self.output_message_stacks[sock]
         if sock in self.r:
             self.r.remove(sock)
         if sock in self.w:
             self.w.remove(sock)
+        sock.close()
 
     def accept_connection(self):
         sock, _ = self.listener.accept()
         sock.setblocking(0)
         self.inputs.append(sock)
         self.outputs.append(sock)
-        self.on_accept_connection(sock=sock)
+        client_session = ClientSession(status=SessionStatus.Handshaking,
+                                       sock=sock,
+                                       peer_name=sock.getpeername())
+        self.client_sessions[sock] = client_session
+        self.on_accept_connection(client_session=client_session)
 
     @abstractmethod
     def on_accept_connection(self, **kwargs):
@@ -97,17 +100,19 @@ class TcpServer:
 
     def handle_readable(self, **kwargs):
         sock = kwargs['sock']
-        data = sock.recv(8192)
+        client_session = self.client_sessions[sock]
+        data = client_session.sock.recv(8192)
         if not data:
             raise ClosedConnection
-        self.received_buffer += data
+        client_session.received_buffer += data
         self.handle_readable_client(**kwargs)
 
     def handle_writable(self, **kwargs):
-        sock = kwargs.get('sock')
-        while len(self.output_message_stacks[sock]) > 0:
-            next_message = self.output_message_stacks[sock].pop(0)
-            sock.send(next_message)
+        sock = kwargs['sock']
+        client_session = self.client_sessions[sock]
+        while len(client_session.output_message_stack) > 0:
+            next_message = client_session.output_message_stack.pop(0)
+            client_session.sock.send(next_message)
 
     def listen(self):
         self.listener = socket.socket()

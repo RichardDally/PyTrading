@@ -1,5 +1,6 @@
 from tcpserver import TcpServer
 from staticdata import StaticData
+from sessionstatus import SessionStatus
 
 
 class Feeder(TcpServer):
@@ -18,19 +19,22 @@ class Feeder(TcpServer):
         self.logger.debug('Referential is loaded')
 
     def on_accept_connection(self, **kwargs):
-        sock = kwargs['sock']
-        self.output_message_stacks[sock] = [self.marshaller.encode_referential(self.referential)]
-        self.logger.info('Feeder got connection from [{}]'.format(sock.getpeername()))
+        client_session = kwargs['client_session']
+        # No authentication for Feed (for the moment)
+        client_session.status = SessionStatus.Authenticated
+        client_session.output_message_stack.append(self.marshaller.encode_referential(self.referential))
+        self.logger.info('Feeder got connection from [{}]'.format(client_session.peer_name))
 
     def handle_readable_client(self, **kwargs):
         raise NotImplementedError('handle_readable_client')
 
     def send_one_peer_order_books(self, **kwargs):
-        sock = kwargs.get('sock')
-        self.logger.debug('Adding message to [{}]  message queue'.format(sock.getpeername()))
+        sock = kwargs['sock']
+        client_session = self.client_sessions[sock]
+        self.logger.debug('Adding message to [{}]  message queue'.format(client_session.peer_name))
         for encoded_order_book in kwargs['encoded_order_books']:
-            self.output_message_stacks[sock].append(encoded_order_book)
-        self.logger.debug('Message queue size [{}] for [{}]'.format(len(self.output_message_stacks[sock]), sock.getpeername()))
+            client_session.output_message_stack.append(encoded_order_book)
+        self.logger.debug('Message queue size [{}] for [{}]'.format(len(client_session.output_message_stack), client_session.peer_name))
 
     def send_all_order_books(self, order_books):
         encoded_order_books = []

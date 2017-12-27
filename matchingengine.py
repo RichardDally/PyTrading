@@ -5,7 +5,6 @@ from orderbook import OrderBook
 from tcpserver import TcpServer
 from staticdata import MessageTypes
 from sessionstatus import SessionStatus
-from clientsession import ClientSession
 
 
 class LogonRejected(BaseException):
@@ -26,11 +25,7 @@ class MatchingEngine(TcpServer):
                                  MessageTypes.CreateOrder.value: self.handle_create_order}
 
     def on_accept_connection(self, **kwargs):
-        sock = kwargs['sock']
-        self.output_message_stacks[sock] = []
-        client_session = ClientSession(status=SessionStatus(SessionStatus.Handshaking),
-                                       sock=sock, peer_name=sock.getpeername())
-        self.client_sessions[sock] = client_session
+        client_session = kwargs['client_session']
         self.logger.info('Matching engine got connection from [{}]'.format(client_session.peer_name))
 
     def handle_logon(self, logon, sock):
@@ -75,10 +70,11 @@ class MatchingEngine(TcpServer):
         self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
 
     def handle_readable_client(self, **kwargs):
-        decoded_objects, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer)
+        client_session = self.client_sessions[kwargs['sock']]
+        decoded_objects, client_session.received_buffer = self.marshaller.decode_buffer(client_session.received_buffer)
         for decoded_object in decoded_objects:
             try:
-                self.handle_callbacks[decoded_object[0]](decoded_object[1], kwargs['sock'])
+                self.handle_callbacks[decoded_object[0]](decoded_object[1], client_session.sock)
             except Exception as exception:
                 self.logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
                 self.logger.error(traceback.print_exc())
