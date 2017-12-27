@@ -41,11 +41,12 @@ class Order:
         return remaining_quantity
 
     def __str__(self):
-        return '{} {} {} @ {} ({})'.format(str(self.way),
-                                           self.instrument_identifier,
-                                           self.get_remaining_quantity(),
-                                           self.price,
-                                           self.timestamp)
+        return '{} {} {} @ {} from {} ({})'.format(str(self.way),
+                                                   self.instrument_identifier,
+                                                   self.get_remaining_quantity(),
+                                                   self.price,
+                                                   self.counterparty,
+                                                   self.timestamp)
 
     def __cmp__(self, other):
         return self.__dict__ == other.__dict__
