@@ -18,10 +18,10 @@ from serialization import Serialization, NotEnoughBytes
 class ProtobufSerialization(Serialization):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.decode_callbacks = {MessageTypes.Logon: self.decode_logon,
-                                 MessageTypes.Referential: self.decode_referential,
-                                 MessageTypes.OrderBook: self.decode_order_book,
-                                 MessageTypes.CreateOrder: self.decode_create_order}
+        self.decode_callbacks = {MessageTypes.Logon.value: self.decode_logon,
+                                 MessageTypes.Referential.value: self.decode_referential,
+                                 MessageTypes.OrderBook.value: self.decode_order_book,
+                                 MessageTypes.CreateOrder.value: self.decode_create_order}
 
     def decode_header(self, encoded_string):
         fmt = '>QB'
@@ -69,7 +69,7 @@ class ProtobufSerialization(Serialization):
 
         self.logger.debug('Referential bytes [{}]'.format(referential_bytes))
         self.logger.debug('Referential bytes length [{}]'.format(len(referential_bytes)))
-        encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential)
+        encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential.value)
         encoded_referential += referential_bytes
         return encoded_referential
 
@@ -102,7 +102,7 @@ class ProtobufSerialization(Serialization):
             order.counterparty = order_to_serialize.counterparty
             order.timestamp = order_to_serialize.timestamp
         order_book_bytes = order_book_message.SerializeToString()
-        encoded_order_book = struct.pack('>QB', len(order_book_bytes), MessageTypes.OrderBook)
+        encoded_order_book = struct.pack('>QB', len(order_book_bytes), MessageTypes.OrderBook.value)
         encoded_order_book += order_book_bytes
         return encoded_order_book
 
@@ -134,7 +134,7 @@ class ProtobufSerialization(Serialization):
         create_order_message.price = create_order.price
         create_order_message.instrument_identifier = create_order.instrument_identifier
         create_order_bytes = create_order_message.SerializeToString()
-        encoded_create_order = struct.pack('>QB', len(create_order_bytes), MessageTypes.CreateOrder)
+        encoded_create_order = struct.pack('>QB', len(create_order_bytes), MessageTypes.CreateOrder.value)
         encoded_create_order += create_order_bytes
         return encoded_create_order
 
@@ -152,7 +152,7 @@ class ProtobufSerialization(Serialization):
         logon_message.login = logon.login
         logon_message.password = logon.password
         logon_message_bytes = logon_message.SerializeToString()
-        encoded_logon_message = struct.pack('>QB', len(logon_message_bytes), MessageTypes.Logon)
+        encoded_logon_message = struct.pack('>QB', len(logon_message_bytes), MessageTypes.Logon.value)
         encoded_logon_message += logon_message_bytes
         return encoded_logon_message
 

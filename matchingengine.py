@@ -22,8 +22,8 @@ class MatchingEngine(TcpServer):
         self.referential = referential
         self.order_books = {}
         self.initialize_order_books()
-        self.handle_callbacks = {MessageTypes.Logon: self.handle_logon,
-                                 MessageTypes.CreateOrder: self.handle_create_order}
+        self.handle_callbacks = {MessageTypes.Logon.value: self.handle_logon,
+                                 MessageTypes.CreateOrder.value: self.handle_create_order}
 
     def on_accept_connection(self, **kwargs):
         sock = kwargs['sock']

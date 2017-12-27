@@ -1,8 +1,9 @@
 from instrument import Instrument
 from referential import Referential
+from enum import Enum
 
 
-class MessageTypes:
+class MessageTypes(Enum):
     Logon = 1
     Referential = 2
     OrderBook = 3

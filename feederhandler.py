@@ -9,8 +9,8 @@ class FeederHandler(TcpClient):
         self.logger = logging.getLogger(__name__)
         self.marshaller = marshaller
         self.referential = None
-        self.handle_callbacks = {MessageTypes.Referential: self.handle_referential,
-                                 MessageTypes.OrderBook: self.handle_order_book}
+        self.handle_callbacks = {MessageTypes.Referential.value: self.handle_referential,
+                                 MessageTypes.OrderBook.value: self.handle_order_book}
 
     def handle_referential(self, new_referential):
         self.referential = new_referential

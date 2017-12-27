@@ -14,10 +14,10 @@ class SimpleSerialization(Serialization):
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.separator = '|'
-        self.decode_callbacks = {MessageTypes.Logon: self.decode_logon,
-                                 MessageTypes.Referential: self.decode_referential,
-                                 MessageTypes.OrderBook: self.decode_order_book,
-                                 MessageTypes.CreateOrder: self.decode_create_order}
+        self.decode_callbacks = {MessageTypes.Logon.value: self.decode_logon,
+                                 MessageTypes.Referential.value: self.decode_referential,
+                                 MessageTypes.OrderBook.value: self.decode_order_book,
+                                 MessageTypes.CreateOrder.value: self.decode_create_order}
 
     def decode_header(self, buffer):
         """ Decode header (total length + message type) """
@@ -66,7 +66,7 @@ class SimpleSerialization(Serialization):
         return decoded_objects, buffer
 
     def encode_referential(self, referential):
-        message_type = str(MessageTypes.Referential)
+        message_type = str(MessageTypes.Referential.value)
         instruments = ''
         for instrument in referential.get_instruments():
             instruments += str(instrument.identifier) + self.separator
@@ -89,7 +89,7 @@ class SimpleSerialization(Serialization):
         return referential
 
     def encode_order_book(self, order_book):
-        message_type = str(MessageTypes.OrderBook)
+        message_type = str(MessageTypes.OrderBook.value)
 
         statistics = '{1}{0}{2}{0}{3}{0}{4}'.format(
             self.separator,
@@ -144,7 +144,7 @@ class SimpleSerialization(Serialization):
         return order_book
 
     def encode_create_order(self, create_order):
-        message_type = MessageTypes.CreateOrder
+        message_type = MessageTypes.CreateOrder.value
         create_order_string = "{0}{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}"\
             .format(self.separator,
                     str(message_type),
@@ -164,7 +164,7 @@ class SimpleSerialization(Serialization):
         return create_order
 
     def encode_logon(self, logon):
-        message_type = MessageTypes.Logon
+        message_type = MessageTypes.Logon.value
         logon_string = "{0}{1}{0}{2}{0}{3}{0}".format(self.separator,
                                                       message_type,
                                                       logon.login,

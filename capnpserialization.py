@@ -15,8 +15,8 @@ class CapnpSerialization(Serialization):
     """ NOT UP-TO-DATE for the moment... """
 
     def __init__(self):
-        self.decode_callbacks = {MessageTypes.Referential: self.decode_referential,
-                                 MessageTypes.OrderBook: self.decode_order_book}
+        self.decode_callbacks = {MessageTypes.Referential.value: self.decode_referential,
+                                 MessageTypes.OrderBook.value: self.decode_order_book}
 
     # TODO: fix implementation
     def decode_buffer(self, encoded_string):
@@ -56,7 +56,7 @@ class CapnpSerialization(Serialization):
                 instrument_list[index].isin = instrument.isin
                 instrument_list[index].currencyIdentifier = instrument.currency_identifier
         referential_bytes = referential_message.to_bytes()
-        encoded_referential = struct.pack('>Qc', len(referential_bytes), MessageTypes.Referential) + referential_bytes
+        encoded_referential = struct.pack('>Qc', len(referential_bytes), MessageTypes.Referential.value) + referential_bytes
         return encoded_referential
 
     def decode_referential(self, encoded_referential):
@@ -92,7 +92,7 @@ class CapnpSerialization(Serialization):
         CapnpSerialization.encode_orders(order_book_message, order_book, 'asks')
 
         order_book_bytes = order_book_message.to_bytes()
-        encoded_order_book = struct.pack('>Qc', len(order_book_bytes), MessageTypes.OrderBook) + order_book_bytes
+        encoded_order_book = struct.pack('>Qc', len(order_book_bytes), MessageTypes.OrderBook.value) + order_book_bytes
         return encoded_order_book
 
     @staticmethod
