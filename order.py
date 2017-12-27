@@ -18,6 +18,8 @@ class Order:
     def __init__(self, way, instrument_identifier, quantity, price, counterparty,
                  identifier=counter.get_value(), timestamp=None,
                  canceled_quantity=0.0, executed_quantity=0.0):
+        if not counterparty:
+            raise Exception('Counterparty not set')
         self.identifier = identifier
         self.way = way
         self.instrument_identifier = instrument_identifier
