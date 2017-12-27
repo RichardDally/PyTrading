@@ -13,6 +13,12 @@ class LogonRejected(BaseException):
         self.reason = reason
 
 
+class OrderRejected(BaseException):
+    """ Order creation is rejected """
+    def __init__(self, reason):
+        self.reason = reason
+
+
 class MatchingEngine(TcpServer):
     def __init__(self, storage, referential, marshaller, port):
         TcpServer.__init__(self, port)
@@ -45,6 +51,9 @@ class MatchingEngine(TcpServer):
 
     def handle_create_order(self, create_order, sock):
         client_session = self.client_sessions[sock]
+        if client_session.status != SessionStatus.Authenticated:
+            raise OrderRejected('Client is not authenticated')
+
         # TODO: does client session is allowed to create orders ?
         # TODO: does client is authenticated ?
         try:
