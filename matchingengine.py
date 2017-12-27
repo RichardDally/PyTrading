@@ -91,5 +91,12 @@ class MatchingEngine(TcpServer):
             except Exception as exception:
                 self.logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
                 self.logger.error(traceback.print_exc())
+            except (LogonRejected, OrderRejected) as exception:
+                if exception is LogonRejected:
+                    self.logger.info('[{}] logon attempt is rejected. Reason [{}]'.format(client_session.login, exception.reason))
+                elif exception is OrderRejected:
+                    self.logger.error('Order from [{}] is rejected. Reason [{}]'.format(client_session.login, exception.reason))
+                self.remove_client_socket(client_session.sock)
+                break
         if len(decoded_objects) == 0:
             self.logger.info('--- No decoded messages ---')
