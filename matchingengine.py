@@ -42,7 +42,6 @@ class MatchingEngine(TcpServer):
 
         for cs in self.client_sessions.values():
             if logon.login == cs.login and cs.status == SessionStatus.Authenticated:
-                self.logger.info('Rejecting logon from [{}]'.format(client_session.peer_name))
                 raise LogonRejected(reason='Already connected')
 
         if not self.storage.is_valid_user(login=logon.login, password=logon.password):
@@ -92,11 +91,14 @@ class MatchingEngine(TcpServer):
             except Exception as exception:
                 self.logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
                 self.logger.error(traceback.print_exc())
-            except (LogonRejected, OrderRejected) as exception:
-                if exception is LogonRejected:
-                    self.logger.info('[{}] logon attempt is rejected. Reason [{}]'.format(client_session.login, exception.reason))
-                elif exception is OrderRejected:
-                    self.logger.error('Order from [{}] is rejected. Reason [{}]'.format(client_session.login, exception.reason))
+            except LogonRejected as exception:
+                self.logger.info('[{}] logon attempt from [{}] is rejected. Reason [{}]'
+                                 .format(client_session.login, client_session.peer_name, exception.reason))
+                self.remove_client_socket(client_session.sock)
+                break
+            except OrderRejected as exception:
+                self.logger.error('[{}] order attempt from [{}] is rejected. Reason [{}]'
+                                  .format(client_session.login, client_session.peer_name, exception.reason))
                 self.remove_client_socket(client_session.sock)
                 break
         if len(decoded_objects) == 0:
