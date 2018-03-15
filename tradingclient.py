@@ -40,6 +40,7 @@ class TradingClient:
         except KeyboardInterrupt:
             self.logger.info('Stopped by user')
         except socket.error as exception:
+            # TODO: improve unable to connect exceptions like
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.ECONNREFUSED):
                 self.logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
                 self.logger.warning(traceback.print_exc())
