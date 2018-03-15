@@ -24,6 +24,9 @@ class SimpleSerialization(Serialization):
 
         self.logger.debug('Buffer [{}]'.format(buffer))
 
+        if len(buffer) == 0:
+            raise NotEnoughBytes
+
         decoded_buffer = buffer.decode('utf-8')
         try:
             message_length_separator_index = decoded_buffer.index(self.separator)
