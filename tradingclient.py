@@ -63,8 +63,8 @@ if __name__ == '__main__':
         ProtobufSerialization = None
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
-        client = TradingClient(login='RichardDally',
-                               password='Password',
+        client = TradingClient(login='rick',
+                               password='pass',
                                marshaller=ProtobufSerialization(),
                                host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=50000,
