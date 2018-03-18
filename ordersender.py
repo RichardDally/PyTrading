@@ -10,7 +10,6 @@ class OrderSender(TcpClient):
         self.login = login
         self.password = password
         self.marshaller = marshaller
-        self.referential = None
         self.handle_callbacks = {}
 
     def on_connect(self):
