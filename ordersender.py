@@ -4,7 +4,7 @@ from createorder import CreateOrder
 from tcpclient import TcpClient
 
 
-class OrderHandler(TcpClient):
+class OrderSender(TcpClient):
     def __init__(self, login, password, marshaller, host, port):
         TcpClient.__init__(self, host, port)
         self.login = login

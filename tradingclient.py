@@ -4,14 +4,14 @@ import socket
 import traceback
 import errno
 from feederhandler import FeederHandler
-from orderhandler import OrderHandler
+from ordersender import OrderSender
 
 
 class TradingClient:
     def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):
         self.logger = logging.getLogger(__name__)
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
-        self.orderhandler = OrderHandler(login=login, password=password, marshaller=marshaller, host=host, port=matching_engine_port)
+        self.ordersender = OrderSender(login=login, password=password, marshaller=marshaller, host=host, port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
@@ -70,4 +70,4 @@ if __name__ == '__main__':
                                feeder_port=50000,
                                matching_engine_port=50001,
                                uptime_in_seconds=None)
-        client.start([client.feedhandler, client.orderhandler])
+        client.start([client.feedhandler, client.ordersender])
