@@ -15,12 +15,12 @@ class OrderSender(TcpClient):
     def on_connect(self):
         logon = Logon(self.login, self.password)
         encoded_logon = self.marshaller.encode_logon(logon)
-        create_order = CreateOrder(way=Buy(),
-                                   price=42.0,
-                                   quantity=1.0,
-                                   instrument_identifier=1)
-        encoded_create_order = self.marshaller.encode_create_order(create_order)
         self.output_message_stacks[self.server_socket].append(encoded_logon)
+
+    def push_order(self, way, price, quantity, instrument_identifier):
+        create_order = CreateOrder(way=way, price=price, quantity=quantity,
+                                   instrument_identifier=instrument_identifier)
+        encoded_create_order = self.marshaller.encode_create_order(create_order)
         self.output_message_stacks[self.server_socket].append(encoded_create_order)
 
     def on_read_from_server(self):
