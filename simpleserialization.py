@@ -19,23 +19,23 @@ class SimpleSerialization(Serialization):
                                  MessageTypes.OrderBook.value: self.decode_order_book,
                                  MessageTypes.CreateOrder.value: self.decode_create_order}
 
-    def decode_header(self, buffer):
+    def decode_header(self, encoded_string):
         """ Decode header (total length + message type) """
 
-        self.logger.debug('Buffer [{}]'.format(buffer))
+        self.logger.debug('Encoded string [{}]'.format(encoded_string))
 
-        if len(buffer) == 0:
+        if len(encoded_string) == 0:
             raise NotEnoughBytes
 
-        decoded_buffer = buffer.decode('utf-8')
+        decoded_buffer = encoded_string.decode('utf-8')
         try:
             message_length_separator_index = decoded_buffer.index(self.separator)
         except ValueError:
-            self.logger.warning('No separator in buffer [{}]'.format(decoded_buffer))
+            self.logger.warning('No separator in decoded buffer [{}]'.format(decoded_buffer))
             raise NotEnoughBytes
 
-        message_length = int(buffer[:message_length_separator_index])
-        message = buffer[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
+        message_length = int(encoded_string[:message_length_separator_index])
+        message = encoded_string[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
         self.logger.debug('Decode buffer, message type [{}]'.format(type(message)))
 
         self.logger.debug('Message length {}'.format(message_length))
@@ -53,20 +53,20 @@ class SimpleSerialization(Serialization):
 
         return message_type, body, new_offset
 
-    def decode_buffer(self, buffer):
+    def decode_buffer(self, encoded_string):
         decoded_objects = []
         try:
             while True:
-                message_type, body, new_offset = self.decode_header(buffer)
+                message_type, body, new_offset = self.decode_header(encoded_string)
                 try:
                     decoded_object = self.decode_callbacks[message_type](body)
                     decoded_objects.append([message_type, decoded_object])
                 except KeyError:
                         self.logger.warning('Message type [{}] cannot be decoded'.format(message_type))
-                buffer = buffer[new_offset:]
+                encoded_string = encoded_string[new_offset:]
         except NotEnoughBytes:
             pass
-        return decoded_objects, buffer
+        return decoded_objects, encoded_string
 
     def encode_referential(self, referential):
         message_type = str(MessageTypes.Referential.value)
