@@ -37,7 +37,3 @@ if __name__ == '__main__':
                         level=logging.INFO,
                         format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %H:%M:%S %p')
-    db = Database()
-    db.initialize()
-    db.insert_user(login='richard', password='password')
-    print(db.is_valid_user(login='richard', password='password'))
