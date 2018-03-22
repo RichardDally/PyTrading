@@ -8,6 +8,7 @@ class FeederHandler(TcpClient):
         TcpClient.__init__(self, host, port)
         self.logger = logging.getLogger(__name__)
         self.marshaller = marshaller
+        self.order_books = {}
         self.referential = None
         self.handle_callbacks = {MessageTypes.Referential.value: self.handle_referential,
                                  MessageTypes.OrderBook.value: self.handle_order_book}
@@ -17,7 +18,8 @@ class FeederHandler(TcpClient):
         self.logger.debug('Referential received:\n{}'.format(str(self.referential)))
 
     def handle_order_book(self, order_book):
-        self.logger.debug('Order book received:{}'.format(str(order_book)))
+        self.order_books[order_book.instrument_identifier] = order_book
+        self.logger.debug('Order book [{}] updated:{}'.format(order_book.instrument_identifier, str(order_book)))
 
     def on_connect(self):
         pass
