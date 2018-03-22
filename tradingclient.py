@@ -3,11 +3,15 @@ import logging
 import socket
 import traceback
 import errno
+from tcpserver import ClosedConnection
 from feederhandler import FeederHandler
 from ordersender import OrderSender
+from abc import ABCMeta, abstractmethod
 
 
 class TradingClient:
+    __metaclass__ = ABCMeta
+
     def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):
         self.logger = logging.getLogger(__name__)
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
@@ -17,6 +21,11 @@ class TradingClient:
         if uptime_in_seconds:
             self.start_time = time.time()
             self.stop_time = self.start_time + uptime_in_seconds
+
+    @abstractmethod
+    def main_loop_hook(self):
+        """ Your trading algo goes here :) """
+        pass
 
     def reached_uptime(self):
         if self.stop_time:
@@ -37,6 +46,9 @@ class TradingClient:
             while not self.reached_uptime() and self.all_connected(handlers):
                 for handler in handlers:
                     handler.process_sockets()
+                self.main_loop_hook()
+        except ClosedConnection:
+            pass
         except KeyboardInterrupt:
             self.logger.info('Stopped by user')
         except socket.error as exception:
@@ -63,11 +75,18 @@ if __name__ == '__main__':
         ProtobufSerialization = None
         print('Unable to start trading client. Reason [{}]'.format(error))
     else:
-        client = TradingClient(login='rick',
-                               password='pass',
-                               marshaller=ProtobufSerialization(),
-                               host=socket.gethostbyname(socket.gethostname()),
-                               feeder_port=50000,
-                               matching_engine_port=50001,
-                               uptime_in_seconds=None)
+        class BasicClient(TradingClient):
+            def __init__(self, *args, **kwargs):
+                super(BasicClient, self).__init__(*args, **kwargs)
+
+            def main_loop_hook(self):
+                pass
+
+        client = BasicClient(login='rick',
+                             password='pass',
+                             marshaller=ProtobufSerialization(),
+                             host=socket.gethostbyname(socket.gethostname()),
+                             feeder_port=50000,
+                             matching_engine_port=50001,
+                             uptime_in_seconds=None)
         client.start([client.feedhandler, client.ordersender])

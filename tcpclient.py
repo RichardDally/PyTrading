@@ -3,6 +3,7 @@ import select
 import socket
 import logging
 import traceback
+from tcpserver import ClosedConnection
 from abc import ABCMeta, abstractmethod
 
 
