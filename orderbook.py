@@ -1,5 +1,6 @@
-from orderway import Buy, Sell, InvalidWay
 import logging
+from orderway import Buy, Sell
+from exceptions import InvalidWay
 
 
 class OrderBook:

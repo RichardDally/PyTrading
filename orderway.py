@@ -1,5 +1,4 @@
-class InvalidWay(BaseException):
-    """ Way must be equal to BUY or SELL """
+from exceptions import InvalidWay
 
 
 class WayEnum:

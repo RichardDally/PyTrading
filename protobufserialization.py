@@ -12,7 +12,8 @@ from orderbook import OrderBook
 from instrument import Instrument
 from referential import Referential
 from staticdata import MessageTypes
-from serialization import Serialization, NotEnoughBytes
+from serialization import Serialization
+from exceptions import NotEnoughBytes
 
 
 class ProtobufSerialization(Serialization):

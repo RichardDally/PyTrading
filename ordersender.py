@@ -1,7 +1,7 @@
 from logon import Logon
 from createorder import CreateOrder
 from tcpclient import TcpClient
-from tcpserver import ClosedConnection
+from exceptions import ClosedConnection
 
 
 class OrderSender(TcpClient):

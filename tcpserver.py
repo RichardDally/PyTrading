@@ -3,13 +3,10 @@ import select
 import socket
 import logging
 import traceback
+from exceptions import ClosedConnection
 from clientsession import ClientSession
 from sessionstatus import SessionStatus
 from abc import ABCMeta, abstractmethod
-
-
-class ClosedConnection(BaseException):
-    """ Client socket connection has been closed """
 
 
 class TcpServer:

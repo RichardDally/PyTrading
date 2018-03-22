@@ -5,19 +5,7 @@ from orderbook import OrderBook
 from tcpserver import TcpServer
 from staticdata import MessageTypes
 from sessionstatus import SessionStatus
-
-
-# TODO: move elsewhere exceptions
-class LogonRejected(BaseException):
-    """ Client logon attempt is rejected """
-    def __init__(self, reason):
-        self.reason = reason
-
-
-class OrderRejected(BaseException):
-    """ Order creation is rejected """
-    def __init__(self, reason):
-        self.reason = reason
+from exceptions import LogonRejected, OrderRejected
 
 
 class MatchingEngine(TcpServer):

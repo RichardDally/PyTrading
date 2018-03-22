@@ -1,5 +1,6 @@
 import unittest
-from orderway import OrderWay, Buy, Sell, InvalidWay, WayEnum
+from orderway import OrderWay, Buy, Sell, WayEnum
+from exceptions import InvalidWay
 
 
 class TestOrderWay(unittest.TestCase):
