@@ -65,7 +65,6 @@ class TradingClient:
 if __name__ == '__main__':
     import sys
     logging.basicConfig(stream=sys.stdout,
-                        #filename=datetime.datetime.now().strftime("TradingClient_%Y%m%d_%H%M%S.log"),
                         level=logging.INFO,
                         format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
                         datefmt='%d/%m/%Y %H:%M:%S %p')
