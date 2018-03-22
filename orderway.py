@@ -3,6 +3,8 @@ class InvalidWay(BaseException):
 
 
 class WayEnum:
+    def __init__(self):
+        pass
     BUY = 0
     SELL = 1
 
