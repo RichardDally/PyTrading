@@ -1,0 +1,21 @@
+environment:
+
+  matrix:
+    - PYTHON: "C:\\Python34"
+    #- PYTHON: "C:\\Python35"
+    #  DISTUTILS_USE_SDK: "1"
+    #- PYTHON: "C:\\Python34-x64"
+    #  DISTUTILS_USE_SDK: "1"
+    #- PYTHON: "C:\\Python35-x64"
+    #- PYTHON: "C:\\Python36-x64"
+
+install:
+  - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
+  - Start-FileDownload https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-win32.zip
+  - 7z x protoc-3.4.0-win32.zip -o protoc-3.4.0-win32
+  - protoc-3.4.0-win32/bin/protoc.exe --python_out=. *.proto
+
+build: off
+
+test_script:
+  - "build.cmd %PYTHON%\\python.exe -m unittest discover -p '*_test.py'"
