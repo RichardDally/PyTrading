@@ -11,7 +11,7 @@ environment:
 
 install:
   - "%PYTHON%\\python.exe -m pip install -r requirements.txt"
-  - Start-FileDownload https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-win32.zip
+  - ps: Start-FileDownload 'https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-win32.zip'
   - 7z x protoc-3.4.0-win32.zip -o protoc-3.4.0-win32
   - protoc-3.4.0-win32/bin/protoc.exe --python_out=. *.proto
 
