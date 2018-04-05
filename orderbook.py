@@ -51,8 +51,12 @@ class OrderBook:
         if order.instrument_identifier != self.instrument_identifier:
             raise Exception('Order instrument must match order book instrument')
 
+        quantity_before_execution = order.get_remaining_quantity()
         self.match_order(order)
-        if order.get_remaining_quantity() > 0.0:
+        if quantity_before_execution == order.get_remaining_quantity():
+            self.logger.info('Attacking order is unmatched, adding [{}] to trading book'.format(order))
+            self.add_order(order)
+        elif order.get_remaining_quantity() > 0.0:
             self.logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
             self.add_order(order)
         else:
