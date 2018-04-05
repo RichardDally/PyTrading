@@ -40,9 +40,11 @@ class OrderBook:
         return self.asks
 
     def count_bids(self):
+        """ Count buy orders """
         return len(self.bids)
 
     def count_asks(self):
+        """ Count sell orders """
         return len(self.asks)
 
     def on_new_order(self, order):
@@ -67,6 +69,7 @@ class OrderBook:
             self.low_price = order.price
 
     def add_order(self, order):
+        """ Do not call add_order directly, use on_new_order instead """
         if order.way == Buy():
             self.bids.append(order)
         elif order.way == Sell():
