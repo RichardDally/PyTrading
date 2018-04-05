@@ -109,7 +109,7 @@ class TcpClient:
         except KeyError:
             pass
         except socket.error as exception:
-            if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN):
+            if exception.errno not in (errno.EPIPE, errno.ECONNRESET, errno.ENOTCONN):
                 self.logger.error('Server connection lost, unhandled errno [{}]'.format(exception.errno))
                 self.logger.error(traceback.print_exc())
         except Exception as exception:
