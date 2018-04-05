@@ -56,7 +56,7 @@ class OrderBook:
         else:
             self.logger.info('Attacking order [{}] has been totally executed'.format(order))
 
-    # TODO: finish implementation
+    # TODO: create and store a deal (not just updating orderbook stats)
     def on_new_deal(self, order):
         self.last_price = order.price
         if not self.high_price and not self.low_price:
