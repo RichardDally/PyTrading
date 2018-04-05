@@ -18,4 +18,5 @@ install:
 build: off
 
 test_script:
+  - ps: echo %CD%
   - "%PYTHON%\\python.exe -m unittest discover -p '*_test.py'"
