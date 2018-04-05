@@ -48,6 +48,18 @@ class TestOrderBook(unittest.TestCase):
         self.assertEqual(self.book.count_bids(), 2)
         self.assertEqual(self.book.count_asks(), 2)
 
+    def test_fifo_matching_orders(self):
+        """ Ensure FIFO matching is enforced """
+        orders = [Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1', timestamp=1),
+                  Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader2', timestamp=2),
+                  Order(Sell(), self.instrument.identifier, 50, 40.0, 'Trader3', timestamp=3)]
+        for order in orders:
+            self.book.on_new_order(order)
+        self.assertEqual(self.book.count_bids(), 1)
+        self.assertEqual(self.book.count_asks(), 0)
+        self.assertEqual(self.book.get_bids()[0].timestamp, 2)
+        self.assertEqual(self.book.get_bids()[0].counterparty, 'Trader2')
+
 
 if __name__ == '__main__':
     unittest.main()
