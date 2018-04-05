@@ -104,13 +104,11 @@ class OrderBook:
 
         for attacked_order in matching_trading_book_orders:
             if self.is_attacked_order_full_executed(attacking_order, attacked_order):
-                self.logger.info('[{}] has been totally executed'.format(attacked_order))
                 attacking_order.executed_quantity += attacked_order.get_remaining_quantity()
                 attacked_order.executed_quantity += attacked_order.get_remaining_quantity()
                 self.on_new_deal(attacked_order)
                 self.get_orders(attacked_order.way).remove(attacked_order)
             else:
-                self.logger.info('[{}] has been partially executed'.format(attacked_order))
                 attacking_order.executedquantity += attacking_order.get_remaining_quantity()
                 attacked_order.executedquantity += attacking_order.get_remaining_quantity()
                 self.on_new_deal(attacking_order)
