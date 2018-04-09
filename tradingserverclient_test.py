@@ -11,7 +11,7 @@ from orderway import Buy, Sell
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
-from simpleserialization import SimpleSerialization
+from protobufserialization import ProtobufSerialization
 
 
 class LiquidityTaker(TradingClient):
@@ -94,7 +94,7 @@ class TestTradingServerClient(unittest.TestCase):
             db.insert_user(login=self.liquidity_provider_login, password=self.client_password)
             db.insert_user(login=self.liquidity_taker_login, password=self.client_password)
             server = TradingServer(storage=db,
-                                   marshaller=SimpleSerialization(),
+                                   marshaller=ProtobufSerialization(),
                                    feeder_port=60000,
                                    matching_engine_port=60001,
                                    uptime_in_seconds=3.0)
@@ -111,7 +111,7 @@ class TestTradingServerClient(unittest.TestCase):
             time.sleep(1)
             client = LiquidityTaker(login=self.liquidity_taker_login,
                                     password=self.client_password,
-                                    marshaller=SimpleSerialization(),
+                                    marshaller=ProtobufSerialization(),
                                     host=socket.gethostbyname(socket.gethostname()),
                                     feeder_port=60000,
                                     matching_engine_port=60001,
@@ -127,7 +127,7 @@ class TestTradingServerClient(unittest.TestCase):
             time.sleep(1)
             client = LiquidityProvider(login=self.liquidity_provider_login,
                                        password=self.client_password,
-                                       marshaller=SimpleSerialization(),
+                                       marshaller=ProtobufSerialization(),
                                        host=socket.gethostbyname(socket.gethostname()),
                                        feeder_port=60000,
                                        matching_engine_port=60001,
