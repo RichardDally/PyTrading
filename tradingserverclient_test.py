@@ -70,6 +70,7 @@ class TestTradingServerClient(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls.db.close()
         os.remove(cls.filename)
 
     def test_trading_server_and_client(self):

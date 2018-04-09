@@ -13,6 +13,7 @@ class TestDatabase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        cls.db.close()
         os.remove(cls.filename)
 
     def test_00_initialize(self):

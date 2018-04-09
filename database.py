@@ -16,6 +16,9 @@ class Database(Storage):
         c.execute('''CREATE TABLE IF NOT EXISTS {} (login text unique, password text)'''.format(self.users_table))
         self.connection.commit()
 
+    def close(self):
+        self.connection.close()
+
     def insert_user(self, login, password):
         c = self.connection.cursor()
         query = "INSERT INTO {} (login, password) VALUES ('{}', '{}')".format(self.users_table, login, password)
