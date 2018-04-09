@@ -7,7 +7,16 @@ class MessageTypes(Enum):
     Logon = 1
     Referential = 2
     OrderBook = 3
-    CreateOrder = 4
+    OrderStatus = 4
+    CreateOrder = 5
+
+
+class OrderStatus(Enum):
+    Created = 1,
+    Modified = 2,
+    Cancelled = 3,
+    FullyExecuted = 4,
+    PartiallyExecuted = 5,
 
 
 currencies = {1: 'EUR',
