@@ -21,7 +21,6 @@ class OrderSender(TcpClient):
         create_order = CreateOrder(way=way, price=price, quantity=quantity,
                                    instrument_identifier=instrument_identifier)
         encoded_create_order = self.marshaller.encode_create_order(create_order)
-
         if not self.server_socket:
             raise ClosedConnection
         self.output_message_stacks[self.server_socket].append(encoded_create_order)
