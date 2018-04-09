@@ -83,9 +83,9 @@ class OrderBook:
 
     def get_matching_orders(self, attacking_order):
         if attacking_order.way == Buy():
-            return sorted([x for x in self.asks if x.counterparty != attacking_order.counterparty and x.price <= attacking_order.price], key=lambda o: o.timestamp)
+            return sorted([s for s in self.asks if s.counterparty != attacking_order.counterparty and s.price <= attacking_order.price], key=lambda o: o.timestamp)
         if attacking_order.way == Sell():
-            return sorted([x for x in self.bids if x.counterparty != attacking_order.counterparty and x.price >= attacking_order.price], key=lambda o: o.timestamp)
+            return sorted([b for b in self.bids if b.counterparty != attacking_order.counterparty and b.price >= attacking_order.price], key=lambda o: o.timestamp)
         raise InvalidWay(attacking_order.way)
 
     @staticmethod
