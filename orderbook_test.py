@@ -60,6 +60,15 @@ class TestOrderBook(unittest.TestCase):
         self.assertEqual(self.book.get_bids()[0].timestamp, 2)
         self.assertEqual(self.book.get_bids()[0].counterparty, 'Trader2')
 
+    def test_self_execution(self):
+        """ Ensure you cannot trade with yourself """
+        orders = [Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
+                  Order(Sell(), self.instrument.identifier, 50, 40.0, 'Trader1')]
+        for order in orders:
+            self.book.on_new_order(order)
+        self.assertEqual(self.book.count_bids(), 1)
+        self.assertEqual(self.book.count_asks(), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
