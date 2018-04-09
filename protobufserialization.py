@@ -5,7 +5,7 @@ import referential_pb2
 import createorder_pb2
 import logon_pb2
 from logon import Logon
-from order import Order
+from serverorder import ServerOrder
 from orderway import OrderWay
 from createorder import CreateOrder
 from orderbook import OrderBook
@@ -115,15 +115,15 @@ class ProtobufSerialization(Serialization):
         order_book.high_price = order_book_message.statistics.high_price
         order_book.low_price = order_book_message.statistics.low_price
         for decoded_order in order_book_message.orders:
-            order = Order(identifier=decoded_order.identifier,
-                          way=OrderWay(decoded_order.way),
-                          instrument_identifier=order_book_message.instrument_identifier,
-                          quantity=decoded_order.quantity,
-                          canceled_quantity=decoded_order.canceled_quantity,
-                          executed_quantity=decoded_order.executed_quantity,
-                          price=decoded_order.price,
-                          counterparty=decoded_order.counterparty,
-                          timestamp=decoded_order.timestamp)
+            order = ServerOrder(identifier=decoded_order.identifier,
+                                way=OrderWay(decoded_order.way),
+                                instrument_identifier=order_book_message.instrument_identifier,
+                                quantity=decoded_order.quantity,
+                                canceled_quantity=decoded_order.canceled_quantity,
+                                executed_quantity=decoded_order.executed_quantity,
+                                price=decoded_order.price,
+                                counterparty=decoded_order.counterparty,
+                                timestamp=decoded_order.timestamp)
             order_book.add_order(order)
         self.logger.debug(order_book)
         return order_book

@@ -1,6 +1,6 @@
 import logging
 import traceback
-from order import Order
+from serverorder import ServerOrder
 from orderbook import OrderBook
 from tcpserver import TcpServer
 from staticdata import MessageTypes
@@ -53,11 +53,11 @@ class MatchingEngine(TcpServer):
             self.logger.warning('Order book related to instrument identifier [{}] does not exist'
                                 .format(create_order.instrument_identifier))
         else:
-            new_order = Order(way=create_order.way,
-                              instrument_identifier=create_order.instrument_identifier,
-                              quantity=create_order.quantity,
-                              price=create_order.price,
-                              counterparty=client_session.login)
+            new_order = ServerOrder(way=create_order.way,
+                                    instrument_identifier=create_order.instrument_identifier,
+                                    quantity=create_order.quantity,
+                                    price=create_order.price,
+                                    counterparty=client_session.login)
             order_book.on_new_order(new_order)
 
     def get_order_books(self):

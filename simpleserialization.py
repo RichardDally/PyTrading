@@ -1,5 +1,5 @@
 import logging
-from order import Order
+from serverorder import ServerOrder
 from logon import Logon
 from orderway import OrderWay
 from createorder import CreateOrder
@@ -134,15 +134,15 @@ class SimpleSerialization(Serialization):
         order_tokens = tokens[4:]
         for x in range(0, len(order_tokens), 8):
             order_book.add_order(
-                Order(instrument_identifier=instrument_identifier,
-                      identifier=int(order_tokens[x]),
-                      way=OrderWay(int(order_tokens[x + 1])),
-                      quantity=float(order_tokens[x + 2]),
-                      canceled_quantity=float(order_tokens[x + 3]),
-                      executed_quantity=float(order_tokens[x + 4]),
-                      price=float(order_tokens[x + 5]),
-                      counterparty=order_tokens[x + 6],
-                      timestamp=order_tokens[x + 7])
+                ServerOrder(instrument_identifier=instrument_identifier,
+                            identifier=int(order_tokens[x]),
+                            way=OrderWay(int(order_tokens[x + 1])),
+                            quantity=float(order_tokens[x + 2]),
+                            canceled_quantity=float(order_tokens[x + 3]),
+                            executed_quantity=float(order_tokens[x + 4]),
+                            price=float(order_tokens[x + 5]),
+                            counterparty=order_tokens[x + 6],
+                            timestamp=order_tokens[x + 7])
             )
 
         return order_book

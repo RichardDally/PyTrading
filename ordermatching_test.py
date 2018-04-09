@@ -1,6 +1,6 @@
 import unittest
 from orderway import Buy, Sell
-from order import Order
+from serverorder import ServerOrder
 from orderbook import OrderBook
 from instrument import Instrument
 
@@ -17,30 +17,30 @@ class TestOrderMatching(unittest.TestCase):
         self.assertEqual(matching_orders[0].__dict__, attacked_order.__dict__)
 
     def test_buy_price_greater_than_sell(self):
-        attacking_order = Order(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
-        attacked_order = Order(Sell(), self.instrument.identifier, 10, 38.0, 'Trader2')
+        attacking_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
+        attacked_order = ServerOrder(Sell(), self.instrument.identifier, 10, 38.0, 'Trader2')
         self.validate_one_matching(attacking_order, attacked_order)
 
     def test_buy_price_equal_to_sell(self):
-        attacking_order = Order(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
-        attacked_order = Order(Sell(), self.instrument.identifier, 10, 40.0, 'Trader2')
+        attacking_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
+        attacked_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader2')
         self.validate_one_matching(attacking_order, attacked_order)
 
     def test_sell_price_greater_than_buy(self):
-        attacking_order = Order(Sell(), self.instrument.identifier, 10, 40.0, 'Trader1')
-        attacked_order = Order(Buy(), self.instrument.identifier, 10, 42.0, 'Trader2')
+        attacking_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader1')
+        attacked_order = ServerOrder(Buy(), self.instrument.identifier, 10, 42.0, 'Trader2')
         self.validate_one_matching(attacking_order, attacked_order)
 
     def test_sell_price_equal_to_buy(self):
-        attacking_order = Order(Sell(), self.instrument.identifier, 10, 40.0, 'Trader1')
-        attacked_order = Order(Buy(), self.instrument.identifier, 10, 40.0, 'Trader2')
+        attacking_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader1')
+        attacked_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader2')
         self.validate_one_matching(attacking_order, attacked_order)
 
     def test_one_full_execution(self):
         quantity = 10
         price = 42.0
-        attacking_order = Order(Sell(), self.instrument.identifier, quantity, price, 'Trader1')
-        attacked_order = Order(Buy(), self.instrument.identifier, quantity, price, 'Trader2')
+        attacking_order = ServerOrder(Sell(), self.instrument.identifier, quantity, price, 'Trader1')
+        attacked_order = ServerOrder(Buy(), self.instrument.identifier, quantity, price, 'Trader2')
         self.book.on_new_order(attacked_order)
         self.book.on_new_order(attacking_order)
         self.assertEqual(self.book.count_bids(), 0)
@@ -54,8 +54,8 @@ class TestOrderMatching(unittest.TestCase):
         attacking_quantity = 20
         attacked_quantity = 10
         price = 42.0
-        attacking_order = Order(Buy(), self.instrument.identifier, attacking_quantity, price, 'Trader1')
-        attacked_order = Order(Sell(), self.instrument.identifier, attacked_quantity, price, 'Trader2')
+        attacking_order = ServerOrder(Buy(), self.instrument.identifier, attacking_quantity, price, 'Trader1')
+        attacked_order = ServerOrder(Sell(), self.instrument.identifier, attacked_quantity, price, 'Trader2')
         self.book.on_new_order(attacked_order)
         self.book.on_new_order(attacking_order)
         self.assertEqual(self.book.count_bids(), 1)
@@ -69,10 +69,10 @@ class TestOrderMatching(unittest.TestCase):
         attacking_quantity = 50
         attacked_quantity = 10
         price = 42.0
-        attacking_order = Order(Buy(), self.instrument.identifier, attacking_quantity, price, 'Trader1')
+        attacking_order = ServerOrder(Buy(), self.instrument.identifier, attacking_quantity, price, 'Trader1')
         attacked_orders = []
         for _ in list(range(5)):
-            attacked_order = Order(Sell(), self.instrument.identifier, attacked_quantity, price, 'Trader2')
+            attacked_order = ServerOrder(Sell(), self.instrument.identifier, attacked_quantity, price, 'Trader2')
             attacked_orders.append(attacked_order)
             self.book.on_new_order(attacked_order)
         self.book.on_new_order(attacking_order)

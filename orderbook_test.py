@@ -1,6 +1,6 @@
 import unittest
 from orderway import Buy, Sell
-from order import Order
+from serverorder import ServerOrder
 from orderbook import OrderBook
 from instrument import Instrument
 
@@ -11,13 +11,13 @@ class TestOrderBook(unittest.TestCase):
         self.book = OrderBook(self.instrument.identifier)
 
     def test_count_bids(self):
-        buy_order = Order(Buy(), self.instrument.identifier, 50, 42.0, 'Trader1')
+        buy_order = ServerOrder(Buy(), self.instrument.identifier, 50, 42.0, 'Trader1')
         self.assertEqual(self.book.count_bids(), 0)
         self.book.on_new_order(buy_order)
         self.assertEqual(self.book.count_bids(), 1)
 
     def test_count_asks(self):
-        sell_order = Order(Sell(), self.instrument.identifier, 50, 42.0, 'Trader1')
+        sell_order = ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader1')
         self.assertEqual(self.book.count_asks(), 0)
         self.book.on_new_order(sell_order)
         self.assertEqual(self.book.count_asks(), 1)
@@ -31,18 +31,18 @@ class TestOrderBook(unittest.TestCase):
         self.assertEqual(len(asks), 0)
 
     def test_two_orders_no_match(self):
-        buy_order = Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1')
-        sell_order = Order(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2')
+        buy_order = ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1')
+        sell_order = ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2')
         self.book.on_new_order(buy_order)
         self.book.on_new_order(sell_order)
         self.assertEqual(self.book.count_bids(), 1)
         self.assertEqual(self.book.count_asks(), 1)
 
     def test_four_stacked_orders_no_match(self):
-        orders = [Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
-                  Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
-                  Order(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2'),
-                  Order(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2')]
+        orders = [ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
+                  ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
+                  ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2'),
+                  ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2')]
         for order in orders:
             self.book.on_new_order(order)
         self.assertEqual(self.book.count_bids(), 2)
@@ -50,9 +50,9 @@ class TestOrderBook(unittest.TestCase):
 
     def test_fifo_matching_orders(self):
         """ Ensure FIFO matching is enforced """
-        orders = [Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1', timestamp=1),
-                  Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader2', timestamp=2),
-                  Order(Sell(), self.instrument.identifier, 50, 40.0, 'Trader3', timestamp=3)]
+        orders = [ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1', timestamp=1),
+                  ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader2', timestamp=2),
+                  ServerOrder(Sell(), self.instrument.identifier, 50, 40.0, 'Trader3', timestamp=3)]
         for order in orders:
             self.book.on_new_order(order)
         self.assertEqual(self.book.count_bids(), 1)
@@ -62,8 +62,8 @@ class TestOrderBook(unittest.TestCase):
 
     def test_self_execution(self):
         """ Ensure you cannot trade with yourself """
-        orders = [Order(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
-                  Order(Sell(), self.instrument.identifier, 50, 40.0, 'Trader1')]
+        orders = [ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
+                  ServerOrder(Sell(), self.instrument.identifier, 50, 40.0, 'Trader1')]
         for order in orders:
             self.book.on_new_order(order)
         self.assertEqual(self.book.count_bids(), 1)

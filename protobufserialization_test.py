@@ -1,7 +1,7 @@
 import unittest
 from logon import Logon
 from orderway import Buy, Sell
-from order import Order
+from serverorder import ServerOrder
 from createorder import CreateOrder
 from orderbook import OrderBook
 from staticdata import StaticData
@@ -49,7 +49,7 @@ class TestProtobufSerialization(unittest.TestCase):
 
     def test_one_buy_order_book(self):
         simple_order_book = OrderBook(self.instrument_identifier)
-        buy_order = Order(Buy(), self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader1')
+        buy_order = ServerOrder(Buy(), self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader1')
         simple_order_book.add_order(buy_order)
         encoded_order_book = self.marshaller.encode_order_book(simple_order_book)
         message_type, body, _ = self.marshaller.decode_header(encoded_order_book)
@@ -59,8 +59,8 @@ class TestProtobufSerialization(unittest.TestCase):
 
     def test_two_opposite_orders_in_order_book(self):
         order_book = OrderBook(self.instrument_identifier)
-        orders = [Order(Buy(), self.instrument_identifier, quantity=100.0, price=9.0, counterparty='Trader1'),
-                  Order(Sell(), self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader2')]
+        orders = [ServerOrder(Buy(), self.instrument_identifier, quantity=100.0, price=9.0, counterparty='Trader1'),
+                  ServerOrder(Sell(), self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader2')]
         for order in orders:
             order_book.add_order(order)
         encoded_order_book = self.marshaller.encode_order_book(order_book)

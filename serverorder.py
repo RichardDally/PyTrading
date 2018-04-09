@@ -14,7 +14,9 @@ class Counter:
 counter = Counter()
 
 
-class Order:
+class ServerOrder:
+    """ A server order contains full details about the order """
+
     def __init__(self, way, instrument_identifier, quantity, price, counterparty,
                  identifier=counter.get_value(), timestamp=None,
                  canceled_quantity=0.0, executed_quantity=0.0):
