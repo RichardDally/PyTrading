@@ -2,14 +2,14 @@ syntax = "proto3";
 
 message CreateOrder
 {
-   enum Way
+   enum OrderWay
    {
-      buy = 0;
+      buy  = 0;
       sell = 1;
    }
 
-    Way way                      = 1;
-    double quantity              = 2;
-    double price                 = 3;
-    uint64 instrument_identifier = 4;
+    OrderWay way                   = 1;
+    double   quantity              = 2;
+    double   price                 = 3;
+    uint64   instrument_identifier = 4;
 }
