@@ -5,9 +5,8 @@ import socket
 import unittest
 import logging
 import traceback
-from orderway import OrderWay
 from database import Database
-from orderway import Buy, Sell
+from orderway import OrderWay, Buy, Sell
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
