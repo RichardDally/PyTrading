@@ -3,10 +3,10 @@ import logging
 import socket
 import traceback
 import errno
-from tcpserver import ClosedConnection
 from feederhandler import FeederHandler
 from ordersender import OrderSender
 from abc import ABCMeta, abstractmethod
+from exceptions import ClosedConnection
 
 
 class TradingClient:
