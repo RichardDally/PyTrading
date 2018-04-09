@@ -19,4 +19,5 @@ build: off
 
 test_script:
   - ps: pwd
+  - ps: ls -Recurse *.*
   - "%PYTHON%\\python.exe -m unittest discover -p '*_test.py'"
