@@ -82,6 +82,7 @@ class OrderBook:
             raise InvalidWay(order.way)
 
     def get_matching_orders(self, attacking_order):
+        # TODO: tweak matching rules to increase flexibility
         if attacking_order.way == Buy():
             return sorted([s for s in self.asks if s.counterparty != attacking_order.counterparty and s.price <= attacking_order.price], key=lambda o: o.timestamp)
         if attacking_order.way == Sell():
