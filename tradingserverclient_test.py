@@ -70,7 +70,6 @@ class TestTradingServerClient(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.db.close()
         os.remove(cls.filename)
 
     def test_trading_server_and_client(self):
@@ -101,6 +100,7 @@ class TestTradingServerClient(unittest.TestCase):
                                    uptime_in_seconds=3.0)
 
             server.start()
+            db.close()
         except Exception as exception:
             print(traceback.print_exc())
             return exception

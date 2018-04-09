@@ -80,3 +80,4 @@ if __name__ == '__main__':
                                marshaller=ProtobufSerialization(),
                                uptime_in_seconds=None)
         server.start()
+        db.close()
