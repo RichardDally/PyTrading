@@ -60,6 +60,10 @@ class LiquidityProvider(TradingClient):
 
 
 class TestTradingServerClient(unittest.TestCase):
+    """
+    Start a server and two clients (one selling, the other buying)
+    """
+
     @classmethod
     def setUpClass(cls):
         cls.liquidity_provider_login = 'BNP'
@@ -103,6 +107,7 @@ class TestTradingServerClient(unittest.TestCase):
 
     def start_liquidity_taker(self):
         try:
+            # Let the server starts properly...
             time.sleep(1)
             client = LiquidityTaker(login=self.liquidity_taker_login,
                                     password=self.client_password,
@@ -119,6 +124,7 @@ class TestTradingServerClient(unittest.TestCase):
 
     def start_liquidity_provider(self):
         try:
+            # Let the server starts properly...
             time.sleep(1)
             client = LiquidityProvider(login=self.liquidity_provider_login,
                                        password=self.client_password,

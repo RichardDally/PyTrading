@@ -49,7 +49,7 @@ class TcpServer:
 
     def accept_connection(self):
         sock, _ = self.listener.accept()
-        sock.setblocking(0)
+        sock.setblocking(False)
         self.inputs.append(sock)
         self.outputs.append(sock)
         client_session = ClientSession(status=SessionStatus.Handshaking,
