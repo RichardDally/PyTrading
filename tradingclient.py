@@ -59,7 +59,7 @@ class TradingClient:
         finally:
             for handler in handlers:
                 handler.cleanup()
-        self.logger.info('Client ends')
+        self.logger.info('[{}] ends'.format(self.__class__.__name__))
 
 
 if __name__ == '__main__':

@@ -10,6 +10,9 @@ from abc import ABCMeta, abstractmethod
 
 
 class TcpServer:
+    """
+    Generic TCP server to handle multiple connections using select syscall.
+    """
     __metaclass__ = ABCMeta
 
     def __init__(self, port):
