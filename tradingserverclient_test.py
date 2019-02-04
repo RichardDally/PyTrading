@@ -65,11 +65,7 @@ class TestTradingServerClient(unittest.TestCase):
         cls.liquidity_provider_login = 'BNP'
         cls.liquidity_taker_login = 'CFM'
         cls.client_password = 'whatever'
-        cls.filename = 'TradingServerClientTest.db'
-
-    @classmethod
-    def tearDownClass(cls):
-        os.remove(cls.filename)
+        cls.filename = ':memory:'
 
     def test_trading_server_and_client(self):
         logging.basicConfig(stream=sys.stdout,
