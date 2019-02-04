@@ -55,10 +55,10 @@ class OrderBook:
         self.match_order(order)
         if quantity_before_execution == order.get_remaining_quantity():
             self.logger.info('Attacking order is unmatched, adding [{}] to trading book'.format(order))
-            self.add_order(order)
+            self._add_order(order)
         elif order.get_remaining_quantity() > 0.0:
             self.logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
-            self.add_order(order)
+            self._add_order(order)
         else:
             self.logger.info('Attacking order [{}] has been totally executed'.format(order))
 
@@ -72,7 +72,7 @@ class OrderBook:
         elif order.price < self.low_price:
             self.low_price = order.price
 
-    def add_order(self, order):
+    def _add_order(self, order):
         """ Do not call add_order directly, use on_new_order instead """
         if order.way == Buy():
             self.bids.append(order)

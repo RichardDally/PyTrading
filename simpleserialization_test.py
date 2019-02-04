@@ -41,7 +41,7 @@ class TestSimpleSerialization(unittest.TestCase):
     def test_one_buy_order_book(self):
         simple_order_book = OrderBook(self.instrument_identifier)
         buy_order = ServerOrder(Buy(), self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader1')
-        simple_order_book.add_order(buy_order)
+        simple_order_book._add_order(buy_order)
         encoded_order_book = self.marshaller.encode_order_book(simple_order_book)
         message_type, body, _ = self.marshaller.decode_header(encoded_order_book)
         decoded_order_book = self.marshaller.decode_order_book(body)
@@ -53,7 +53,7 @@ class TestSimpleSerialization(unittest.TestCase):
         orders = [ServerOrder(Buy(), self.instrument_identifier, quantity=100.0, price=9.0, counterparty='Trader1'),
                   ServerOrder(Sell(), self.instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader2')]
         for order in orders:
-            order_book.add_order(order)
+            order_book._add_order(order)
         encoded_order_book = self.marshaller.encode_order_book(order_book)
         message_type, body, _ = self.marshaller.decode_header(encoded_order_book)
         decoded_order_book = self.marshaller.decode_order_book(body)

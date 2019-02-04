@@ -124,7 +124,7 @@ class ProtobufSerialization(Serialization):
                                 price=decoded_order.price,
                                 counterparty=decoded_order.counterparty,
                                 timestamp=decoded_order.timestamp)
-            order_book.add_order(order)
+            order_book.on_new_order(order)
         self.logger.debug(order_book)
         return order_book
 
