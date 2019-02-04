@@ -113,7 +113,7 @@ class TcpServer:
 
     def listen(self):
         self.listener = socket.socket()
-        self.listener.setblocking(0)
+        self.listener.setblocking(False)
         host = socket.gethostname()
         self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.listener.bind((host, self.port))
