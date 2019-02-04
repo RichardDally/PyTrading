@@ -45,7 +45,7 @@ class TcpClient:
             raise Exception("Already connected...")
         self.server_socket = socket.socket()
         self.server_socket.settimeout(10)
-        self.logger.info('Connecting on [{0}:{1}]'.format(self.host, self.port))
+        self.logger.info('Connecting [{}] on [{}:{}]'.format(self.__class__.__name__, self.host, self.port))
         self.server_socket.connect((self.host, self.port))
         self.inputs.append(self.server_socket)
         # TODO: investigate why this goes to 100% CPU
@@ -53,7 +53,8 @@ class TcpClient:
         self.on_connect()
 
     def remove_server_socket(self):
-        self.logger.info('Removing server socket [{}]'.format(self.server_socket.getsockname()))
+        self.logger.info('Removing server socket [{}] from [{}]'.format(self.server_socket.getsockname(),
+                                                                        self.__class__.__name__))
         if self.server_socket in self.outputs:
             self.outputs.remove(self.server_socket)
         if self.server_socket in self.inputs:
