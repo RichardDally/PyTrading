@@ -10,6 +10,11 @@ from loguru import logger
 
 
 class TradingClient:
+    """
+    TradingClient holds two client sockets: a feeder handler and an order sender.
+    Feeder handler will receive referential (instruments that can be traded) and orders from the feeder.
+    Order sender will send orders and receive deal confirmations.
+    """
     __metaclass__ = ABCMeta
 
     def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):

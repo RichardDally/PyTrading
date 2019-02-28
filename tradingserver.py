@@ -8,6 +8,12 @@ from matchingengine import MatchingEngine
 
 
 class TradingServer:
+    """
+    TradingServer holds two socket servers: a feeder and a matching engine.
+    Feeder will stream referential (instruments that can be traded) and order books (orders placed by traders)
+    Matching engine will handle orders received and send match confirmations (deal).
+    Database will contain traders credentials for authentication
+    """
     def __init__(self, storage, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
         self.storage = storage
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)

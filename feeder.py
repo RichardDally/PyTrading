@@ -5,6 +5,9 @@ from loguru import logger
 
 
 class Feeder(TcpServer):
+    """
+    Feeder is a server that streams referential and order books
+    """
     def __init__(self, marshaller, port):
         TcpServer.__init__(self, port)
         self.marshaller = marshaller
@@ -20,6 +23,10 @@ class Feeder(TcpServer):
         logger.info('Referential is loaded')
 
     def on_accept_connection(self, **kwargs):
+        """
+        Send the referential to latest client
+        Order books will be send afterwards
+        """
         client_session = kwargs['client_session']
         # No authentication for Feed (for the moment)
         client_session.status = SessionStatus.Authenticated
