@@ -1,4 +1,4 @@
-import logging
+from loguru import logger
 from serverorder import ServerOrder
 from logon import Logon
 from orderway import OrderWay
@@ -13,7 +13,6 @@ from exceptions import NotEnoughBytes
 
 class SimpleSerialization(Serialization):
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
         self.separator = '|'
         self.decode_callbacks = {MessageTypes.Logon.value: self.decode_logon,
                                  MessageTypes.Referential.value: self.decode_referential,
@@ -23,7 +22,7 @@ class SimpleSerialization(Serialization):
     def decode_header(self, encoded_string):
         """ Decode header (total length + message type) """
 
-        self.logger.debug('Encoded string [{}]'.format(encoded_string))
+        logger.trace('Encoded string [{}]'.format(encoded_string))
 
         if len(encoded_string) == 0:
             raise NotEnoughBytes
@@ -32,19 +31,19 @@ class SimpleSerialization(Serialization):
         try:
             message_length_separator_index = decoded_buffer.index(self.separator)
         except ValueError:
-            self.logger.warning('No separator in decoded buffer [{}]'.format(decoded_buffer))
+            logger.warning('No separator in decoded buffer [{}]'.format(decoded_buffer))
             raise NotEnoughBytes
 
         message_length = int(encoded_string[:message_length_separator_index])
         message = encoded_string[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
-        self.logger.debug('Decode buffer, message type [{}]'.format(type(message)))
+        logger.trace('Decode buffer, message type [{}]'.format(type(message)))
 
-        self.logger.debug('Message length {}'.format(message_length))
-        self.logger.debug('Message actual length [{}]'.format(len(message)))
-        self.logger.debug('Message [{}]'.format(message))
+        logger.trace('Message length {}'.format(message_length))
+        logger.trace('Message actual length [{}]'.format(len(message)))
+        logger.trace('Message [{}]'.format(message))
 
         if len(message) != message_length - 1:
-            self.logger.info('Message length does not match current message length')
+            logger.info('Message length does not match current message length')
             raise NotEnoughBytes
 
         message_type_separator_index = message.index(self.separator)
@@ -63,7 +62,7 @@ class SimpleSerialization(Serialization):
                     decoded_object = self.decode_callbacks[message_type](body)
                     decoded_objects.append([message_type, decoded_object])
                 except KeyError:
-                        self.logger.warning('Message type [{}] cannot be decoded'.format(message_type))
+                        logger.warning('Message type [{}] cannot be decoded'.format(message_type))
                 encoded_string = encoded_string[new_offset:]
         except NotEnoughBytes:
             pass

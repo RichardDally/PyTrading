@@ -1,5 +1,5 @@
-import logging
 import traceback
+from loguru import logger
 from serverorder import ServerOrder
 from orderbook import OrderBook
 from tcpserver import TcpServer
@@ -11,7 +11,6 @@ from exceptions import LogonRejected, OrderRejected
 class MatchingEngine(TcpServer):
     def __init__(self, storage, referential, marshaller, port):
         TcpServer.__init__(self, port)
-        self.logger = logging.getLogger(__name__)
         self.storage = storage
         self.marshaller = marshaller
         self.referential = referential
@@ -22,7 +21,7 @@ class MatchingEngine(TcpServer):
 
     def on_accept_connection(self, **kwargs):
         client_session = kwargs['client_session']
-        self.logger.info('Matching engine got connection from [{}]'.format(client_session.peer_name))
+        logger.info('Matching engine got connection from [{}]'.format(client_session.peer_name))
 
     def handle_logon(self, logon, sock):
         client_session = self.client_sessions[sock]
@@ -37,7 +36,7 @@ class MatchingEngine(TcpServer):
 
         client_session.password = logon.password
         client_session.status = SessionStatus.Authenticated
-        self.logger.info('[{}] is now [{}]'.format(logon.login, client_session.status.name))
+        logger.info('[{}] is now [{}]'.format(logon.login, client_session.status.name))
 
     def handle_create_order(self, create_order, sock):
         client_session = self.client_sessions[sock]
@@ -47,10 +46,10 @@ class MatchingEngine(TcpServer):
         # TODO: does client session is allowed to create orders ?
 
         try:
-            self.logger.info('Create order for {}'.format(client_session))
+            logger.info('Create order for {}'.format(client_session))
             order_book = self.order_books[create_order.instrument_identifier]
         except KeyError:
-            self.logger.warning('Order book related to instrument identifier [{}] does not exist'
+            logger.warning('Order book related to instrument identifier [{}] does not exist'
                                 .format(create_order.instrument_identifier))
         else:
             new_order = ServerOrder(way=create_order.way,
@@ -64,11 +63,11 @@ class MatchingEngine(TcpServer):
         return self.order_books
 
     def initialize_order_books(self):
-        self.logger.debug('Initializing order books')
+        logger.trace('Initializing order books')
         # TODO: use generator
         for instrument in self.referential.instruments:
             self.order_books[instrument.identifier] = OrderBook(instrument.identifier)
-        self.logger.debug('[{}] order books are initialized'.format(len(self.referential)))
+        logger.trace('[{}] order books are initialized'.format(len(self.referential)))
 
     def handle_readable_client(self, **kwargs):
         client_session = self.client_sessions[kwargs['sock']]
@@ -77,17 +76,17 @@ class MatchingEngine(TcpServer):
             try:
                 self.handle_callbacks[decoded_object[0]](decoded_object[1], client_session.sock)
             except Exception as exception:
-                self.logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
-                self.logger.error(traceback.print_exc())
+                logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
+                logger.error(traceback.print_exc())
             except LogonRejected as exception:
-                self.logger.info('[{}] logon attempt from [{}] is rejected. Reason [{}]'
+                logger.info('[{}] logon attempt from [{}] is rejected. Reason [{}]'
                                  .format(client_session.login, client_session.peer_name, exception.reason))
                 self.remove_client_socket(client_session.sock)
                 break
             except OrderRejected as exception:
-                self.logger.error('[{}] order attempt from [{}] is rejected. Reason [{}]'
+                logger.error('[{}] order attempt from [{}] is rejected. Reason [{}]'
                                   .format(client_session.login, client_session.peer_name, exception.reason))
                 self.remove_client_socket(client_session.sock)
                 break
         if len(decoded_objects) == 0:
-            self.logger.info('--- No decoded messages ---')
+            logger.info('--- No decoded messages ---')

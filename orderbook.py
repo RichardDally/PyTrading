@@ -1,11 +1,10 @@
-import logging
 from orderway import Buy, Sell
 from exceptions import InvalidWay
+from loguru import logger
 
 
 class OrderBook:
     def __init__(self, instrument_identifier):
-        self.logger = logging.getLogger(__name__)
         self.instrument_identifier = instrument_identifier
         self.asks = []
         self.bids = []
@@ -54,13 +53,13 @@ class OrderBook:
         quantity_before_execution = order.get_remaining_quantity()
         self.match_order(order)
         if quantity_before_execution == order.get_remaining_quantity():
-            self.logger.info('Attacking order is unmatched, adding [{}] to trading book'.format(order))
+            logger.info('Attacking order is unmatched, adding [{}] to trading book'.format(order))
             self._add_order(order)
         elif order.get_remaining_quantity() > 0.0:
-            self.logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
+            logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
             self._add_order(order)
         else:
-            self.logger.info('Attacking order [{}] has been totally executed'.format(order))
+            logger.info('Attacking order [{}] has been totally executed'.format(order))
 
     # TODO: create and store a deal (not just updating orderbook stats)
     def on_new_deal(self, order):
@@ -104,7 +103,7 @@ class OrderBook:
         raise InvalidWay
 
     def match_order(self, attacking_order):
-        self.logger.info('Find a matching order for [{}]'.format(attacking_order))
+        logger.info('Find a matching order for [{}]'.format(attacking_order))
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
         for attacked_order in matching_trading_book_orders:

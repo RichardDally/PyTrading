@@ -1,8 +1,8 @@
 import errno
 import select
 import socket
-import logging
 import traceback
+from loguru import logger
 from exceptions import ClosedConnection
 from clientsession import ClientSession
 from sessionstatus import SessionStatus
@@ -16,7 +16,6 @@ class TcpServer:
     __metaclass__ = ABCMeta
 
     def __init__(self, port):
-        self.logger = logging.getLogger(__name__)
         self.port = port
         self.select_timeout = 0.5
         self.listener = None
@@ -38,7 +37,7 @@ class TcpServer:
 
     def remove_client_socket(self, sock):
         client_session = self.client_sessions.pop(sock)
-        self.logger.info('Removing client socket [{}] from port [{}]'.format(client_session.peer_name,
+        logger.info('Removing client socket [{}] from port [{}]'.format(client_session.peer_name,
                                                                              self.port))
         if sock in self.outputs:
             self.outputs.remove(sock)
@@ -91,11 +90,11 @@ class TcpServer:
             pass
         except socket.error as exception:
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.EWOULDBLOCK):
-                self.logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
-                self.logger.warning(traceback.print_exc())
+                logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
+                logger.warning(traceback.print_exc())
         except Exception as exception:
-            self.logger.error('generic_handle: {}'.format(exception))
-            self.logger.error(traceback.print_exc())
+            logger.error('generic_handle: {}'.format(exception))
+            logger.error(traceback.print_exc())
         self.remove_client_socket(kwargs['sock'])
 
     def handle_readable(self, **kwargs):

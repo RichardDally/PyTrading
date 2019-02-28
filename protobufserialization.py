@@ -1,10 +1,10 @@
 import struct
-import logging
 import orderbook_pb2
 import referential_pb2
 import createorder_pb2
 import logon_pb2
 from logon import Logon
+from loguru import logger
 from serverorder import ServerOrder
 from orderway import OrderWay
 from createorder import CreateOrder
@@ -18,7 +18,6 @@ from exceptions import NotEnoughBytes
 
 class ProtobufSerialization(Serialization):
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
         self.decode_callbacks = {MessageTypes.Logon.value: self.decode_logon,
                                  MessageTypes.Referential.value: self.decode_referential,
                                  MessageTypes.OrderBook.value: self.decode_order_book,
@@ -31,8 +30,8 @@ class ProtobufSerialization(Serialization):
         readable_bytes = len(encoded_string) - header_size
         if message_length > readable_bytes:
             raise NotEnoughBytes
-        self.logger.debug('Message type [{}]'.format(message_type))
-        self.logger.debug('Message length [{}]'.format(message_length))
+        logger.trace('Message type [{}]'.format(message_type))
+        logger.trace('Message length [{}]'.format(message_length))
         body = bytes(encoded_string[header_size: header_size + message_length])
         new_offset = header_size + message_length
         return message_type, body, new_offset
@@ -68,8 +67,8 @@ class ProtobufSerialization(Serialization):
                 instrument.currency_identifier = instrument_to_serialize.currency_identifier
         referential_bytes = referential_message.SerializeToString()
 
-        self.logger.debug('Referential bytes [{}]'.format(referential_bytes))
-        self.logger.debug('Referential bytes length [{}]'.format(len(referential_bytes)))
+        logger.trace('Referential bytes [{}]'.format(referential_bytes))
+        logger.trace('Referential bytes length [{}]'.format(len(referential_bytes)))
         encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential.value)
         encoded_referential += referential_bytes
         return encoded_referential
@@ -125,7 +124,7 @@ class ProtobufSerialization(Serialization):
                                 counterparty=decoded_order.counterparty,
                                 timestamp=decoded_order.timestamp)
             order_book.on_new_order(order)
-        self.logger.debug(order_book)
+        logger.trace(order_book)
         return order_book
 
     def encode_create_order(self, create_order):

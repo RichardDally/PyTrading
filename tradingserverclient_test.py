@@ -1,9 +1,6 @@
-import os
-import sys
 import time
 import socket
 import unittest
-import logging
 import traceback
 from database import Database
 from orderway import OrderWay, Buy, Sell
@@ -72,11 +69,6 @@ class TestTradingServerClient(unittest.TestCase):
         cls.filename = ':memory:'
 
     def test_trading_server_and_client(self):
-        logging.basicConfig(stream=sys.stdout,
-                            level=logging.INFO,
-                            format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
-                            datefmt='%d/%m/%Y %H:%M:%S')
-
         thread_pool = ThreadPool(processes=3)
         async_server_result = thread_pool.apply_async(self.start_server)
         liquidity_provider_result = thread_pool.apply_async(self.start_liquidity_provider)

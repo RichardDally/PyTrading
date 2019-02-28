@@ -1,9 +1,8 @@
-import logging
+from loguru import logger
 
 
 class Referential:
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
         self.instruments = []
 
     def __cmp__(self, other):
@@ -30,7 +29,7 @@ class Referential:
         return len(self.instruments)
 
     def add_instrument(self, instrument):
-        self.logger.debug('Adding [{}] to referential'.format(instrument))
+        logger.trace('Adding [{}] to referential'.format(instrument))
         self.instruments.append(instrument)
 
     def get_instruments(self):

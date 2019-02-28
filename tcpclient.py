@@ -1,8 +1,8 @@
 import errno
 import select
 import socket
-import logging
 import traceback
+from loguru import logger
 from abc import ABCMeta, abstractmethod
 
 
@@ -13,7 +13,6 @@ class TcpClient:
     __metaclass__ = ABCMeta
 
     def __init__(self, host, port):
-        self.logger = logging.getLogger(__name__)
         self.server_socket = None
         self.received_buffer = bytearray()
         self.host = host
@@ -48,7 +47,7 @@ class TcpClient:
             raise Exception("Already connected...")
         self.server_socket = socket.socket()
         self.server_socket.settimeout(10)
-        self.logger.info('Connecting [{}] on [{}:{}]'.format(self.__class__.__name__, self.host, self.port))
+        logger.info('Connecting [{}] on [{}:{}]'.format(self.__class__.__name__, self.host, self.port))
         self.server_socket.connect((self.host, self.port))
         self.inputs.append(self.server_socket)
         # TODO: investigate why this goes to 100% CPU
@@ -56,7 +55,7 @@ class TcpClient:
         self.on_connect()
 
     def remove_server_socket(self):
-        self.logger.info('Removing server socket [{}] from [{}]'.format(self.server_socket.getsockname(),
+        logger.info('Removing server socket [{}] from [{}]'.format(self.server_socket.getsockname(),
                                                                         self.__class__.__name__))
         if self.server_socket in self.outputs:
             self.outputs.remove(self.server_socket)
@@ -89,11 +88,11 @@ class TcpClient:
         sock = kwargs.get('sock')
         data = sock.recv(8192)
         if data:
-            self.logger.debug('Adding server data ({}) to received buffer'.format(len(data)))
+            logger.trace('Adding server data ({}) to received buffer'.format(len(data)))
             self.received_buffer += data
             self.on_read_from_server()
         else:
-            self.logger.info('Server [{}] closed its socket'.format(sock.getpeername()))
+            logger.info('Server [{}] closed its socket'.format(sock.getpeername()))
             self.remove_server_socket()
 
     def write_to_server(self, **kwargs):
@@ -113,10 +112,10 @@ class TcpClient:
             pass
         except socket.error as exception:
             if exception.errno not in (errno.EPIPE, errno.ECONNRESET, errno.ENOTCONN):
-                self.logger.error('Server connection lost, unhandled errno [{}]'.format(exception.errno))
-                self.logger.error(traceback.print_exc())
+                logger.error('Server connection lost, unhandled errno [{}]'.format(exception.errno))
+                logger.error(traceback.print_exc())
         except Exception as exception:
-            self.logger.error('generic_handle: {}'.format(exception))
-            self.logger.error(traceback.print_exc())
+            logger.error('generic_handle: {}'.format(exception))
+            logger.error(traceback.print_exc())
 
         self.remove_server_socket()

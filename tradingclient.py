@@ -1,5 +1,4 @@
 import time
-import logging
 import socket
 import traceback
 import errno
@@ -7,13 +6,13 @@ from feederhandler import FeederHandler
 from ordersender import OrderSender
 from abc import ABCMeta, abstractmethod
 from exceptions import ClosedConnection
+from loguru import logger
 
 
 class TradingClient:
     __metaclass__ = ABCMeta
 
     def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):
-        self.logger = logging.getLogger(__name__)
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
         self.ordersender = OrderSender(login=login, password=password, marshaller=marshaller, host=host, port=matching_engine_port)
         self.start_time = None
@@ -50,37 +49,29 @@ class TradingClient:
         except ClosedConnection:
             pass
         except KeyboardInterrupt:
-            self.logger.info('Stopped by user')
+            logger.info('Stopped by user')
         except socket.error as exception:
             # TODO: improve unable to connect exceptions like
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.ECONNREFUSED):
-                self.logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
-                self.logger.warning(traceback.print_exc())
+                logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
+                logger.warning(traceback.print_exc())
         finally:
             for handler in handlers:
                 handler.cleanup()
-        self.logger.info('[{}] ends'.format(self.__class__.__name__))
+        logger.info('[{}] ends'.format(self.__class__.__name__))
+
+
+class BasicClient(TradingClient):
+    def __init__(self, *args, **kwargs):
+        super(BasicClient, self).__init__(*args, **kwargs)
+
+    def main_loop_hook(self):
+        pass
 
 
 if __name__ == '__main__':
-    import sys
-    logging.basicConfig(stream=sys.stdout,
-                        level=logging.INFO,
-                        format='%(asctime)s.%(msecs)03d %(levelname)-8s %(message)s',
-                        datefmt='%d/%m/%Y %H:%M:%S %p')
     try:
         from protobufserialization import ProtobufSerialization
-    except ImportError as error:
-        ProtobufSerialization = None
-        print('Unable to start trading client. Reason [{}]'.format(error))
-    else:
-        class BasicClient(TradingClient):
-            def __init__(self, *args, **kwargs):
-                super(BasicClient, self).__init__(*args, **kwargs)
-
-            def main_loop_hook(self):
-                pass
-
         client = BasicClient(login='rick',
                              password='pass',
                              marshaller=ProtobufSerialization(),
@@ -89,3 +80,6 @@ if __name__ == '__main__':
                              matching_engine_port=50001,
                              uptime_in_seconds=None)
         client.start([client.feedhandler, client.ordersender])
+    except ImportError as error:
+        ProtobufSerialization = None
+        logger.critical('Unable to start trading client. Reason [{}]'.format(error))
