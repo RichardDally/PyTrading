@@ -6,3 +6,4 @@ __pycache__
 *_pb2.py
 *.db
 Compile.bat
+venv
