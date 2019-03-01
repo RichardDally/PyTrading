@@ -134,7 +134,7 @@ class SimpleSerialization(Serialization):
         for x in range(0, len(order_tokens), 8):
             order_book.on_new_order(
                 ServerOrder(instrument_identifier=instrument_identifier,
-                            identifier=int(order_tokens[x]),
+                            identifier=order_tokens[x],
                             way=OrderWay(int(order_tokens[x + 1])),
                             quantity=float(order_tokens[x + 2]),
                             canceled_quantity=float(order_tokens[x + 3]),

@@ -17,7 +17,7 @@ message OrderBook
 
    message Order
    {
-      uint64   identifier        = 1;
+      bytes    identifier        = 1;
       OrderWay way               = 2;
       double   quantity          = 3;
       double   canceled_quantity = 4;
