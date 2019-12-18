@@ -130,7 +130,3 @@ class TestTradingServerClient(unittest.TestCase):
             print(traceback.print_exc())
             return exception
         return None
-
-
-if __name__ == '__main__':
-    unittest.main()

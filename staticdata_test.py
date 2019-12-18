@@ -15,7 +15,3 @@ class TestReferential(unittest.TestCase):
     def test_at_least_one_currency(self):
         currency = StaticData.get_currency(1)
         self.assertIsNotNone(currency)
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -21,7 +21,3 @@ class TestOrderWay(unittest.TestCase):
         wrong_way_value = 42
         with self.assertRaises(InvalidWay):
             OrderWay(way=wrong_way_value)
-
-
-if __name__ == '__main__':
-    unittest.main()

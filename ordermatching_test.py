@@ -83,7 +83,3 @@ class TestOrderMatching(unittest.TestCase):
         for attacked_order in attacked_orders:
             self.assertEqual(attacked_order.executed_quantity, attacked_quantity)
             self.assertEqual(attacked_order.get_remaining_quantity(), 0)
-
-
-if __name__ == '__main__':
-    unittest.main()

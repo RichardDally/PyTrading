@@ -18,7 +18,3 @@ class TestSqliteUserStorage(unittest.TestCase):
 
     def test_02_valid_user(self):
         self.db.is_valid_user(login=self.login, password=self.password)
-
-
-if __name__ == '__main__':
-    unittest.main()

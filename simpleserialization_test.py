@@ -67,7 +67,3 @@ class TestSimpleSerialization(unittest.TestCase):
         decoded_create_order = self.marshaller.decode_create_order(body)
         self.assertEqual(message_type, MessageTypes.CreateOrder.value)
         self.assertEqual(create_order.__dict__, decoded_create_order.__dict__)
-
-
-if __name__ == '__main__':
-    unittest.main()
