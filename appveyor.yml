@@ -15,4 +15,4 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON%\\python.exe -m unittest discover -p *_test.py"
+  - "%PYTHON%\\python.exe -m pytest"
