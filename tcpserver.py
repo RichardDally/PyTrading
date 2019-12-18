@@ -38,7 +38,7 @@ class TcpServer:
     def remove_client_socket(self, sock):
         client_session = self.client_sessions.pop(sock)
         logger.info('Removing client socket [{}] from port [{}]'.format(client_session.peer_name,
-                                                                             self.port))
+                                                                        self.port))
         if sock in self.outputs:
             self.outputs.remove(sock)
         if sock in self.inputs:

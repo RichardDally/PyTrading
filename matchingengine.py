@@ -50,7 +50,7 @@ class MatchingEngine(TcpServer):
             order_book = self.order_books[create_order.instrument_identifier]
         except KeyError:
             logger.warning('Order book related to instrument identifier [{}] does not exist'
-                                .format(create_order.instrument_identifier))
+                           .format(create_order.instrument_identifier))
         else:
             new_order = ServerOrder(way=create_order.way,
                                     instrument_identifier=create_order.instrument_identifier,
@@ -80,12 +80,12 @@ class MatchingEngine(TcpServer):
                 logger.error(traceback.print_exc())
             except LogonRejected as exception:
                 logger.info('[{}] logon attempt from [{}] is rejected. Reason [{}]'
-                                 .format(client_session.login, client_session.peer_name, exception.reason))
+                            .format(client_session.login, client_session.peer_name, exception.reason))
                 self.remove_client_socket(client_session.sock)
                 break
             except OrderRejected as exception:
                 logger.error('[{}] order attempt from [{}] is rejected. Reason [{}]'
-                                  .format(client_session.login, client_session.peer_name, exception.reason))
+                             .format(client_session.login, client_session.peer_name, exception.reason))
                 self.remove_client_socket(client_session.sock)
                 break
         if len(decoded_objects) == 0:

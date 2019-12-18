@@ -35,7 +35,7 @@ class SimpleSerialization(Serialization):
             raise NotEnoughBytes
 
         message_length = int(encoded_string[:message_length_separator_index])
-        message = encoded_string[message_length_separator_index + 1:message_length + message_length_separator_index].decode('utf-8')
+        message = encoded_string[message_length_separator_index + 1: message_length + message_length_separator_index].decode('utf-8')
         logger.trace('Decode buffer, message type [{}]'.format(type(message)))
 
         logger.trace('Message length {}'.format(message_length))
@@ -62,7 +62,7 @@ class SimpleSerialization(Serialization):
                     decoded_object = self.decode_callbacks[message_type](body)
                     decoded_objects.append([message_type, decoded_object])
                 except KeyError:
-                        logger.warning('Message type [{}] cannot be decoded'.format(message_type))
+                    logger.warning('Message type [{}] cannot be decoded'.format(message_type))
                 encoded_string = encoded_string[new_offset:]
         except NotEnoughBytes:
             pass

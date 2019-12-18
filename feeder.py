@@ -42,7 +42,7 @@ class Feeder(TcpServer):
         logger.trace('Adding message to [{}]  message queue'.format(client_session.peer_name))
         for encoded_order_book in kwargs['encoded_order_books']:
             client_session.output_message_stack.append(encoded_order_book)
-        logger.trace('Message queue size [{}] for [{}]'.format(len(client_session.output_message_stack), client_session.peer_name))
+        logger.trace(f'Message queue size [{len(client_session.output_message_stack)}] for [{client_session.peer_name}]')
 
     def send_all_order_books(self, order_books):
         encoded_order_books = []
@@ -51,4 +51,6 @@ class Feeder(TcpServer):
         for sock in self.inputs:
             if sock is self.listener:
                 continue
-            self.generic_handle(handler=self.send_one_peer_order_books, sock=sock, encoded_order_books=encoded_order_books)
+            self.generic_handle(handler=self.send_one_peer_order_books,
+                                sock=sock,
+                                encoded_order_books=encoded_order_books)

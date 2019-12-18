@@ -12,19 +12,17 @@ class MessageTypes(Enum):
 
 
 class OrderStatus(Enum):
-    Created = 1,
-    Modified = 2,
-    Cancelled = 3,
-    FullyExecuted = 4,
-    PartiallyExecuted = 5,
+    Created = 1
+    Modified = 2
+    Cancelled = 3
+    FullyExecuted = 4
+    PartiallyExecuted = 5
 
 
-currencies = {1: 'EUR',
-              2: 'USD'}
+currencies = {1: 'EUR', 2: 'USD'}
 
 instruments = {1: Instrument(identifier=1, name='Carrefour', isin='FR0000120172', currency_identifier=1),
-               2: Instrument(identifier=2, name='Societe Generale', isin='FR0000130809', currency_identifier=1)
-               }
+               2: Instrument(identifier=2, name='Societe Generale', isin='FR0000130809', currency_identifier=1)}
 
 
 class StaticData:

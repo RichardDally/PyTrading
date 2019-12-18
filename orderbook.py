@@ -53,13 +53,13 @@ class OrderBook:
         quantity_before_execution = order.get_remaining_quantity()
         self.match_order(order)
         if quantity_before_execution == order.get_remaining_quantity():
-            logger.info('Attacking order is unmatched, adding [{}] to trading book'.format(order))
+            logger.info(f'Attacking order is unmatched, adding [{order}] to trading book')
             self._add_order(order)
         elif order.get_remaining_quantity() > 0.0:
-            logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
+            logger.info(f'Attacking order cannot be fully executed, adding [{order}] to trading book')
             self._add_order(order)
         else:
-            logger.info('Attacking order [{}] has been totally executed'.format(order))
+            logger.info(f'Attacking order [{order}] has been totally executed')
 
     # TODO: create and store a deal (not just updating orderbook stats)
     def on_new_deal(self, order):
@@ -83,9 +83,11 @@ class OrderBook:
     def get_matching_orders(self, attacking_order):
         # TODO: tweak matching rules to increase flexibility
         if attacking_order.way == Buy():
-            return sorted([s for s in self.asks if s.counterparty != attacking_order.counterparty and s.price <= attacking_order.price], key=lambda o: o.timestamp)
+            return sorted([s for s in self.asks if s.counterparty != attacking_order.counterparty and s.price <= attacking_order.price],
+                          key=lambda o: o.timestamp)
         if attacking_order.way == Sell():
-            return sorted([b for b in self.bids if b.counterparty != attacking_order.counterparty and b.price >= attacking_order.price], key=lambda o: o.timestamp)
+            return sorted([b for b in self.bids if b.counterparty != attacking_order.counterparty and b.price >= attacking_order.price],
+                          key=lambda o: o.timestamp)
         raise InvalidWay(attacking_order.way)
 
     @staticmethod
@@ -103,7 +105,7 @@ class OrderBook:
         raise InvalidWay
 
     def match_order(self, attacking_order):
-        logger.info('Find a matching order for [{}]'.format(attacking_order))
+        logger.info(f'Find a matching order for [{attacking_order}]')
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
         for attacked_order in matching_trading_book_orders:

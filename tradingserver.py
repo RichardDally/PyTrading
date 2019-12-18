@@ -35,11 +35,11 @@ class TradingServer:
     def print_listen_messages(self):
         if self.start_time and self.stop_time:
             duration = self.stop_time - self.start_time
-            logger.info('Feeder listening on port [{}] for [{}] seconds'.format(self.feeder.port, duration))
-            logger.info('Matching engine listening on port [{}] for [{}] seconds'.format(self.matching_engine.port, duration))
+            logger.info(f'Feeder listening on port [{self.feeder.port}] for [{duration}] seconds')
+            logger.info(f'Matching engine listening on port [{self.matching_engine.port}] for [{duration}] seconds')
         else:
-            logger.info('Feeder listening on port [{}]'.format(self.feeder.port))
-            logger.info('Matching engine listening on port [{}]'.format(self.matching_engine.port))
+            logger.info(f'Feeder listening on port [{self.feeder.port}]')
+            logger.info(f'Matching engine listening on port [{self.matching_engine.port}]')
 
     def start(self):
         try:

@@ -19,7 +19,8 @@ class TradingClient:
 
     def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
-        self.ordersender = OrderSender(login=login, password=password, marshaller=marshaller, host=host, port=matching_engine_port)
+        self.ordersender = OrderSender(login=login, password=password, marshaller=marshaller,
+                                       host=host, port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
