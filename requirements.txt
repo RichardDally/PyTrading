@@ -1,3 +1,4 @@
 protobuf==3.4.0
-loguru==0.2.5
-pymongo==3.9.0
+loguru==0.4.0
+pymongo==3.10.0
+pytest==5.3.2
