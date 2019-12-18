@@ -1,20 +1,14 @@
-import os
 import unittest
-from database import Database
+from sqliteuserstorage import SqliteUserStorage
 
 
-class TestDatabase(unittest.TestCase):
+class TestSqliteUserStorage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.login = 'rick'
-        cls.password = 'pass'
-        cls.filename = 'PyTradingTest.db'
-        cls.db = Database(database_filename=cls.filename)
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.db.close()
-        os.remove(cls.filename)
+        cls.password = 'rocks'
+        cls.filename = ':memory:'
+        cls.db = SqliteUserStorage(database_filename=cls.filename)
 
     def test_00_initialize(self):
         self.db.initialize()

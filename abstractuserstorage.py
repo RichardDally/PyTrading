@@ -1,17 +1,19 @@
 from abc import ABCMeta, abstractmethod
 
 
-class Storage:
+class AbstractUserStorage:
     __metaclass__ = ABCMeta
 
-    @abstractmethod
     def initialize(self):
         pass
 
-    @abstractmethod
-    def insert_user(self, login, password):
+    def close(self):
         pass
 
     @abstractmethod
-    def is_valid_user(self, login, password):
+    def insert_user(self, login, password) -> None:
+        pass
+
+    @abstractmethod
+    def is_valid_user(self, login, password) -> bool:
         pass
