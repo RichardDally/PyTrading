@@ -3,7 +3,7 @@ import socket
 import traceback
 from loguru import logger
 from feeder import Feeder
-from mongouserstorage import MongoUserStorage
+from mongouserstorage import MongoStorage
 from matchingengine import MatchingEngine
 
 
@@ -12,7 +12,7 @@ class TradingServer:
     TradingServer holds two socket servers: a feeder and a matching engine.
     Feeder will stream referential (instruments that can be traded) and order books (orders placed by traders)
     Matching engine will handle orders received and send match confirmations (deal).
-    SqliteUserStorage will contain traders credentials for authentication
+    SqliteStorage will contain traders credentials for authentication
     """
     def __init__(self, storage, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
         self.storage = storage
@@ -65,7 +65,7 @@ if __name__ == '__main__':
         from protobufserialization import ProtobufSerialization
         login = 'rick'
         password = 'pass'
-        db = MongoUserStorage(host="localhost", port=27017)
+        db = MongoStorage(host="localhost", port=27017)
         db.initialize()
         if not db.is_valid_user(login=login, password=password):
             db.insert_user(login=login, password=password)

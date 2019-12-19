@@ -6,6 +6,7 @@ from feederhandler import FeederHandler
 from ordersender import OrderSender
 from abc import ABCMeta, abstractmethod
 from exceptions import ClosedConnection
+from orderway import Buy
 from loguru import logger
 
 
@@ -70,9 +71,16 @@ class TradingClient:
 class BasicClient(TradingClient):
     def __init__(self, *args, **kwargs):
         super(BasicClient, self).__init__(*args, **kwargs)
+        self.send_one_order = True
 
     def main_loop_hook(self):
-        pass
+        if self.send_one_order:
+            first_instrument = self.feedhandler.referential.get_instruments()[0]
+            self.ordersender.push_order(way=Buy(),
+                                        price=42.0,
+                                        quantity=10.0,
+                                        instrument_identifier=first_instrument.identifier)
+            self.send_one_order = False
 
 
 if __name__ == '__main__':

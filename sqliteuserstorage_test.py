@@ -1,5 +1,5 @@
 import unittest
-from sqliteuserstorage import SqliteUserStorage
+from sqliteuserstorage import SqliteStorage
 
 
 class TestSqliteUserStorage(unittest.TestCase):
@@ -8,7 +8,7 @@ class TestSqliteUserStorage(unittest.TestCase):
         cls.login = 'rick'
         cls.password = 'rocks'
         cls.filename = ':memory:'
-        cls.db = SqliteUserStorage(database_filename=cls.filename)
+        cls.db = SqliteStorage(database_filename=cls.filename)
 
     def test_00_initialize(self):
         self.db.initialize()

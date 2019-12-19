@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class AbstractUserStorage:
+class AbstractStorage:
     __metaclass__ = ABCMeta
 
     def initialize(self):
@@ -16,4 +16,8 @@ class AbstractUserStorage:
 
     @abstractmethod
     def is_valid_user(self, login, password) -> bool:
+        pass
+
+    @abstractmethod
+    def book_deal(self, deal) -> None:
         pass

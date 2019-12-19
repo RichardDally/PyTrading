@@ -2,7 +2,7 @@ import time
 import socket
 import unittest
 import traceback
-from sqliteuserstorage import SqliteUserStorage
+from sqliteuserstorage import SqliteStorage
 from orderway import OrderWay, Buy, Sell
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
@@ -80,7 +80,7 @@ class TestTradingServerClient(unittest.TestCase):
 
     def start_server(self):
         try:
-            db = SqliteUserStorage(database_filename=self.filename)
+            db = SqliteStorage(database_filename=self.filename)
             db.initialize()
             db.insert_user(login=self.liquidity_provider_login, password=self.client_password)
             db.insert_user(login=self.liquidity_taker_login, password=self.client_password)

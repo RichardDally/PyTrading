@@ -1,8 +1,8 @@
 import sqlite3
-from abstractuserstorage import AbstractUserStorage
+from abstractstorage import AbstractStorage
 
 
-class SqliteUserStorage(AbstractUserStorage):
+class SqliteStorage(AbstractStorage):
     def __init__(self, database_filename):
         self.database_filename = database_filename
         self.users_table = 'Users'
