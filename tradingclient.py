@@ -6,7 +6,7 @@ from feederhandler import FeederHandler
 from ordersender import OrderSender
 from abc import ABCMeta, abstractmethod
 from exceptions import ClosedConnection
-from orderway import Buy
+from orderway import Buy, Sell
 from loguru import logger
 
 
