@@ -45,16 +45,14 @@ class MatchingEngine(TcpServer):
         try:
             logger.info('Create order for {}'.format(client_session))
             order_book = self.order_books[create_order.instrument_identifier]
-        except KeyError:
-            logger.warning('Order book related to instrument identifier [{}] does not exist'
-                           .format(create_order.instrument_identifier))
-        else:
             new_order = ServerOrder(way=create_order.way,
                                     instrument_identifier=create_order.instrument_identifier,
                                     quantity=create_order.quantity,
                                     price=create_order.price,
                                     counterparty=client_session.login)
             order_book.on_new_order(new_order)
+        except KeyError:
+            logger.warning(f"Order book related to instrument identifier [{create_order.instrument_identifier}] does not exist")
 
     def get_order_books(self):
         return self.order_books
