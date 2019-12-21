@@ -67,9 +67,9 @@ class ProtobufSerialization(Serialization):
                 instrument.currency_identifier = instrument_to_serialize.currency_identifier
         referential_bytes = referential_message.SerializeToString()
 
-        logger.trace('Referential bytes [{}]'.format(referential_bytes))
-        logger.trace('Referential bytes length [{}]'.format(len(referential_bytes)))
-        encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential.value)
+        logger.trace(f"Referential bytes [{referential_bytes}]")
+        logger.trace(f"Referential bytes length [{len(referential_bytes)}]")
+        encoded_referential = struct.pack(">QB", len(referential_bytes), MessageTypes.Referential.value)
         encoded_referential += referential_bytes
         return encoded_referential
 
