@@ -123,7 +123,8 @@ class ProtobufSerialization(Serialization):
                                 price=decoded_order.price,
                                 counterparty=decoded_order.counterparty,
                                 timestamp=decoded_order.timestamp)
-            order_book.on_new_order(order)
+            # Rebuild order book (do not call on_new_order)
+            order_book._add_order(order)
         logger.trace(order_book)
         return order_book
 
