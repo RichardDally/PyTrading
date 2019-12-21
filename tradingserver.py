@@ -16,10 +16,8 @@ class TradingServer:
     def __init__(self, storage, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
         self.storage = storage
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)
-        self.matching_engine = MatchingEngine(storage=self.storage,
-                                              referential=self.feeder.get_referential(),
-                                              marshaller=marshaller,
-                                              port=matching_engine_port)
+        self.matching_engine = MatchingEngine(storage=self.storage, marshaller=marshaller, port=matching_engine_port)
+        self.matching_engine.initialize_order_books(referential=self.feeder.get_referential())
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:

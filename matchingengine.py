@@ -8,13 +8,11 @@ from exceptions import LogonRejected, OrderRejected
 
 
 class MatchingEngine(TcpServer):
-    def __init__(self, storage, referential, marshaller, port):
+    def __init__(self, storage, marshaller, port):
         TcpServer.__init__(self, port)
         self.storage = storage
         self.marshaller = marshaller
-        self.referential = referential
         self.order_books = {}
-        self.initialize_order_books()
         self.handle_callbacks = {MessageTypes.Logon.value: self.handle_logon,
                                  MessageTypes.CreateOrder.value: self.handle_create_order}
 
@@ -61,10 +59,10 @@ class MatchingEngine(TcpServer):
     def get_order_books(self):
         return self.order_books
 
-    def initialize_order_books(self):
-        logger.trace('Initializing order books')
+    def initialize_order_books(self, referential):
+        logger.trace("Initializing order books")
         # TODO: use generator
-        for instrument in self.referential.instruments:
+        for instrument in referential.instruments:
             self.order_books[instrument.identifier] = OrderBook(instrument.identifier)
         logger.trace(f"[{len(referential)}] order books are initialized")
 
