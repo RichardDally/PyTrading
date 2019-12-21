@@ -46,6 +46,11 @@ class Feeder(TcpServer):
         logger.trace(f"Message queue size [{len(client_session.output_message_stack)}] for [{client_session.peer_name}]")
 
     def send_all_order_books(self, order_books):
+        """
+        1) Encode once all books
+        2) Enqueue messages for all clients
+        3) Actual sending is done later in TcpServer.handle_writable
+        """
         if len(self.inputs) == 1 and self.inputs[0] is self.listener:
             logger.trace("Nothing to send...")
             return
