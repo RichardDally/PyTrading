@@ -20,16 +20,18 @@ class Feeder(TcpServer):
     def initialize_referential(self):
         logger.info('Loading referential')
         self.referential = StaticData.get_default_referential()
-        logger.info('Referential is loaded')
+        logger.info(f"Referential is loaded (size [{len(self.referential)}])")
 
     def on_accept_connection(self, **kwargs):
         """
-        Send the referential to latest client
+        Send the referential to incoming client
         Order books will be send afterwards
         """
         client_session = kwargs['client_session']
+        logger.info(f'Feeder got connection from [{client_session.peer_name}]')
         # No authentication for Feed (for the moment)
         client_session.status = SessionStatus.Authenticated
+        logger.debug(f'Push encoded referential to [{client_session.peer_name}]')
         client_session.output_message_stack.append(self.marshaller.encode_referential(self.referential))
         logger.info('Feeder got connection from [{}]'.format(client_session.peer_name))
 

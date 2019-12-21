@@ -24,6 +24,7 @@ class FeederHandler(TcpClient):
         pass
 
     def on_read_from_server(self):
+        # TODO: decoded_objects should be a NAMED TUPLE.
         decoded_objects, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer)
         for decoded_object in decoded_objects:
             self.handle_callbacks[decoded_object[0]](decoded_object[1])

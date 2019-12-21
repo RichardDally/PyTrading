@@ -37,8 +37,7 @@ class TcpServer:
 
     def remove_client_socket(self, sock):
         client_session = self.client_sessions.pop(sock)
-        logger.info('Removing client socket [{}] from port [{}]'.format(client_session.peer_name,
-                                                                        self.port))
+        logger.info(f'Removing client socket [{client_session.peer_name}] from port [{self.port}]')
         if sock in self.outputs:
             self.outputs.remove(sock)
         if sock in self.inputs:
@@ -81,6 +80,9 @@ class TcpServer:
             self.generic_handle(handler=self.handle_writable, sock=sock)
 
     def generic_handle(self, **kwargs):
+        """
+        Exception safe generic method to avoid exception handling duplicates
+        """
         try:
             kwargs['handler'](**kwargs)
             return

@@ -105,6 +105,9 @@ class OrderBook:
         raise InvalidWay
 
     def match_order(self, attacking_order):
+        """
+        TODO: match_order is called even on CLIENT side, this is useless...
+        """
         logger.info(f'Find a matching order for [{attacking_order}]')
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
