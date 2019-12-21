@@ -30,7 +30,7 @@ class TradingClient:
 
     @abstractmethod
     def main_loop_hook(self):
-        """ Your trading algo goes here :) """
+        """ Your trading algorithm goes here :) """
         pass
 
     def reached_uptime(self):
@@ -80,8 +80,12 @@ class BasicClient(TradingClient):
                                         price=42.0,
                                         quantity=10.0,
                                         instrument_identifier=first_instrument.identifier)
+            self.ordersender.push_order(way=Sell(),
+                                        price=42.0,
+                                        quantity=10.0,
+                                        instrument_identifier=first_instrument.identifier)
             self.send_one_order = False
-            logger.trace("ORDER SENT")
+            logger.debug("ORDER SENT")
 
 
 if __name__ == '__main__':

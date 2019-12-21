@@ -18,18 +18,20 @@ class OrderBook:
         for order in self.bids:
             yield order
 
-    # TODO: improve string formatting
     def __str__(self):
-        string = '\n--- [{}] order book ---\n'.format(self.instrument_identifier)
-        string += 'Last: {} \nHigh: {} \nLow: {} \n'.format(self.last_price, self.high_price, self.low_price)
+        """
+        TODO: improve string formatting
+        """
+        string = f"\n--- [{self.instrument_identifier}] order book ---\n"
+        string += f"Last: {self.last_price} \nHigh: {self.high_price} \nLow: {self.low_price} \n"
         if len(self.bids):
-            string += 'Bid side ({}):\n'.format(len(self.bids))
-            string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse=True)])
+            string += f"Bid side ({len(self.bids)}):\n"
+            string += "\n".join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse=True)])
         if len(self.asks):
             if len(self.bids):
-                string += '\n'
-            string += 'Ask side ({}):\n'.format(len(self.asks))
-            string += '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
+                string += "\n"
+            string += f"Ask side ({len(self.asks)}):\n"
+            string += "\n".join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
         return string
 
     def get_bids(self):
@@ -53,16 +55,18 @@ class OrderBook:
         quantity_before_execution = order.get_remaining_quantity()
         self.match_order(order)
         if quantity_before_execution == order.get_remaining_quantity():
-            logger.info(f"Attacking order is unmatched, adding [{order}] to trading book")
+            logger.debug(f"Attacking order is unmatched, adding [{order}] to trading book")
             self._add_order(order)
         elif order.get_remaining_quantity() > 0.0:
-            logger.info(f"Attacking order cannot be fully executed, adding [{order}] to trading book")
+            logger.debug(f"Attacking order cannot be fully executed, adding [{order}] to trading book")
             self._add_order(order)
         else:
-            logger.info(f"Attacking order [{order}] has been totally executed")
+            logger.debug(f"Attacking order [{order}] has been totally executed")
 
-    # TODO: create and store a deal (not just updating orderbook stats)
     def on_new_deal(self, order):
+        """
+        TODO: create and store a deal (not just updating order_book stats)
+        """
         self.last_price = order.price
         if not self.high_price and not self.low_price:
             self.high_price = self.low_price = order.price
@@ -72,7 +76,9 @@ class OrderBook:
             self.low_price = order.price
 
     def _add_order(self, order):
-        """ Do not call add_order directly, use on_new_order instead """
+        """
+        Do not call add_order directly, use on_new_order instead on server side
+        """
         if order.way == Buy():
             self.bids.append(order)
         elif order.way == Sell():
@@ -105,10 +111,7 @@ class OrderBook:
         raise InvalidWay
 
     def match_order(self, attacking_order):
-        """
-        TODO: match_order is called even on CLIENT side, this is useless...
-        """
-        logger.info(f"Find a matching order for [{attacking_order}]")
+        logger.debug(f"Find a matching order for [{attacking_order}]")
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
         for attacked_order in matching_trading_book_orders:
