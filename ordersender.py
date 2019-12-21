@@ -29,4 +29,4 @@ class OrderSender(TcpClient):
         decoded_messages_count, self.received_buffer = self.marshaller.decode_buffer(self.received_buffer,
                                                                                      self.handle_callbacks)
         if decoded_messages_count == 0:
-            print('--- No decoded messages ---')
+            print("--- No decoded messages ---")

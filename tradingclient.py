@@ -81,13 +81,14 @@ class BasicClient(TradingClient):
                                         quantity=10.0,
                                         instrument_identifier=first_instrument.identifier)
             self.send_one_order = False
+            logger.trace("ORDER SENT")
 
 
 if __name__ == '__main__':
     try:
         from protobufserialization import ProtobufSerialization
-        client = BasicClient(login='rick',
-                             password='pass',
+        client = BasicClient(login="rick",
+                             password="pass",
                              marshaller=ProtobufSerialization(),
                              host=socket.gethostbyname(socket.gethostname()),
                              feeder_port=50000,
@@ -96,4 +97,4 @@ if __name__ == '__main__':
         client.start([client.feedhandler, client.ordersender])
     except ImportError as error:
         ProtobufSerialization = None
-        logger.critical('Unable to start trading client. Reason [{}]'.format(error))
+        logger.critical(f"Unable to start trading client. Reason [{error}]")

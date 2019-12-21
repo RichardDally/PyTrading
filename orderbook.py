@@ -48,18 +48,18 @@ class OrderBook:
 
     def on_new_order(self, order):
         if order.instrument_identifier != self.instrument_identifier:
-            raise Exception('Order instrument must match order book instrument')
+            raise Exception("[LOGIC FAILURE] Order instrument must match order book instrument")
 
         quantity_before_execution = order.get_remaining_quantity()
         self.match_order(order)
         if quantity_before_execution == order.get_remaining_quantity():
-            logger.info(f'Attacking order is unmatched, adding [{order}] to trading book')
+            logger.info(f"Attacking order is unmatched, adding [{order}] to trading book")
             self._add_order(order)
         elif order.get_remaining_quantity() > 0.0:
-            logger.info(f'Attacking order cannot be fully executed, adding [{order}] to trading book')
+            logger.info(f"Attacking order cannot be fully executed, adding [{order}] to trading book")
             self._add_order(order)
         else:
-            logger.info(f'Attacking order [{order}] has been totally executed')
+            logger.info(f"Attacking order [{order}] has been totally executed")
 
     # TODO: create and store a deal (not just updating orderbook stats)
     def on_new_deal(self, order):
@@ -108,7 +108,7 @@ class OrderBook:
         """
         TODO: match_order is called even on CLIENT side, this is useless...
         """
-        logger.info(f'Find a matching order for [{attacking_order}]')
+        logger.info(f"Find a matching order for [{attacking_order}]")
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
 
         for attacked_order in matching_trading_book_orders:

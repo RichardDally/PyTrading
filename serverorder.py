@@ -27,16 +27,12 @@ class ServerOrder:
     def get_remaining_quantity(self):
         remaining_quantity = self.quantity - self.executed_quantity - self.canceled_quantity
         if remaining_quantity < 0.0:
-            raise Exception('Remaining quantity cannot be negative')
+            raise Exception("Remaining quantity cannot be negative")
         return remaining_quantity
 
     def __str__(self):
-        return '{} {} {} @ {} from {} ({})'.format(str(self.way),
-                                                   self.instrument_identifier,
-                                                   self.get_remaining_quantity(),
-                                                   self.price,
-                                                   self.counterparty,
-                                                   self.timestamp)
+        return f"{str(self.way)} {self.instrument_identifier} {self.get_remaining_quantity()} @ {self.price} " \
+               f"from {self.counterparty} ({self.timestamp})"
 
     def __cmp__(self, other):
         return self.__dict__ == other.__dict__

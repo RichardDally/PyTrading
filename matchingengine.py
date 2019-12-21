@@ -40,7 +40,7 @@ class MatchingEngine(TcpServer):
     def handle_create_order(self, create_order, sock):
         client_session = self.client_sessions[sock]
         if client_session.status != SessionStatus.Authenticated:
-            raise OrderRejected('Client is not authenticated')
+            raise OrderRejected("Client is not authenticated")
 
         # TODO: does client session is allowed to create orders ?
 
@@ -75,7 +75,7 @@ class MatchingEngine(TcpServer):
             try:
                 self.handle_callbacks[decoded_object[0]](decoded_object[1], client_session.sock)
             except Exception as exception:
-                logger.error('Matching engine, handle_readable_client failed [{}]'.format(exception))
+                logger.error(f"Matching engine, handle_readable_client failed [{exception}]")
                 logger.exception(exception)
             except LogonRejected as exception:
                 logger.info(f"[{client_session.login}] logon attempt from [{client_session.peer_name}] is rejected. "
@@ -88,4 +88,4 @@ class MatchingEngine(TcpServer):
                 self.remove_client_socket(client_session.sock)
                 break
         if len(decoded_objects) == 0:
-            logger.info('--- No decoded messages ---')
+            logger.info("--- No decoded messages ---")

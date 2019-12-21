@@ -30,8 +30,8 @@ class ProtobufSerialization(Serialization):
         readable_bytes = len(encoded_string) - header_size
         if message_length > readable_bytes:
             raise NotEnoughBytes
-        logger.trace('Message type [{}]'.format(message_type))
-        logger.trace('Message length [{}]'.format(message_length))
+        logger.trace(f"Message type [{message_type}]")
+        logger.trace(f"Message length [{message_length}]")
         body = bytes(encoded_string[header_size: header_size + message_length])
         new_offset = header_size + message_length
         return message_type, body, new_offset

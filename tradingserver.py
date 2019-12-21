@@ -1,6 +1,5 @@
 import time
 import socket
-import traceback
 from loguru import logger
 from feeder import Feeder
 from mongouserstorage import MongoStorage
@@ -35,11 +34,11 @@ class TradingServer:
     def print_listen_messages(self):
         if self.start_time and self.stop_time:
             duration = self.stop_time - self.start_time
-            logger.info(f'Feeder listening on port [{self.feeder.port}] for [{duration}] seconds')
-            logger.info(f'Matching engine listening on port [{self.matching_engine.port}] for [{duration}] seconds')
+            logger.info(f"Feeder listening on port [{self.feeder.port}] for [{duration}] seconds")
+            logger.info(f"Matching engine listening on port [{self.matching_engine.port}] for [{duration}] seconds")
         else:
-            logger.info(f'Feeder listening on port [{self.feeder.port}]')
-            logger.info(f'Matching engine listening on port [{self.matching_engine.port}]')
+            logger.info(f"Feeder listening on port [{self.feeder.port}]")
+            logger.info(f"Matching engine listening on port [{self.matching_engine.port}]")
 
     def start(self):
         try:
@@ -49,12 +48,13 @@ class TradingServer:
             while not self.reached_uptime():
                 self.matching_engine.process_sockets()
                 self.feeder.process_sockets()
-                self.feeder.send_all_order_books(self.matching_engine.get_order_books())
+                order_books = self.matching_engine.get_order_books()
+                self.feeder.send_all_order_books(order_books)
         except KeyboardInterrupt:
-            logger.info('Stopped by user')
+            logger.info("Stopped by user")
         except socket.error as exception:
-            logger.error('Trading server socket error [{}]'.format(exception))
-            logger.error(traceback.print_exc())
+            logger.error(f"Trading server socket error [{exception}]")
+            logger.exception(exception)
         finally:
             self.feeder.cleanup()
             self.matching_engine.cleanup()
