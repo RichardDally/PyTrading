@@ -15,6 +15,12 @@ To generate Protobuf "_pb2.py" files:
 $ protoc --python_out=. *.proto`
 ```
 
+### Lexicon
+
+- An **order** is composed of a price, a quantity, a way (buy or sell) and the instrument you want to trade (e.g. Apple stock)
+- A **deal** is generated when there is a match between two orders on same price and same instruments (**order book**'s last price is updated)
+- An **order book** hosts every incoming orders waiting to be executed (most interesting price comes first)
+
 ### High level architecture:
 - `TradingServer` is composed of two servers: a matching engine and a feeder.
   - `MatchingEngine` accepts orders from clients and try to match them.
