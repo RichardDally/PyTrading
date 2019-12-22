@@ -104,11 +104,10 @@ class TradingSandbox:
 
 
 if __name__ == '__main__':
-    logger.remove(sys.stdout)
+    logger.remove()
     logger.add(sink=sys.stdout,
-               format="{time:YYYY-MM-DD at HH:mm:ss} | {thread} | {level} | {message}")
-
-    # logger.add(sys.stderr, level="TRACE")
-
+               format="{time:HH:mm:ss} | {thread} | {level} | {message}",
+               level="DEBUG",
+               colorize=True)
     sandbox = TradingSandbox()
     sandbox.start_all_components()
