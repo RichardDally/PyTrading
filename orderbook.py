@@ -3,6 +3,16 @@ from exceptions import InvalidWay
 from loguru import logger
 
 
+class OrderBookChanges:
+    def __init__(self, *args, **kwargs):
+        self.order_to_add = kwargs.get('order_to_add', [])
+        self.order_to_remove = kwargs.get('order_to_remove', [])
+        self.deals_to_add = kwargs.get('deals_to_add', [])
+
+    def __str__(self):
+        return f"Add order [{self.order_to_add}]\nRemove order [{self.order_to_remove}]\nAdd deal [{self.deals_to_add}]"
+
+
 class OrderBook:
     def __init__(self, instrument_identifier):
         self.instrument_identifier = instrument_identifier
@@ -48,34 +58,53 @@ class OrderBook:
         """ Count sell orders """
         return len(self.asks)
 
-    def on_new_order(self, order):
+    def on_new_order(self, order, apply_changes=False) -> OrderBookChanges:
+        """
+        Entry point to process a new order in order book
+        apply_changes indicates either order book changes are applied directly at the end (testing purpose)
+        """
         if order.instrument_identifier != self.instrument_identifier:
             raise Exception("[LOGIC FAILURE] Order instrument must match order book instrument")
 
         quantity_before_execution = order.get_remaining_quantity()
-        self.match_order(order)
+        changes = self.match_order(order)
+        # Case 1: unmatched
         if quantity_before_execution == order.get_remaining_quantity():
             logger.debug(f"Attacking order is unmatched, adding [{order}] to trading book")
-            self._add_order(order)
+            changes.order_to_add.append(order)
+        # Case 2: partially executed (existing order(s) have been executed)
         elif order.get_remaining_quantity() > 0.0:
             logger.debug(f"Attacking order cannot be fully executed, adding [{order}] to trading book")
-            self._add_order(order)
+            changes.order_to_add.append(order)
+        # Case 3: order has been fully executed
         else:
             logger.debug(f"Attacking order [{order}] has been totally executed")
 
-    def on_new_deal(self, order):
-        """
-        TODO: create and store a deal (not just updating order_book stats)
-        """
-        self.last_price = order.price
-        if not self.high_price and not self.low_price:
-            self.high_price = self.low_price = order.price
-        elif order.price > self.high_price:
-            self.high_price = order.price
-        elif order.price < self.low_price:
-            self.low_price = order.price
+        if apply_changes:
+            self.apply_changes(changes)
 
-    def _add_order(self, order):
+        return changes
+
+    def apply_changes(self, order_book_changes):
+        """
+        TODO: deal processing (order_book_changes.deal_to_add)
+        """
+        for order in order_book_changes.order_to_add:
+            self.add_order(order)
+        for order_to_remove in order_book_changes.order_to_remove:
+            # TODO: improve removal ?
+            self.get_orders(order_to_remove.way).remove(order_to_remove)
+
+    def update_statistics(self, last_executed_order):
+        self.last_price = last_executed_order.price
+        if not self.high_price and not self.low_price:
+            self.high_price = self.low_price = last_executed_order.price
+        elif last_executed_order.price > self.high_price:
+            self.high_price = last_executed_order.price
+        elif last_executed_order.price < self.low_price:
+            self.low_price = last_executed_order.price
+
+    def add_order(self, order):
         """
         Do not call add_order directly, use on_new_order instead on server side
         """
@@ -110,19 +139,30 @@ class OrderBook:
             return self.asks
         raise InvalidWay
 
-    def match_order(self, attacking_order):
+    def match_order(self, attacking_order) -> OrderBookChanges:
         logger.debug(f"Find a matching order for [{attacking_order}]")
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
+        return self.update_matched_orders(attacking_order, matching_trading_book_orders)
 
-        for attacked_order in matching_trading_book_orders:
+    def update_matched_orders(self, attacking_order, matching_orders) -> OrderBookChanges:
+        changes = OrderBookChanges()
+
+        for attacked_order in matching_orders:
             if self.is_attacked_order_full_executed(attacking_order, attacked_order):
                 attacking_order.executed_quantity += attacked_order.get_remaining_quantity()
                 attacked_order.executed_quantity += attacked_order.get_remaining_quantity()
-                self.on_new_deal(attacked_order)
-                self.get_orders(attacked_order.way).remove(attacked_order)
+                self.update_statistics(last_executed_order=attacked_order)
+                # Create a deal
+                changes.deals_to_add.append(attacked_order)
+                # Remove executed order
+                changes.order_to_remove.append(attacked_order)
             else:
                 attacking_order.executedquantity += attacking_order.get_remaining_quantity()
                 attacked_order.executedquantity += attacking_order.get_remaining_quantity()
-                self.on_new_deal(attacking_order)
+                # Create a deal
+                self.update_statistics(last_executed_order=attacking_order)
+                changes.deals_to_add.append(attacking_order)
             if attacking_order.get_remaining_quantity() == 0.0:
                 break
+
+        return changes

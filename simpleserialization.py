@@ -132,7 +132,7 @@ class SimpleSerialization(Serialization):
 
         order_tokens = tokens[4:]
         for x in range(0, len(order_tokens), 8):
-            order_book.on_new_order(
+            order_book.add_order(
                 ServerOrder(instrument_identifier=instrument_identifier,
                             identifier=order_tokens[x],
                             way=OrderWay(int(order_tokens[x + 1])),
