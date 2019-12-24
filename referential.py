@@ -29,7 +29,7 @@ class Referential:
         return len(self.instruments)
 
     def add_instrument(self, instrument):
-        logger.info('Adding [{}] to referential'.format(instrument))
+        logger.debug('Adding [{}] to referential'.format(instrument))
         self.instruments.append(instrument)
 
     def get_instruments(self):
