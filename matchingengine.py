@@ -51,7 +51,7 @@ class MatchingEngine(TcpServer):
                                     price=create_order.price,
                                     counterparty=client_session.login)
             order_book_changes = order_book.on_new_order(new_order)
-            order_book.apply_changes(order_book_changes)
+            order_book.apply_order_book_changes(order_book_changes)
             logger.debug(str(order_book_changes))
         except KeyError:
             logger.warning(f"Order book related to instrument identifier [{create_order.instrument_identifier}] does not exist")

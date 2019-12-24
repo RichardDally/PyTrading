@@ -81,11 +81,11 @@ class OrderBook:
             logger.debug(f"Attacking order [{order}] has been totally executed")
 
         if apply_changes:
-            self.apply_changes(changes)
+            self.apply_order_book_changes(changes)
 
         return changes
 
-    def apply_changes(self, order_book_changes):
+    def apply_order_book_changes(self, order_book_changes):
         """
         TODO: deal processing (order_book_changes.deal_to_add)
         """
