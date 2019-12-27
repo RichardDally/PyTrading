@@ -17,6 +17,12 @@ class MatchingEngine(TcpServer):
         self.handle_callbacks = {MessageTypes.Logon.value: self.handle_logon,
                                  MessageTypes.CreateOrder.value: self.handle_create_order}
 
+    def cleanup(self):
+        super().cleanup()
+        if self.storage:
+            logger.debug("Cleaning up orders")
+            self.storage.delete_all_orders()
+
     def on_accept_connection(self, **kwargs):
         client_session = kwargs['client_session']
         logger.info(f"Matching engine got connection from [{client_session.peer_name}]")
