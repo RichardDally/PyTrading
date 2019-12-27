@@ -5,10 +5,11 @@ from tcpserver import TcpServer
 from staticdata import MessageTypes
 from sessionstatus import SessionStatus
 from exceptions import LogonRejected, OrderRejected
+from abstractstorage import AbstractStorage
 
 
 class MatchingEngine(TcpServer):
-    def __init__(self, storage, marshaller, port):
+    def __init__(self, storage: AbstractStorage, marshaller, port):
         TcpServer.__init__(self, port)
         self.storage = storage
         self.marshaller = marshaller
