@@ -90,6 +90,9 @@ class BasicClient(TradingClient):
 
 if __name__ == '__main__':
     try:
+        import sys
+        logger.remove()
+        logger.add(sys.stdout, level="TRACE")
         from protobufserialization import ProtobufSerialization
         client = BasicClient(login="rick",
                              password="pass",
