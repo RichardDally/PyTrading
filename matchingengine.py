@@ -59,9 +59,21 @@ class MatchingEngine(TcpServer):
                                     counterparty=client_session.login)
             order_book_changes = order_book.on_new_order(new_order)
             order_book.apply_order_book_changes(order_book_changes)
+            self.apply_order_book_changes_in_storage(order_book_changes)
             logger.debug(str(order_book_changes))
         except KeyError:
             logger.warning(f"Order book related to instrument identifier [{create_order.instrument_identifier}] does not exist")
+
+    def apply_order_book_changes_in_storage(self, order_book_changes):
+        if self.storage is None:
+            logger.warning("Storage is not initialized")
+            return
+        for order_to_add in order_book_changes.order_to_add:
+            logger.info(f"Order to add [{order_to_add}]")
+            self.storage.insert_order(order_to_add)
+        for order_to_remove in order_book_changes.order_to_remove:
+            pass
+
 
     def get_order_books(self):
         return self.order_books
