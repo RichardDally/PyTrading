@@ -52,4 +52,20 @@ class MongoStorage(AbstractStorage):
         logger.info(f"Deleted orders [{result.deleted_count}]")
 
     def insert_deal(self, deal) -> None:
-        raise NotImplementedError()
+        """
+        First draft of deal insertion
+        """
+        result = self.deals_collection.insert_one(
+            {
+                "identifier": deal.identifier,
+                "way": deal.way.way,
+                "instrument_identifier": deal.instrument_identifier,
+                "quantity": deal.quantity,
+                "canceled_quantity": deal.canceled_quantity,
+                "executed_quantity": deal.executed_quantity,
+                "price": deal.price,
+                "counterparty": deal.counterparty,
+                "timestamp": deal.timestamp,
+            }
+        )
+        logger.debug(result)

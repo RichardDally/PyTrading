@@ -79,6 +79,9 @@ class MatchingEngine(TcpServer):
         for order_to_remove in order_book_changes.order_to_remove:
             logger.info(f"Order to remove [{str(order_to_remove)}]")
             self.storage.delete_order(order_to_remove)
+        for deal_to_add in order_book_changes.deals_to_add:
+            logger.info(f"Deal to add [{str(deal_to_add)}]")
+            self.storage.insert_deal(deal_to_add)
 
     def get_order_books(self):
         return self.order_books
