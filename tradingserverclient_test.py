@@ -1,7 +1,7 @@
 import time
 import socket
 import unittest
-import traceback
+from loguru import logger
 from sqliteuserstorage import SqliteStorage
 from orderway import OrderWay, Buy, Sell
 from multiprocessing.pool import ThreadPool
@@ -93,7 +93,7 @@ class TestTradingServerClient(unittest.TestCase):
             server.start()
             db.close()
         except Exception as exception:
-            print(traceback.print_exc())
+            logger.exception(exception)
             return exception
         return None
 
@@ -110,7 +110,7 @@ class TestTradingServerClient(unittest.TestCase):
                                     uptime_in_seconds=3.0)
             client.start([client.feedhandler, client.ordersender])
         except Exception as exception:
-            print(traceback.print_exc())
+            logger.exception(exception)
             return exception
         return None
 
@@ -127,6 +127,6 @@ class TestTradingServerClient(unittest.TestCase):
                                        uptime_in_seconds=3.0)
             client.start([client.feedhandler, client.ordersender])
         except Exception as exception:
-            print(traceback.print_exc())
+            logger.exception(exception)
             return exception
         return None
