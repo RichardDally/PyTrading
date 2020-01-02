@@ -28,7 +28,7 @@ class MongoStorage(AbstractStorage):
         return self.users_collection.count(document) == 1
 
     def insert_order(self, order) -> None:
-        self.orders_collection.insert_one(
+        result = self.orders_collection.insert_one(
             {
                 "identifier": order.identifier,
                 "way": order.way.way,
@@ -41,10 +41,15 @@ class MongoStorage(AbstractStorage):
                 "timestamp": order.timestamp,
             }
         )
+        logger.debug(result)
+
+    def delete_order(self, order) -> None:
+        result = self.orders_collection.delete_one({"identifier": order.identifier})
+        logger.debug(f"Deleted order [{result.deleted_count}]")
 
     def delete_all_orders(self) -> None:
-        delete_results = self.orders_collection.delete_many({})
-        logger.info(f"Deleted orders [{delete_results.deleted_count}]")
+        result = self.orders_collection.delete_many({})
+        logger.info(f"Deleted orders [{result.deleted_count}]")
 
     def insert_deal(self, deal) -> None:
         raise NotImplementedError()
