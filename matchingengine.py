@@ -66,7 +66,8 @@ class MatchingEngine(TcpServer):
             self.apply_order_book_changes_in_storage(order_book_changes)
             logger.debug(f"Changes to be applied:\n{str(order_book_changes)}")
         except KeyError:
-            logger.warning(f"Order book related to instrument identifier [{create_order.instrument_identifier}] does not exist")
+            instrument_identifier = create_order.instrument_identifier
+            logger.warning(f"Order book related to instrument identifier [{instrument_identifier}] does not exist")
 
     def apply_order_book_changes_in_storage(self, order_book_changes):
         if self.storage is None:
