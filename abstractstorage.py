@@ -23,9 +23,13 @@ class AbstractStorage:
         pass
 
     @abstractmethod
+    def delete_order(self, order) -> None:
+        pass
+
+    @abstractmethod
     def delete_all_orders(self) -> None:
         pass
 
     @abstractmethod
-    def book_deal(self, deal) -> None:
+    def insert_deal(self, deal) -> None:
         pass
