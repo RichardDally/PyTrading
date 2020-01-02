@@ -5,8 +5,12 @@ from abstractstorage import AbstractStorage
 
 class MongoStorage(AbstractStorage):
     def __init__(self, host, port):
+        """
+        Mind aggressive timeout on distant locations (3 seconds)
+        """
+        self.client = MongoClient(host=host, port=port, serverSelectionTimeoutMS=3000)
+        self.client.admin.command("ismaster")
         self.database_name = "PyTrading"
-        self.client = MongoClient(host, port)
         self.database = self.client[self.database_name]
         self.users_collection_name = "Users"
         self.orders_collection_name = "Orders"
