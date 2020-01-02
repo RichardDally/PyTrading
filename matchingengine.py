@@ -18,6 +18,10 @@ class MatchingEngine(TcpServer):
                                  MessageTypes.CreateOrder.value: self.handle_create_order}
 
     def cleanup(self):
+        """
+        Remove all orders if any storage used
+        TODO: make this feature as an option
+        """
         super().cleanup()
         if self.storage:
             logger.debug("Cleaning up orders")
@@ -60,7 +64,7 @@ class MatchingEngine(TcpServer):
             order_book_changes = order_book.on_new_order(new_order)
             order_book.apply_order_book_changes(order_book_changes)
             self.apply_order_book_changes_in_storage(order_book_changes)
-            logger.debug(str(order_book_changes))
+            logger.debug(f"Changes to be applied:\n{str(order_book_changes)}")
         except KeyError:
             logger.warning(f"Order book related to instrument identifier [{create_order.instrument_identifier}] does not exist")
 
@@ -69,7 +73,7 @@ class MatchingEngine(TcpServer):
             logger.warning("Storage is not initialized")
             return
         for order_to_add in order_book_changes.order_to_add:
-            logger.info(f"Order to add [{order_to_add}]")
+            logger.info(f"Order to add [{str(order_to_add)}]")
             self.storage.insert_order(order_to_add)
         for order_to_remove in order_book_changes.order_to_remove:
             pass

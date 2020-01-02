@@ -31,7 +31,10 @@ class ServerOrder:
         return remaining_quantity
 
     def __str__(self):
-        return f"{str(self.way)} {self.instrument_identifier} {self.get_remaining_quantity()} @ {self.price} " \
+        """
+        Quantity displayed may not updated (creation time quantity) because of cancellation or execution
+        """
+        return f"[{self.instrument_identifier}] {str(self.way)} {self.quantity} @ {self.price} " \
                f"from {self.counterparty} ({self.timestamp})"
 
     def __cmp__(self, other):

@@ -42,5 +42,5 @@ class MongoStorage(AbstractStorage):
         delete_results = self.orders_collection.delete_many({})
         logger.info(f"Deleted orders [{delete_results.deleted_count}]")
 
-    def book_deal(self, deal) -> None:
-        pass
+    def insert_deal(self, deal) -> None:
+        raise NotImplementedError()
