@@ -2,6 +2,7 @@ import time
 import socket
 import unittest
 from loguru import logger
+from toolbox import random_string
 from sqliteuserstorage import SqliteStorage
 from orderway import OrderWay, Buy, Sell
 from multiprocessing.pool import ThreadPool
@@ -63,9 +64,9 @@ class TestTradingServerClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.liquidity_provider_login = 'BNP'
-        cls.liquidity_taker_login = 'CFM'
-        cls.client_password = 'whatever'
+        cls.liquidity_provider_login = random_string(length=4)
+        cls.liquidity_taker_login = random_string(length=5)
+        cls.client_password = random_string(length=6)
         cls.filename = ':memory:'
 
     def test_trading_server_and_client(self):

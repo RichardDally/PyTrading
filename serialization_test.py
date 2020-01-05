@@ -7,6 +7,7 @@ from orderbook import OrderBook
 from serverorder import ServerOrder
 from createorder import CreateOrder
 from logon import Logon
+from toolbox import random_string
 from simpleserialization import SimpleSerialization
 from protobufserialization import ProtobufSerialization
 
@@ -15,7 +16,7 @@ from protobufserialization import ProtobufSerialization
 @pytest.mark.parametrize('marshaller', [SimpleSerialization(), ProtobufSerialization()])
 class TestSerialization:
     def test_logon(self, instrument_identifier, marshaller):
-        logon = Logon(login='Richard', password='MyUltraSecretPassword')
+        logon = Logon(login=random_string(length=5), password=random_string(length=5))
         encoded_logon = marshaller.encode_logon(logon=logon)
         message_type, body, _ = marshaller.decode_header(encoded_logon)
         decoded_logon = marshaller.decode_logon(body)

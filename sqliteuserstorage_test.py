@@ -1,12 +1,13 @@
 import unittest
+from toolbox import random_string
 from sqliteuserstorage import SqliteStorage
 
 
 class TestSqliteUserStorage(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.login = 'rick'
-        cls.password = 'rocks'
+        cls.login = random_string(length=5)
+        cls.password = random_string(length=5)
         cls.filename = ':memory:'
         cls.db = SqliteStorage(database_filename=cls.filename)
 
