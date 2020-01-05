@@ -6,11 +6,11 @@ class ServerOrder:
     """ A server order contains full details about the order """
 
     def __init__(self, way, instrument_identifier, quantity, price, counterparty,
-                 identifier=uuid.uuid4().bytes, timestamp=None,
+                 identifier=None, timestamp=None,
                  canceled_quantity=0.0, executed_quantity=0.0):
         if not counterparty:
-            raise Exception('Counterparty not set')
-        self.identifier = identifier
+            raise ValueError("Counterparty not set")
+        self.identifier = identifier if identifier is not None else uuid.uuid4().bytes
         self.way = way
         self.instrument_identifier = instrument_identifier
         self.quantity = quantity
