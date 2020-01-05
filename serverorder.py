@@ -27,7 +27,7 @@ class ServerOrder:
     def get_remaining_quantity(self):
         remaining_quantity = self.quantity - self.executed_quantity - self.canceled_quantity
         if remaining_quantity < 0.0:
-            raise Exception("Remaining quantity cannot be negative")
+            raise ValueError(f"Remaining quantity [{remaining_quantity}] cannot be negative")
         return remaining_quantity
 
     def __str__(self):
