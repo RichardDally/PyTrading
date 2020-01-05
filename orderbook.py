@@ -49,6 +49,9 @@ class OrderBook:
         """ Count sell orders """
         return len(self.asks)
 
+    def count_all_orders(self):
+        return self.count_bids() + self.count_asks()
+
     def on_new_order(self, order, apply_changes=False) -> OrderBookChanges:
         """
         Entry point to process a new order in order book
