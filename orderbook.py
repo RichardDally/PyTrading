@@ -150,8 +150,8 @@ class OrderBook:
                 # Remove executed order
                 changes.order_to_remove.append(attacked_order)
             else:
-                attacking_order.executedquantity += attacking_order.get_remaining_quantity()
-                attacked_order.executedquantity += attacking_order.get_remaining_quantity()
+                attacking_order.executed_quantity += attacking_order.get_remaining_quantity()
+                attacked_order.executed_quantity += attacking_order.get_remaining_quantity()
                 # Create a deal
                 self.update_statistics(last_executed_order=attacking_order)
                 changes.deals_to_add.append(attacking_order)
