@@ -52,7 +52,10 @@ class MatchingEngine(TcpServer):
 
         client_session.password = logon.password
         client_session.status = SessionStatus.Authenticated
-        logger.info(f"[{logon.login}] is now [{client_session.status.name}]")
+        if self.client_authentication:
+            logger.info(f"[{logon.login}] is now [{client_session.status.name}]")
+        else:
+            logger.info(f"[{logon.login}] has been automatically [{client_session.status.name}]")
 
     def handle_create_order(self, create_order, sock):
         client_session = self.client_sessions[sock]
