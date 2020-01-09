@@ -156,8 +156,9 @@ class OrderBook:
 
         for attacked_order in matching_orders:
             if self.is_attacked_order_full_executed(attacking_order, attacked_order):
-                attacking_order.executed_quantity += attacked_order.get_remaining_quantity()
-                attacked_order.executed_quantity += attacked_order.get_remaining_quantity()
+                executed_quantity = attacked_order.get_remaining_quantity()
+                attacking_order.executed_quantity += executed_quantity
+                attacked_order.executed_quantity += executed_quantity
                 self.update_statistics(last_executed_order=attacked_order)
                 # Create a deal
                 changes.deals_to_add.append(attacked_order)
