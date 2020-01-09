@@ -1,13 +1,14 @@
 import sys
 import time
 import socket
+from loguru import logger
+from toolbox import random_string
 from mongostorage import MongoStorage
 from orderway import Buy, Sell
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
 from tradingclient import TradingClient
 from protobufserialization import ProtobufSerialization
-from loguru import logger
 
 
 class AbstractTrader(TradingClient):
@@ -41,6 +42,8 @@ class TradingSandbox:
     """
     Start a server and two clients (one selling, the other buying)
     """
+    def __init__(self):
+        self.serializer = ProtobufSerialization
 
     def start_all_components(self):
         thread_pool = ThreadPool(processes=3)
@@ -56,7 +59,8 @@ class TradingSandbox:
         try:
             db = MongoStorage(host="localhost", port=27017)
             server = TradingServer(storage=db,
-                                   marshaller=ProtobufSerialization(),
+                                   client_authentication=False,
+                                   marshaller=self.serializer(),
                                    feeder_port=60000,
                                    matching_engine_port=60001,
                                    uptime_in_seconds=3.0)
@@ -69,9 +73,9 @@ class TradingSandbox:
         try:
             # Let the server starts properly...
             time.sleep(1)
-            client = BuyTrader(login="Trader2",
-                               password="Trader2",
-                               marshaller=ProtobufSerialization(),
+            client = BuyTrader(login="HedgeFund",
+                               password=random_string(length=5),
+                               marshaller=self.serializer(),
                                host=socket.gethostbyname(socket.gethostname()),
                                feeder_port=60000,
                                matching_engine_port=60001,
@@ -86,9 +90,9 @@ class TradingSandbox:
         try:
             # Let the server starts properly...
             time.sleep(1)
-            client = SellTrader(login="Trader1",
-                                password="Trader1",
-                                marshaller=ProtobufSerialization(),
+            client = SellTrader(login="Bank",
+                                password=random_string(length=5),
+                                marshaller=self.serializer(),
                                 host=socket.gethostbyname(socket.gethostname()),
                                 feeder_port=60000,
                                 matching_engine_port=60001,
@@ -96,8 +100,6 @@ class TradingSandbox:
             client.start([client.feedhandler, client.ordersender])
         except Exception as exception:
             logger.exception(exception)
-            return exception
-        return None
 
 
 if __name__ == '__main__':
