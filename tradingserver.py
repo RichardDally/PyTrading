@@ -82,4 +82,4 @@ if __name__ == '__main__':
         db.close()
     except ImportError as error:
         ProtobufSerialization = None
-        logger.critical('Unable to start trading server. Reason [{}]'.format(error))
+        logger.critical(f"Unable to start trading server. Reason [{error}]")
