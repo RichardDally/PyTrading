@@ -8,3 +8,4 @@ __pycache__
 Compile.bat
 venv
 Pipfile*
+.coverage
