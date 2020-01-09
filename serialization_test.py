@@ -58,10 +58,6 @@ class TestSerialization:
         assert encoded_order_book == marshaller.encode_order_book(decoded_order_book)
 
     def test_two_opposite_orders_in_order_book(self, instrument_identifier, marshaller):
-        """
-        Sometimes some tests may fail due to ServerOrder identifier
-        TODO: investigate uuid.uuid4().bytes
-        """
         order_book = OrderBook(instrument_identifier)
         orders = [ServerOrder(Buy(), instrument_identifier, quantity=100.0, price=9.0, counterparty='Trader1'),
                   ServerOrder(Sell(), instrument_identifier, quantity=100.0, price=10.0, counterparty='Trader2')]
