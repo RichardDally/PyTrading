@@ -5,9 +5,11 @@ This project has an educational purpose to learn how financial markets work.
 
 ### Continuous Integration and code quality
 
-| GNU/Linux     | Windows       | Code quality  |
-|:-------------:|:-------------:|:-------------:|
-| [![Build Status](https://travis-ci.org/RichardDally/PyTrading.svg?branch=master)](https://travis-ci.org/RichardDally/PyTrading)  | [![Build status](https://ci.appveyor.com/api/projects/status/lt43ryv8akxftw90/branch/master?svg=true)](https://ci.appveyor.com/project/RichardDally/pytrading/branch/master) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4a222cf711354f8dab9e797759b03ea5)](https://www.codacy.com/manual/RichardDally/PyTrading?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RichardDally/PyTrading&amp;utm_campaign=Badge_Grade)|
+| GNU/Linux     | Windows       | Static analysis  | Code coverage |
+|:-------------:|:-------------:|:-------------:|:-------------:|
+| [![Build Status](https://travis-ci.org/RichardDally/PyTrading.svg?branch=master)](https://travis-ci.org/RichardDally/PyTrading)  | [![Build status](https://ci.appveyor.com/api/projects/status/lt43ryv8akxftw90/branch/master?svg=true)](https://ci.appveyor.com/project/RichardDally/pytrading/branch/master) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4a222cf711354f8dab9e797759b03ea5)](https://www.codacy.com/manual/RichardDally/PyTrading?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RichardDally/PyTrading&amp;utm_campaign=Badge_Grade)|[![codecov](https://codecov.io/gh/RichardDally/PyTrading/branch/master/graph/badge.svg)](https://codecov.io/gh/RichardDally/PyTrading)|
+
+
 
 ### How to generate .proto files
 To generate Protobuf "_pb2.py" files:  
