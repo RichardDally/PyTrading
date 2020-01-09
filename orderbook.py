@@ -160,6 +160,8 @@ class OrderBook:
                 attacking_order.executed_quantity += executed_quantity
                 attacked_order.executed_quantity += executed_quantity
                 self.update_statistics(last_executed_order=attacked_order)
+                logger.debug(f"Attacker [{attacking_order.counterparty}]")
+                logger.debug(f"Attacked [{attacked_order.counterparty}]")
                 # Create a deal
                 changes.deals_to_add.append(attacked_order)
                 # Remove executed order
