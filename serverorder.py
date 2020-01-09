@@ -1,5 +1,6 @@
 import time
 import uuid
+from toolbox import pretty_timestamp
 
 
 class ServerOrder:
@@ -32,10 +33,19 @@ class ServerOrder:
 
     def __str__(self):
         """
-        Quantity displayed may not updated (creation time quantity) because of cancellation or execution
+        Note remaining quantity is always displayed
         """
-        return f"[{self.instrument_identifier}] {str(self.way)} {self.quantity} @ {self.price} " \
-               f"from {self.counterparty} ({self.timestamp})"
+        return f"Id [{self.instrument_identifier}] " \
+               f"[{str(self.way)}] " \
+               f"[{self.get_remaining_quantity()}] @ [{self.price}] " \
+               f"from [{self.counterparty}] " \
+               f"[{pretty_timestamp(self.timestamp)}]"
+
+    def pretty(self, remaining_quantity: bool) -> str:
+        quantity_to_display = self.get_remaining_quantity() if remaining_quantity else self.quantity
+        return f"Instrument id [{self.instrument_identifier}] " \
+               f"[{str(self.way)}] [{quantity_to_display}] @ [{self.price}] " \
+               f"from [{self.counterparty}] [{pretty_timestamp(self.timestamp)}]"
 
     def __cmp__(self, other):
         return self.__dict__ == other.__dict__

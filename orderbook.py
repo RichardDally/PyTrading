@@ -22,18 +22,25 @@ class OrderBook:
 
     def __str__(self):
         """
-        TODO: improve string formatting
+        Use pretty function to have a detailed order book overview
         """
+        return f"Instrument id [{self.instrument_identifier}] " \
+               f"orders count [{self.count_all_orders()}] " \
+               f"last [{self.last_price}] " \
+               f"high [{self.high_price}] " \
+               f"low [{self.low_price}]"
+
+    def pretty(self, remaining_quantity: bool) -> str:
         string = f"\n--- [{self.instrument_identifier}] order book ---\n"
         string += f"Last: {self.last_price} \nHigh: {self.high_price} \nLow: {self.low_price} \n"
         if len(self.bids):
-            string += f"Bid side ({len(self.bids)}):\n"
-            string += "\n".join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse=True)])
+            string += f"Bid side ({self.count_bids()}):\n"
+            string += "\n".join([str(order) for order in sorted(self.bids, key=lambda order: order.price, reverse=True)])
         if len(self.asks):
             if len(self.bids):
                 string += "\n"
-            string += f"Ask side ({len(self.asks)}):\n"
-            string += "\n".join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
+            string += f"Ask side ({self.count_asks()}):\n"
+            string += "\n".join([order.pretty(remaining_quantity) for order in sorted(self.asks, key=lambda order: order.price)])
         return string
 
     def get_bids(self):
