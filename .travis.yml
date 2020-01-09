@@ -14,4 +14,7 @@ install:
   - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
 
 script:
-  - python -m pytest
+  - pytest --cov=./
+
+after_success:
+  - codecov
