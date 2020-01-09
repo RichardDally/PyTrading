@@ -6,10 +6,14 @@ from staticdata import MessageTypes
 from sessionstatus import SessionStatus
 from exceptions import LogonRejected, OrderRejected
 from abstractstorage import AbstractStorage
+from serialization import Serialization
 
 
 class MatchingEngine(TcpServer):
-    def __init__(self, storage: AbstractStorage, marshaller, port):
+    def __init__(self,
+                 storage: AbstractStorage,
+                 marshaller: Serialization,
+                 port: int):
         TcpServer.__init__(self, port)
         self.storage = storage
         self.marshaller = marshaller

@@ -4,6 +4,8 @@ from loguru import logger
 from feeder import Feeder
 from mongostorage import MongoStorage
 from matchingengine import MatchingEngine
+from abstractstorage import AbstractStorage
+from typing import Optional
 
 
 class TradingServer:
@@ -11,9 +13,14 @@ class TradingServer:
     TradingServer holds two socket servers: a feeder and a matching engine.
     Feeder will stream referential (instruments that can be traded) and order books (orders placed by traders)
     Matching engine will handle orders received and send match confirmations (deal).
-    SqliteStorage will contain traders credentials for authentication
+    Storage will contain traders credentials for authentication (if enabled by client_authentication parameter)
     """
-    def __init__(self, storage, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
+    def __init__(self,
+                 storage: AbstractStorage,
+                 marshaller,
+                 feeder_port: int,
+                 matching_engine_port: int,
+                 uptime_in_seconds: Optional[int]):
         self.storage = storage
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)
         self.matching_engine = MatchingEngine(storage=self.storage, marshaller=marshaller, port=matching_engine_port)

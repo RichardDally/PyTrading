@@ -1,6 +1,7 @@
 from orderway import Buy, Sell
 from exceptions import InvalidWay
 from orderbookchanges import OrderBookChanges
+from serverorder import ServerOrder
 from loguru import logger
 
 
@@ -140,7 +141,10 @@ class OrderBook:
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
         return self.update_matched_orders(attacking_order, matching_trading_book_orders)
 
-    def update_matched_orders(self, attacking_order, matching_orders) -> OrderBookChanges:
+    def update_matched_orders(self, attacking_order: ServerOrder, matching_orders) -> OrderBookChanges:
+        """
+        Iterate and update attacked orders, create deals upon total and partial executions
+        """
         changes = OrderBookChanges()
 
         for attacked_order in matching_orders:
