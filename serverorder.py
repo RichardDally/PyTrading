@@ -1,6 +1,6 @@
 import time
-import uuid
 from toolbox import pretty_timestamp
+from toolbox import generate_unique_identifier
 
 
 class ServerOrder:
@@ -11,7 +11,7 @@ class ServerOrder:
                  canceled_quantity=0.0, executed_quantity=0.0):
         if not counterparty:
             raise ValueError("Counterparty not set")
-        self.identifier = identifier if identifier is not None else uuid.uuid4().bytes
+        self.identifier = identifier if identifier is not None else generate_unique_identifier()
         self.way = way
         self.instrument_identifier = instrument_identifier
         self.quantity = quantity

@@ -1,6 +1,11 @@
+import uuid
 import random
 import string
 from datetime import datetime
+
+
+def generate_unique_identifier() -> str:
+    return str(uuid.uuid4().int)
 
 
 def pretty_timestamp(timestamp: int):
