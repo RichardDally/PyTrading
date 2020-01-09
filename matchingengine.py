@@ -12,14 +12,17 @@ from serialization import Serialization
 class MatchingEngine(TcpServer):
     def __init__(self,
                  storage: AbstractStorage,
+                 client_authentication: bool,
                  marshaller: Serialization,
                  port: int):
         TcpServer.__init__(self, port)
         self.storage = storage
+        self.client_authentication = client_authentication
         self.marshaller = marshaller
         self.order_books = {}
         self.handle_callbacks = {MessageTypes.Logon.value: self.handle_logon,
                                  MessageTypes.CreateOrder.value: self.handle_create_order}
+        logger.info(f"Client authentication has been [{'enabled' if self.client_authentication else 'disabled'}]")
 
     def cleanup(self):
         """
@@ -43,8 +46,9 @@ class MatchingEngine(TcpServer):
             if logon.login == cs.login and cs.status == SessionStatus.Authenticated:
                 raise LogonRejected(reason="Already connected")
 
-        if not self.storage.is_valid_user(login=logon.login, password=logon.password):
-            raise LogonRejected(reason="Unknown user")
+        if self.client_authentication:
+            if self.storage and not self.storage.is_valid_user(login=logon.login, password=logon.password):
+                raise LogonRejected(reason="Unknown user")
 
         client_session.password = logon.password
         client_session.status = SessionStatus.Authenticated

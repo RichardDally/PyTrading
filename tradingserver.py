@@ -17,13 +17,15 @@ class TradingServer:
     """
     def __init__(self,
                  storage: AbstractStorage,
+                 client_authentication: bool,
                  marshaller,
                  feeder_port: int,
                  matching_engine_port: int,
                  uptime_in_seconds: Optional[int]):
         self.storage = storage
+        self.client_authentication = client_authentication
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)
-        self.matching_engine = MatchingEngine(storage=self.storage, marshaller=marshaller, port=matching_engine_port)
+        self.matching_engine = MatchingEngine(self.storage, client_authentication, marshaller, port=matching_engine_port)
         self.matching_engine.initialize_order_books(referential=self.feeder.get_referential())
         self.start_time = None
         self.stop_time = None
@@ -68,13 +70,10 @@ class TradingServer:
 if __name__ == '__main__':
     try:
         from protobufserialization import ProtobufSerialization
-        login = 'rick'
-        password = 'pass'
         db = MongoStorage(host="localhost", port=27017)
         db.initialize()
-        if not db.is_valid_user(login=login, password=password):
-            db.insert_user(login=login, password=password)
         server = TradingServer(storage=db,
+                               client_authentication=False,
                                feeder_port=50000,
                                matching_engine_port=50001,
                                marshaller=ProtobufSerialization(),

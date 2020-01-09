@@ -86,6 +86,7 @@ class TestTradingServerClient(unittest.TestCase):
             db.insert_user(login=self.liquidity_provider_login, password=self.client_password)
             db.insert_user(login=self.liquidity_taker_login, password=self.client_password)
             server = TradingServer(storage=db,
+                                   client_authentication=False,
                                    marshaller=ProtobufSerialization(),
                                    feeder_port=60000,
                                    matching_engine_port=60001,
