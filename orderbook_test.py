@@ -72,11 +72,16 @@ class TestOrderBook(unittest.TestCase):
         attacking_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
         attacked_order = ServerOrder(Sell(), self.instrument.identifier, 10, 38.0, 'Trader2')
         self.validate_one_matching(attacking_order, attacked_order)
+        self.assertEqual(attacking_order.get_remaining_quantity(), 10)
+        self.assertEqual(attacked_order.get_remaining_quantity(), 10)
 
     def test_buy_price_equal_to_sell(self):
         attacking_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
         attacked_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader2')
-        self.validate_one_matching(attacking_order, attacked_order)
+        self.book.on_new_order(attacked_order, apply_changes=True)
+        self.book.on_new_order(attacking_order, apply_changes=True)
+        self.assertEqual(attacking_order.get_remaining_quantity(), 0)
+        self.assertEqual(attacked_order.get_remaining_quantity(), 0)
 
     def test_sell_price_greater_than_buy(self):
         attacking_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader1')
