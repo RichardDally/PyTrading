@@ -48,9 +48,9 @@ class TradingSandbox:
         liquidity_provider_result = thread_pool.apply_async(self.start_selling)
         liquidity_taker_result = thread_pool.apply_async(self.start_buying)
 
-        for failure in [async_server_result.get(), liquidity_taker_result.get(), liquidity_provider_result.get()]:
-            if failure:
-                self.fail(failure)
+        async_server_result.get()
+        liquidity_taker_result.get()
+        liquidity_provider_result.get()
 
     def start_server(self):
         try:
@@ -62,11 +62,8 @@ class TradingSandbox:
                                    uptime_in_seconds=3.0)
 
             server.start()
-            db.close()
         except Exception as exception:
             logger.exception(exception)
-            return exception
-        return None
 
     def start_selling(self):
         try:
