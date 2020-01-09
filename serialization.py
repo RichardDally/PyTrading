@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
+# TODO: improve naming between marshaller used in instances and Serialization in classes
 class Serialization:
     __metaclass__ = ABCMeta
 

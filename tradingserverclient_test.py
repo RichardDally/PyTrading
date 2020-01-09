@@ -13,8 +13,6 @@ from protobufserialization import ProtobufSerialization
 
 class LiquidityTaker(TradingClient):
     """ LiquidityTaker is looking for all available orders and sends opposite way orders to clear order book"""
-    def __init__(self, *args, **kwargs):
-        super(LiquidityTaker, self).__init__(*args, **kwargs)
 
     def main_loop_hook(self):
         # Read the order books
@@ -83,8 +81,6 @@ class TestTradingServerClient(unittest.TestCase):
         try:
             db = SqliteStorage(database_filename=self.filename)
             db.initialize()
-            db.insert_user(login=self.liquidity_provider_login, password=self.client_password)
-            db.insert_user(login=self.liquidity_taker_login, password=self.client_password)
             server = TradingServer(storage=db,
                                    client_authentication=False,
                                    marshaller=ProtobufSerialization(),
