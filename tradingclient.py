@@ -6,6 +6,7 @@ from feederhandler import FeederHandler
 from ordersender import OrderSender
 from abc import ABCMeta, abstractmethod
 from exceptions import ClosedConnection
+from orderway import Buy, Sell
 from loguru import logger
 
 
@@ -19,7 +20,8 @@ class TradingClient:
 
     def __init__(self, marshaller, login, password, host, feeder_port, matching_engine_port, uptime_in_seconds):
         self.feedhandler = FeederHandler(marshaller=marshaller, host=host, port=feeder_port)
-        self.ordersender = OrderSender(login=login, password=password, marshaller=marshaller, host=host, port=matching_engine_port)
+        self.ordersender = OrderSender(login=login, password=password, marshaller=marshaller,
+                                       host=host, port=matching_engine_port)
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
@@ -28,7 +30,7 @@ class TradingClient:
 
     @abstractmethod
     def main_loop_hook(self):
-        """ Your trading algo goes here :) """
+        """ Your trading algorithm goes here :) """
         pass
 
     def reached_uptime(self):
@@ -69,16 +71,31 @@ class TradingClient:
 class BasicClient(TradingClient):
     def __init__(self, *args, **kwargs):
         super(BasicClient, self).__init__(*args, **kwargs)
+        self.send_one_order = True
 
     def main_loop_hook(self):
-        pass
+        if self.send_one_order:
+            first_instrument = self.feedhandler.referential.get_instruments()[0]
+            self.ordersender.push_order(way=Buy(),
+                                        price=42.0,
+                                        quantity=10.0,
+                                        instrument_identifier=first_instrument.identifier)
+            self.ordersender.push_order(way=Sell(),
+                                        price=42.0,
+                                        quantity=10.0,
+                                        instrument_identifier=first_instrument.identifier)
+            self.send_one_order = False
+            logger.debug("ORDER SENT")
 
 
 if __name__ == '__main__':
     try:
+        import sys
+        logger.remove()
+        logger.add(sys.stdout, level="TRACE")
         from protobufserialization import ProtobufSerialization
-        client = BasicClient(login='rick',
-                             password='pass',
+        client = BasicClient(login="rick",
+                             password="pass",
                              marshaller=ProtobufSerialization(),
                              host=socket.gethostbyname(socket.gethostname()),
                              feeder_port=50000,
@@ -87,4 +104,4 @@ if __name__ == '__main__':
         client.start([client.feedhandler, client.ordersender])
     except ImportError as error:
         ProtobufSerialization = None
-        logger.critical('Unable to start trading client. Reason [{}]'.format(error))
+        logger.critical(f"Unable to start trading client. Reason [{error}]")

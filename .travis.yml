@@ -2,17 +2,19 @@ language: python
 compiler: gcc
 
 python:
-  - "3.5"
   - "3.6"
   - "3.6-dev"
   - "3.7-dev"
   - "nightly"
 
 install:
-  - pip install -r requirements.txt
+  - pip install codecov -r requirements.txt
   - wget https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-linux-x86_64.zip
   - unzip protoc-3.4.0-linux-x86_64.zip -d protoc-3.4.0-linux-x86_64
   - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
 
 script:
-  - python -m unittest discover -p '*_test.py'
+  - pytest --cov=./
+
+after_success:
+  - codecov

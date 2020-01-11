@@ -1,10 +1,13 @@
 from orderway import Buy, Sell
 from exceptions import InvalidWay
+from orderbookchanges import OrderBookChanges
+from serverorder import ServerOrder
 from loguru import logger
+from serverdeal import ServerDeal
 
 
 class OrderBook:
-    def __init__(self, instrument_identifier):
+    def __init__(self, instrument_identifier: int):
         self.instrument_identifier = instrument_identifier
         self.asks = []
         self.bids = []
@@ -18,18 +21,27 @@ class OrderBook:
         for order in self.bids:
             yield order
 
-    # TODO: improve string formatting
     def __str__(self):
-        string = '\n--- [{}] order book ---\n'.format(self.instrument_identifier)
-        string += 'Last: {} \nHigh: {} \nLow: {} \n'.format(self.last_price, self.high_price, self.low_price)
+        """
+        Use pretty function to have a detailed order book overview
+        """
+        return f"Instrument id [{self.instrument_identifier}] " \
+               f"orders count [{self.count_all_orders()}] " \
+               f"last [{self.last_price}] " \
+               f"high [{self.high_price}] " \
+               f"low [{self.low_price}]"
+
+    def pretty(self, remaining_quantity: bool) -> str:
+        string = f"\n--- [{self.instrument_identifier}] order book ---\n"
+        string += f"Last: {self.last_price} \nHigh: {self.high_price} \nLow: {self.low_price} \n"
         if len(self.bids):
-            string += 'Bid side ({}):\n'.format(len(self.bids))
-            string += '\n'.join([str(o) for o in sorted(self.bids, key=lambda o: o.price, reverse=True)])
+            string += f"Bid side ({self.count_bids()}):\n"
+            string += "\n".join([str(order) for order in sorted(self.bids, key=lambda order: order.price, reverse=True)])
         if len(self.asks):
             if len(self.bids):
-                string += '\n'
-            string += 'Ask side ({}):\n'.format(len(self.asks))
-            string += '\n'.join([str(o) for o in sorted(self.asks, key=lambda o: o.price)])
+                string += "\n"
+            string += f"Ask side ({self.count_asks()}):\n"
+            string += "\n".join([order.pretty(remaining_quantity) for order in sorted(self.asks, key=lambda order: order.price)])
         return string
 
     def get_bids(self):
@@ -46,33 +58,59 @@ class OrderBook:
         """ Count sell orders """
         return len(self.asks)
 
-    def on_new_order(self, order):
+    def count_all_orders(self):
+        return self.count_bids() + self.count_asks()
+
+    def on_new_order(self, order: ServerOrder, apply_changes=False) -> OrderBookChanges:
+        """
+        Entry point to process a new order in order book
+        apply_changes indicates either order book changes are applied directly at the end (testing purpose)
+        """
         if order.instrument_identifier != self.instrument_identifier:
-            raise Exception('Order instrument must match order book instrument')
+            raise Exception("[LOGIC FAILURE] Order instrument must match order book instrument")
 
         quantity_before_execution = order.get_remaining_quantity()
-        self.match_order(order)
+        changes = self.match_order(order)
+        # Case 1: unmatched
         if quantity_before_execution == order.get_remaining_quantity():
-            logger.info('Attacking order is unmatched, adding [{}] to trading book'.format(order))
-            self._add_order(order)
+            logger.debug(f"Attacking order is unmatched, adding [{order}] to trading book")
+            changes.order_to_add.append(order)
+        # Case 2: partially executed (existing order(s) have been executed)
         elif order.get_remaining_quantity() > 0.0:
-            logger.info('Attacking order cannot be fully executed, adding [{}] to trading book'.format(order))
-            self._add_order(order)
+            logger.debug(f"Attacking order cannot be fully executed, adding [{order}] to trading book")
+            changes.order_to_add.append(order)
+        # Case 3: order has been fully executed
         else:
-            logger.info('Attacking order [{}] has been totally executed'.format(order))
+            logger.debug(f"Attacking order [{order}] has been totally executed")
 
-    # TODO: create and store a deal (not just updating orderbook stats)
-    def on_new_deal(self, order):
-        self.last_price = order.price
+        if apply_changes:
+            self.apply_order_book_changes(changes)
+
+        return changes
+
+    def apply_order_book_changes(self, order_book_changes: OrderBookChanges):
+        """
+        TODO: deal processing (order_book_changes.deal_to_add)
+        """
+        for order in order_book_changes.order_to_add:
+            self.add_order(order)
+        for order_to_remove in order_book_changes.order_to_remove:
+            # TODO: improve removal ?
+            self.get_orders(order_to_remove.way).remove(order_to_remove)
+
+    def update_statistics(self, last_executed_order):
+        self.last_price = last_executed_order.price
         if not self.high_price and not self.low_price:
-            self.high_price = self.low_price = order.price
-        elif order.price > self.high_price:
-            self.high_price = order.price
-        elif order.price < self.low_price:
-            self.low_price = order.price
+            self.high_price = self.low_price = last_executed_order.price
+        elif last_executed_order.price > self.high_price:
+            self.high_price = last_executed_order.price
+        elif last_executed_order.price < self.low_price:
+            self.low_price = last_executed_order.price
 
-    def _add_order(self, order):
-        """ Do not call add_order directly, use on_new_order instead """
+    def add_order(self, order):
+        """
+        Do not call add_order directly, use on_new_order instead on server side
+        """
         if order.way == Buy():
             self.bids.append(order)
         elif order.way == Sell():
@@ -81,11 +119,15 @@ class OrderBook:
             raise InvalidWay(order.way)
 
     def get_matching_orders(self, attacking_order):
-        # TODO: tweak matching rules to increase flexibility
+        """
+        TODO: tweak matching rules to increase flexibility
+        """
         if attacking_order.way == Buy():
-            return sorted([s for s in self.asks if s.counterparty != attacking_order.counterparty and s.price <= attacking_order.price], key=lambda o: o.timestamp)
+            return sorted([s for s in self.asks if s.counterparty != attacking_order.counterparty and s.price <= attacking_order.price],
+                          key=lambda o: o.timestamp)
         if attacking_order.way == Sell():
-            return sorted([b for b in self.bids if b.counterparty != attacking_order.counterparty and b.price >= attacking_order.price], key=lambda o: o.timestamp)
+            return sorted([b for b in self.bids if b.counterparty != attacking_order.counterparty and b.price >= attacking_order.price],
+                          key=lambda o: o.timestamp)
         raise InvalidWay(attacking_order.way)
 
     @staticmethod
@@ -102,19 +144,39 @@ class OrderBook:
             return self.asks
         raise InvalidWay
 
-    def match_order(self, attacking_order):
-        logger.info('Find a matching order for [{}]'.format(attacking_order))
+    def match_order(self, attacking_order) -> OrderBookChanges:
+        logger.debug(f"Find a matching order for [{attacking_order}]")
         matching_trading_book_orders = self.get_matching_orders(attacking_order)
+        return self.update_matched_orders(attacking_order, matching_trading_book_orders)
 
-        for attacked_order in matching_trading_book_orders:
+    def update_matched_orders(self, attacking_order: ServerOrder, matching_orders) -> OrderBookChanges:
+        """
+        Iterate and update attacked orders, create deals upon total and partial executions
+        """
+        changes = OrderBookChanges()
+
+        for attacked_order in matching_orders:
             if self.is_attacked_order_full_executed(attacking_order, attacked_order):
-                attacking_order.executed_quantity += attacked_order.get_remaining_quantity()
-                attacked_order.executed_quantity += attacked_order.get_remaining_quantity()
-                self.on_new_deal(attacked_order)
-                self.get_orders(attacked_order.way).remove(attacked_order)
+                executed_quantity = attacked_order.get_remaining_quantity()
+                attacking_order.executed_quantity += executed_quantity
+                attacked_order.executed_quantity += executed_quantity
+                self.update_statistics(last_executed_order=attacked_order)
+                logger.debug(f"Attacker [{attacking_order.counterparty}]")
+                logger.debug(f"Attacked [{attacked_order.counterparty}]")
+                # Create deal
+                deal = ServerDeal(attacking_order, attacked_order, executed_quantity)
+                changes.deals_to_add.append(deal)
+                # Remove executed order
+                changes.order_to_remove.append(attacked_order)
             else:
-                attacking_order.executedquantity += attacking_order.get_remaining_quantity()
-                attacked_order.executedquantity += attacking_order.get_remaining_quantity()
-                self.on_new_deal(attacking_order)
+                executed_quantity = attacking_order.get_remaining_quantity()
+                attacking_order.executed_quantity += executed_quantity
+                attacked_order.executed_quantity += executed_quantity
+                self.update_statistics(last_executed_order=attacking_order)
+                # Create a deal
+                deal = ServerDeal(attacking_order, attacked_order, executed_quantity)
+                changes.deals_to_add.append(attacking_order)
             if attacking_order.get_remaining_quantity() == 0.0:
                 break
+
+        return changes

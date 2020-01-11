@@ -1,7 +1,6 @@
 import errno
 import select
 import socket
-import traceback
 from loguru import logger
 from exceptions import ClosedConnection
 from clientsession import ClientSession
@@ -37,8 +36,7 @@ class TcpServer:
 
     def remove_client_socket(self, sock):
         client_session = self.client_sessions.pop(sock)
-        logger.info('Removing client socket [{}] from port [{}]'.format(client_session.peer_name,
-                                                                             self.port))
+        logger.info(f"Removing client socket [{client_session.peer_name}] from port [{self.port}]")
         if sock in self.outputs:
             self.outputs.remove(sock)
         if sock in self.inputs:
@@ -81,6 +79,9 @@ class TcpServer:
             self.generic_handle(handler=self.handle_writable, sock=sock)
 
     def generic_handle(self, **kwargs):
+        """
+        Exception safe generic method to avoid exception handling duplicates
+        """
         try:
             kwargs['handler'](**kwargs)
             return
@@ -90,15 +91,15 @@ class TcpServer:
             pass
         except socket.error as exception:
             if exception.errno not in (errno.ECONNRESET, errno.ENOTCONN, errno.EWOULDBLOCK):
-                logger.warning('Client connection lost, unhandled errno [{}]'.format(exception.errno))
-                logger.warning(traceback.print_exc())
+                logger.warning(f"Client connection lost, unhandled errno [{exception.errno}]")
+                logger.exception(exception)
         except Exception as exception:
-            logger.error('generic_handle: {}'.format(exception))
-            logger.error(traceback.print_exc())
+            logger.error(f"generic_handle: {exception}")
+            logger.exception(exception)
         self.remove_client_socket(kwargs['sock'])
 
     def handle_readable(self, **kwargs):
-        sock = kwargs['sock']
+        sock = kwargs["sock"]
         client_session = self.client_sessions[sock]
         data = client_session.sock.recv(8192)
         if not data:

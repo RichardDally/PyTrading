@@ -30,8 +30,8 @@ class ProtobufSerialization(Serialization):
         readable_bytes = len(encoded_string) - header_size
         if message_length > readable_bytes:
             raise NotEnoughBytes
-        logger.trace('Message type [{}]'.format(message_type))
-        logger.trace('Message length [{}]'.format(message_length))
+        logger.trace(f"Message type [{message_type}]")
+        logger.trace(f"Message length [{message_length}]")
         body = bytes(encoded_string[header_size: header_size + message_length])
         new_offset = header_size + message_length
         return message_type, body, new_offset
@@ -67,9 +67,9 @@ class ProtobufSerialization(Serialization):
                 instrument.currency_identifier = instrument_to_serialize.currency_identifier
         referential_bytes = referential_message.SerializeToString()
 
-        logger.trace('Referential bytes [{}]'.format(referential_bytes))
-        logger.trace('Referential bytes length [{}]'.format(len(referential_bytes)))
-        encoded_referential = struct.pack('>QB', len(referential_bytes), MessageTypes.Referential.value)
+        logger.trace(f"Referential bytes [{referential_bytes}]")
+        logger.trace(f"Referential bytes length [{len(referential_bytes)}]")
+        encoded_referential = struct.pack(">QB", len(referential_bytes), MessageTypes.Referential.value)
         encoded_referential += referential_bytes
         return encoded_referential
 
@@ -123,7 +123,8 @@ class ProtobufSerialization(Serialization):
                                 price=decoded_order.price,
                                 counterparty=decoded_order.counterparty,
                                 timestamp=decoded_order.timestamp)
-            order_book.on_new_order(order)
+            # Rebuild order book (do not call on_new_order)
+            order_book.add_order(order)
         logger.trace(order_book)
         return order_book
 

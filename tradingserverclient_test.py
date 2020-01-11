@@ -1,8 +1,9 @@
 import time
 import socket
 import unittest
-import traceback
-from database import Database
+from loguru import logger
+from toolbox import random_string
+from sqliteuserstorage import SqliteStorage
 from orderway import OrderWay, Buy, Sell
 from multiprocessing.pool import ThreadPool
 from tradingserver import TradingServer
@@ -12,8 +13,6 @@ from protobufserialization import ProtobufSerialization
 
 class LiquidityTaker(TradingClient):
     """ LiquidityTaker is looking for all available orders and sends opposite way orders to clear order book"""
-    def __init__(self, *args, **kwargs):
-        super(LiquidityTaker, self).__init__(*args, **kwargs)
 
     def main_loop_hook(self):
         # Read the order books
@@ -63,9 +62,9 @@ class TestTradingServerClient(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.liquidity_provider_login = 'BNP'
-        cls.liquidity_taker_login = 'CFM'
-        cls.client_password = 'whatever'
+        cls.liquidity_provider_login = random_string(length=4)
+        cls.liquidity_taker_login = random_string(length=5)
+        cls.client_password = random_string(length=6)
         cls.filename = ':memory:'
 
     def test_trading_server_and_client(self):
@@ -80,11 +79,10 @@ class TestTradingServerClient(unittest.TestCase):
 
     def start_server(self):
         try:
-            db = Database(database_filename=self.filename)
+            db = SqliteStorage(database_filename=self.filename)
             db.initialize()
-            db.insert_user(login=self.liquidity_provider_login, password=self.client_password)
-            db.insert_user(login=self.liquidity_taker_login, password=self.client_password)
             server = TradingServer(storage=db,
+                                   client_authentication=False,
                                    marshaller=ProtobufSerialization(),
                                    feeder_port=60000,
                                    matching_engine_port=60001,
@@ -93,7 +91,7 @@ class TestTradingServerClient(unittest.TestCase):
             server.start()
             db.close()
         except Exception as exception:
-            print(traceback.print_exc())
+            logger.exception(exception)
             return exception
         return None
 
@@ -110,7 +108,7 @@ class TestTradingServerClient(unittest.TestCase):
                                     uptime_in_seconds=3.0)
             client.start([client.feedhandler, client.ordersender])
         except Exception as exception:
-            print(traceback.print_exc())
+            logger.exception(exception)
             return exception
         return None
 
@@ -127,10 +125,6 @@ class TestTradingServerClient(unittest.TestCase):
                                        uptime_in_seconds=3.0)
             client.start([client.feedhandler, client.ordersender])
         except Exception as exception:
-            print(traceback.print_exc())
+            logger.exception(exception)
             return exception
         return None
-
-
-if __name__ == '__main__':
-    unittest.main()

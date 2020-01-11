@@ -1,10 +1,11 @@
 import time
 import socket
-import traceback
 from loguru import logger
 from feeder import Feeder
-from database import Database
+from mongostorage import MongoStorage
 from matchingengine import MatchingEngine
+from abstractstorage import AbstractStorage
+from typing import Optional
 
 
 class TradingServer:
@@ -12,15 +13,20 @@ class TradingServer:
     TradingServer holds two socket servers: a feeder and a matching engine.
     Feeder will stream referential (instruments that can be traded) and order books (orders placed by traders)
     Matching engine will handle orders received and send match confirmations (deal).
-    Database will contain traders credentials for authentication
+    Storage will contain traders credentials for authentication (if enabled by client_authentication parameter)
     """
-    def __init__(self, storage, marshaller, feeder_port, matching_engine_port, uptime_in_seconds):
+    def __init__(self,
+                 storage: AbstractStorage,
+                 client_authentication: bool,
+                 marshaller,
+                 feeder_port: int,
+                 matching_engine_port: int,
+                 uptime_in_seconds: Optional[int]):
         self.storage = storage
+        self.client_authentication = client_authentication
         self.feeder = Feeder(marshaller=marshaller, port=feeder_port)
-        self.matching_engine = MatchingEngine(storage=self.storage,
-                                              referential=self.feeder.get_referential(),
-                                              marshaller=marshaller,
-                                              port=matching_engine_port)
+        self.matching_engine = MatchingEngine(self.storage, client_authentication, marshaller, port=matching_engine_port)
+        self.matching_engine.initialize_order_books(referential=self.feeder.get_referential())
         self.start_time = None
         self.stop_time = None
         if uptime_in_seconds:
@@ -35,11 +41,11 @@ class TradingServer:
     def print_listen_messages(self):
         if self.start_time and self.stop_time:
             duration = self.stop_time - self.start_time
-            logger.info('Feeder listening on port [{}] for [{}] seconds'.format(self.feeder.port, duration))
-            logger.info('Matching engine listening on port [{}] for [{}] seconds'.format(self.matching_engine.port, duration))
+            logger.info(f"Feeder listening on port [{self.feeder.port}] for [{duration}] seconds")
+            logger.info(f"Matching engine listening on port [{self.matching_engine.port}] for [{duration}] seconds")
         else:
-            logger.info('Feeder listening on port [{}]'.format(self.feeder.port))
-            logger.info('Matching engine listening on port [{}]'.format(self.matching_engine.port))
+            logger.info(f"Feeder listening on port [{self.feeder.port}]")
+            logger.info(f"Matching engine listening on port [{self.matching_engine.port}]")
 
     def start(self):
         try:
@@ -49,12 +55,13 @@ class TradingServer:
             while not self.reached_uptime():
                 self.matching_engine.process_sockets()
                 self.feeder.process_sockets()
-                self.feeder.send_all_order_books(self.matching_engine.get_order_books())
+                order_books = self.matching_engine.get_order_books()
+                self.feeder.send_all_order_books(order_books)
         except KeyboardInterrupt:
-            logger.info('Stopped by user')
+            logger.info("Stopped by user")
         except socket.error as exception:
-            logger.error('Trading server socket error [{}]'.format(exception))
-            logger.error(traceback.print_exc())
+            logger.error(f"Trading server socket error [{exception}]")
+            logger.exception(exception)
         finally:
             self.feeder.cleanup()
             self.matching_engine.cleanup()
@@ -63,13 +70,10 @@ class TradingServer:
 if __name__ == '__main__':
     try:
         from protobufserialization import ProtobufSerialization
-        login = 'rick'
-        password = 'pass'
-        db = Database(database_filename='PyTrading.db')
+        db = MongoStorage(host="localhost", port=27017)
         db.initialize()
-        if not db.is_valid_user(login=login, password=password):
-            db.insert_user(login=login, password=password)
         server = TradingServer(storage=db,
+                               client_authentication=False,
                                feeder_port=50000,
                                matching_engine_port=50001,
                                marshaller=ProtobufSerialization(),
@@ -78,4 +82,4 @@ if __name__ == '__main__':
         db.close()
     except ImportError as error:
         ProtobufSerialization = None
-        logger.critical('Unable to start trading server. Reason [{}]'.format(error))
+        logger.critical(f"Unable to start trading server. Reason [{error}]")

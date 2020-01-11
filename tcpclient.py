@@ -56,7 +56,7 @@ class TcpClient:
 
     def remove_server_socket(self):
         logger.info('Removing server socket [{}] from [{}]'.format(self.server_socket.getsockname(),
-                                                                        self.__class__.__name__))
+                                                                   self.__class__.__name__))
         if self.server_socket in self.outputs:
             self.outputs.remove(self.server_socket)
         if self.server_socket in self.inputs:
