@@ -3,10 +3,11 @@ from exceptions import InvalidWay
 from orderbookchanges import OrderBookChanges
 from serverorder import ServerOrder
 from loguru import logger
+from serverdeal import ServerDeal
 
 
 class OrderBook:
-    def __init__(self, instrument_identifier):
+    def __init__(self, instrument_identifier: int):
         self.instrument_identifier = instrument_identifier
         self.asks = []
         self.bids = []
@@ -60,7 +61,7 @@ class OrderBook:
     def count_all_orders(self):
         return self.count_bids() + self.count_asks()
 
-    def on_new_order(self, order, apply_changes=False) -> OrderBookChanges:
+    def on_new_order(self, order: ServerOrder, apply_changes=False) -> OrderBookChanges:
         """
         Entry point to process a new order in order book
         apply_changes indicates either order book changes are applied directly at the end (testing purpose)
@@ -87,7 +88,7 @@ class OrderBook:
 
         return changes
 
-    def apply_order_book_changes(self, order_book_changes):
+    def apply_order_book_changes(self, order_book_changes: OrderBookChanges):
         """
         TODO: deal processing (order_book_changes.deal_to_add)
         """

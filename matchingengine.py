@@ -1,4 +1,5 @@
 from loguru import logger
+from typing import Dict
 from serverorder import ServerOrder
 from orderbook import OrderBook
 from tcpserver import TcpServer
@@ -94,7 +95,7 @@ class MatchingEngine(TcpServer):
             logger.info(f"Deal to add [{str(deal_to_add)}]")
             self.storage.insert_deal(deal_to_add)
 
-    def get_order_books(self):
+    def get_order_books(self) -> Dict[int, OrderBook]:
         return self.order_books
 
     def initialize_order_books(self, referential):

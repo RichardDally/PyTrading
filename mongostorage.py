@@ -1,6 +1,8 @@
 from loguru import logger
 from pymongo import MongoClient
 from abstractstorage import AbstractStorage
+from serverorder import ServerOrder
+from serverdeal import ServerDeal
 
 
 class MongoStorage(AbstractStorage):
@@ -43,7 +45,7 @@ class MongoStorage(AbstractStorage):
         )
         logger.debug(result)
 
-    def delete_order(self, order) -> None:
+    def delete_order(self, order: ServerOrder) -> None:
         result = self.orders_collection.delete_one({"identifier": order.identifier})
         logger.debug(f"Deleted order [{result.deleted_count}]")
 
@@ -51,7 +53,7 @@ class MongoStorage(AbstractStorage):
         result = self.orders_collection.delete_many({})
         logger.info(f"Deleted orders [{result.deleted_count}]")
 
-    def insert_deal(self, deal) -> None:
+    def insert_deal(self, deal: ServerDeal) -> None:
         """
         First draft of deal insertion
         """

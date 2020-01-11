@@ -1,5 +1,5 @@
 class Instrument:
-    def __init__(self, identifier, name, isin, currency_identifier):
+    def __init__(self, identifier: int, name: str, isin: str, currency_identifier: int):
         self.identifier = identifier
         self.name = name
         self.isin = isin
