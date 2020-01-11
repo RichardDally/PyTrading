@@ -22,7 +22,7 @@ def pretty_timestamp(timestamp: int):
 
 def random_string(length):
     """
-    Generate a random string of fixed length
+    Generate a random fixed length string
     """
     letters = string.ascii_lowercase
     return "".join(random.choice(letters) for _ in range(length))
