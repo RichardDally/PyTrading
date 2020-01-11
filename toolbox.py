@@ -1,7 +1,15 @@
+import time
 import uuid
 import random
 import string
 from datetime import datetime
+
+
+def generate_timestamp() -> int:
+    """
+    TODO: improve timestamp precision to milliseconds
+    """
+    return int(time.time())
 
 
 def generate_unique_identifier() -> str:
