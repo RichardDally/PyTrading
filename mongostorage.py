@@ -60,13 +60,11 @@ class MongoStorage(AbstractStorage):
         result = self.deals_collection.insert_one(
             {
                 "identifier": deal.identifier,
-                "way": deal.way.way,
                 "instrument_identifier": deal.instrument_identifier,
                 "quantity": deal.quantity,
-                "canceled_quantity": deal.canceled_quantity,
-                "executed_quantity": deal.executed_quantity,
                 "price": deal.price,
-                "counterparty": deal.counterparty,
+                "attacker": deal.attacker,
+                "attacked": deal.attacked,
                 "timestamp": deal.timestamp,
             }
         )

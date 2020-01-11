@@ -163,15 +163,18 @@ class OrderBook:
                 self.update_statistics(last_executed_order=attacked_order)
                 logger.debug(f"Attacker [{attacking_order.counterparty}]")
                 logger.debug(f"Attacked [{attacked_order.counterparty}]")
-                # Create a deal
-                changes.deals_to_add.append(attacked_order)
+                # Create deal
+                deal = ServerDeal(attacking_order, attacked_order, executed_quantity)
+                changes.deals_to_add.append(deal)
                 # Remove executed order
                 changes.order_to_remove.append(attacked_order)
             else:
-                attacking_order.executed_quantity += attacking_order.get_remaining_quantity()
-                attacked_order.executed_quantity += attacking_order.get_remaining_quantity()
-                # Create a deal
+                executed_quantity = attacking_order.get_remaining_quantity()
+                attacking_order.executed_quantity += executed_quantity
+                attacked_order.executed_quantity += executed_quantity
                 self.update_statistics(last_executed_order=attacking_order)
+                # Create a deal
+                deal = ServerDeal(attacking_order, attacked_order, executed_quantity)
                 changes.deals_to_add.append(attacking_order)
             if attacking_order.get_remaining_quantity() == 0.0:
                 break
