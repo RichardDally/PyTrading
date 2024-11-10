@@ -1,19 +1,16 @@
 import struct
-import orderbook_pb2
-import referential_pb2
-import createorder_pb2
-import logon_pb2
-from logon import Logon
 from loguru import logger
-from serverorder import ServerOrder
-from orderway import OrderWay
-from createorder import CreateOrder
-from orderbook import OrderBook
-from instrument import Instrument
-from referential import Referential
-from staticdata import MessageTypes
-from serialization import Serialization
-from exceptions import NotEnoughBytes
+from pytrading import Logon
+from pytrading import ServerOrder
+from pytrading import OrderWay
+from pytrading import CreateOrder
+from pytrading import OrderBook
+from pytrading import Instrument
+from pytrading import Referential
+from pytrading import MessageTypes
+from pytrading import Serialization
+from pytrading import NotEnoughBytes
+from pytrading.protobuf import referential_pb2, logon_pb2, createorder_pb2, orderbook_pb2
 
 
 class ProtobufSerialization(Serialization):

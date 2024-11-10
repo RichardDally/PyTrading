@@ -1,15 +1,15 @@
 import pytest
-from orderway import Buy, Sell
-from referential import Referential
-from staticdata import StaticData
-from staticdata import MessageTypes
-from orderbook import OrderBook
-from serverorder import ServerOrder
-from createorder import CreateOrder
-from logon import Logon
-from toolbox import random_string
-from simpleserialization import SimpleSerialization
-from protobufserialization import ProtobufSerialization
+from pytrading import Buy, Sell
+from pytrading import Referential
+from pytrading import StaticData
+from pytrading import MessageTypes
+from pytrading import OrderBook
+from pytrading import ServerOrder
+from pytrading import CreateOrder
+from pytrading import Logon
+from pytrading import random_string
+from pytrading import SimpleSerialization
+from pytrading import ProtobufSerialization
 
 
 @pytest.mark.parametrize("instrument_identifier", [1])

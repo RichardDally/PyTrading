@@ -1,6 +1,6 @@
 import unittest
-from instrument import Instrument
-from referential import Referential
+from pytrading.core.instrument import Instrument
+from pytrading.core.referential import Referential
 
 
 class TestReferential(unittest.TestCase):

@@ -1,6 +1,6 @@
-from tcpclient import TcpClient
-from staticdata import MessageTypes
 from loguru import logger
+from pytrading import TcpClient
+from pytrading import MessageTypes
 
 
 class FeederHandler(TcpClient):

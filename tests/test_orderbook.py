@@ -1,34 +1,33 @@
-import unittest
-from orderway import Buy, Sell
-from serverorder import ServerOrder
-from orderbook import OrderBook
-from instrument import Instrument
+from pytrading import Buy, Sell
+from pytrading import ServerOrder
+from pytrading import OrderBook
+from pytrading import Instrument
 
 
-class TestOrderBook(unittest.TestCase):
-    def setUp(self):
+class TestOrderBook:
+    def setup_method(self, _):
         self.instrument = Instrument(identifier=0, name='Carrefour', isin='FR0000120172', currency_identifier=0)
         self.book = OrderBook(self.instrument.identifier)
 
     def test_count_bids(self):
         buy_order = ServerOrder(Buy(), self.instrument.identifier, 50, 42.0, 'Trader1')
-        self.assertEqual(self.book.count_bids(), 0)
+        assert self.book.count_bids() == 0
         self.book.on_new_order(buy_order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 1)
+        assert self.book.count_bids() == 1
 
     def test_count_asks(self):
         sell_order = ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader1')
-        self.assertEqual(self.book.count_asks(), 0)
+        assert self.book.count_asks() == 0
         self.book.on_new_order(sell_order, apply_changes=True)
-        self.assertEqual(self.book.count_asks(), 1)
+        assert self.book.count_asks() == 1
 
     def test_get_bids(self):
         bids = self.book.get_bids()
-        self.assertEqual(len(bids), 0)
+        assert len(bids) == 0
 
     def test_get_asks(self):
         asks = self.book.get_asks()
-        self.assertEqual(len(asks), 0)
+        assert len(asks) == 0
 
     def test_self_execution(self):
         """
@@ -38,8 +37,8 @@ class TestOrderBook(unittest.TestCase):
                   ServerOrder(Sell(), self.instrument.identifier, 50, 40.0, 'Trader1')]
         for order in orders:
             self.book.on_new_order(order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 1)
-        self.assertEqual(self.book.count_asks(), 1)
+        assert self.book.count_bids() == 1
+        assert self.book.count_asks() == 1
 
     def test_two_orders_no_match(self):
         """
@@ -49,8 +48,8 @@ class TestOrderBook(unittest.TestCase):
         sell_order = ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2')
         self.book.on_new_order(buy_order, apply_changes=True)
         self.book.on_new_order(sell_order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 1)
-        self.assertEqual(self.book.count_asks(), 1)
+        assert self.book.count_bids() == 1
+        assert self.book.count_asks() == 1
 
     def test_four_stacked_orders_no_match(self):
         orders = [ServerOrder(Buy(), self.instrument.identifier, 50, 40.0, 'Trader1'),
@@ -59,29 +58,29 @@ class TestOrderBook(unittest.TestCase):
                   ServerOrder(Sell(), self.instrument.identifier, 50, 42.0, 'Trader2')]
         for order in orders:
             self.book.on_new_order(order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 2)
-        self.assertEqual(self.book.count_asks(), 2)
+        assert self.book.count_bids() == 2
+        assert self.book.count_asks() == 2
 
     def validate_one_matching(self, attacking_order, attacked_order):
         self.book.on_new_order(attacked_order, apply_changes=True)
         matching_orders = self.book.get_matching_orders(attacking_order)
-        self.assertEqual(len(matching_orders), 1)
-        self.assertEqual(matching_orders[0].__dict__, attacked_order.__dict__)
+        assert len(matching_orders) == 1
+        assert matching_orders[0].__dict__ == attacked_order.__dict__
 
     def test_buy_price_greater_than_sell(self):
         attacking_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
         attacked_order = ServerOrder(Sell(), self.instrument.identifier, 10, 38.0, 'Trader2')
         self.validate_one_matching(attacking_order, attacked_order)
-        self.assertEqual(attacking_order.get_remaining_quantity(), 10)
-        self.assertEqual(attacked_order.get_remaining_quantity(), 10)
+        assert attacking_order.get_remaining_quantity() == 10
+        assert attacked_order.get_remaining_quantity() == 10
 
     def test_buy_price_equal_to_sell(self):
         attacking_order = ServerOrder(Buy(), self.instrument.identifier, 10, 40.0, 'Trader1')
         attacked_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader2')
         self.book.on_new_order(attacked_order, apply_changes=True)
         self.book.on_new_order(attacking_order, apply_changes=True)
-        self.assertEqual(attacking_order.get_remaining_quantity(), 0)
-        self.assertEqual(attacked_order.get_remaining_quantity(), 0)
+        assert attacking_order.get_remaining_quantity() == 0
+        assert attacked_order.get_remaining_quantity() == 0
 
     def test_sell_price_greater_than_buy(self):
         attacking_order = ServerOrder(Sell(), self.instrument.identifier, 10, 40.0, 'Trader1')
@@ -102,10 +101,10 @@ class TestOrderBook(unittest.TestCase):
                   ServerOrder(Sell(), self.instrument.identifier, 50, 40.0, 'Trader3', timestamp=3)]
         for order in orders:
             self.book.on_new_order(order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 1)
-        self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(self.book.get_bids()[0].timestamp, 2)
-        self.assertEqual(self.book.get_bids()[0].counterparty, 'Trader2')
+        assert self.book.count_bids() == 1
+        assert self.book.count_asks() == 0
+        assert self.book.get_bids()[0].timestamp == 2
+        assert self.book.get_bids()[0].counterparty == 'Trader2'
 
     def test_one_full_execution(self):
         quantity = 10
@@ -114,12 +113,12 @@ class TestOrderBook(unittest.TestCase):
         attacked_order = ServerOrder(Buy(), self.instrument.identifier, quantity, price, 'Trader2')
         self.book.on_new_order(attacked_order, apply_changes=True)
         self.book.on_new_order(attacking_order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 0)
-        self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(attacking_order.executed_quantity, quantity)
-        self.assertEqual(attacked_order.executed_quantity, quantity)
-        self.assertEqual(attacking_order.get_remaining_quantity(), 0)
-        self.assertEqual(attacked_order.get_remaining_quantity(), 0)
+        assert self.book.count_bids() == 0
+        assert self.book.count_asks() == 0
+        assert attacking_order.executed_quantity, quantity
+        assert attacked_order.executed_quantity, quantity
+        assert attacking_order.get_remaining_quantity() == 0
+        assert attacked_order.get_remaining_quantity() == 0
 
     def test_one_partial_execution(self):
         attacking_quantity = 20
@@ -129,12 +128,12 @@ class TestOrderBook(unittest.TestCase):
         attacked_order = ServerOrder(Sell(), self.instrument.identifier, attacked_quantity, price, 'Trader2')
         self.book.on_new_order(attacked_order, apply_changes=True)
         self.book.on_new_order(attacking_order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 1)
-        self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(attacking_order.executed_quantity, attacking_quantity - attacked_quantity)
-        self.assertEqual(attacked_order.executed_quantity, attacked_quantity)
-        self.assertEqual(attacking_order.get_remaining_quantity(), attacking_quantity - attacked_quantity)
-        self.assertEqual(attacked_order.get_remaining_quantity(), 0)
+        assert self.book.count_bids() == 1
+        assert self.book.count_asks() == 0
+        assert attacking_order.executed_quantity == attacking_quantity - attacked_quantity
+        assert attacked_order.executed_quantity == attacked_quantity
+        assert attacking_order.get_remaining_quantity() == attacking_quantity - attacked_quantity
+        assert attacked_order.get_remaining_quantity() == 0
 
     def test_multiple_partial_executions(self):
         attacking_quantity = 50
@@ -147,10 +146,10 @@ class TestOrderBook(unittest.TestCase):
             attacked_orders.append(attacked_order)
             self.book.on_new_order(attacked_order, apply_changes=True)
         self.book.on_new_order(attacking_order, apply_changes=True)
-        self.assertEqual(self.book.count_bids(), 0)
-        self.assertEqual(self.book.count_asks(), 0)
-        self.assertEqual(attacking_order.executed_quantity, attacking_quantity)
-        self.assertEqual(attacking_order.get_remaining_quantity(), 0)
+        assert self.book.count_bids() == 0
+        assert self.book.count_asks() == 0
+        assert attacking_order.executed_quantity == attacking_quantity
+        assert attacking_order.get_remaining_quantity() == 0
         for attacked_order in attacked_orders:
-            self.assertEqual(attacked_order.executed_quantity, attacked_quantity)
-            self.assertEqual(attacked_order.get_remaining_quantity(), 0)
+            assert attacked_order.executed_quantity == attacked_quantity
+            assert attacked_order.get_remaining_quantity() == 0

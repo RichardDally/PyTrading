@@ -1,10 +1,9 @@
 import time
 import socket
 from loguru import logger
-from feeder import Feeder
-from mongostorage import MongoStorage
-from matchingengine import MatchingEngine
-from abstractstorage import AbstractStorage
+from pytrading import Feeder, SqliteStorage, MongoStorage
+from pytrading import MatchingEngine
+from pytrading import AbstractStorage
 from typing import Optional
 
 
@@ -67,19 +66,34 @@ class TradingServer:
             self.matching_engine.cleanup()
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Requires a real MongoDB server locally.
+    Use `from pymongo_inmemory import MongoClient` if you prefer simplicity.
+    """
     try:
-        from protobufserialization import ProtobufSerialization
-        db = MongoStorage(host="localhost", port=27017)
+        from pytrading import ProtobufSerialization
+        # from pymongo import MongoClient
+        # mongo_client = MongoClient(host="localhost", port=27017, serverSelectionTimeoutMS=3000)
+        # from pymongo_inmemory import MongoClient
+        # mongo_client = MongoClient()
+        # db = MongoStorage(client=mongo_client)
+        db = SqliteStorage()
         db.initialize()
-        server = TradingServer(storage=db,
-                               client_authentication=False,
-                               feeder_port=50000,
-                               matching_engine_port=50001,
-                               marshaller=ProtobufSerialization(),
-                               uptime_in_seconds=None)
+        server = TradingServer(
+            storage=db,
+            client_authentication=False,
+            feeder_port=50000,
+            matching_engine_port=50001,
+            marshaller=ProtobufSerialization(),
+            uptime_in_seconds=None,
+        )
         server.start()
         db.close()
     except ImportError as error:
         ProtobufSerialization = None
         logger.critical(f"Unable to start trading server. Reason [{error}]")
+
+
+if __name__ == '__main__':
+    main()

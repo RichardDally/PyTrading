@@ -1,9 +1,9 @@
-from orderway import Buy, Sell
-from exceptions import InvalidWay
-from orderbookchanges import OrderBookChanges
-from serverorder import ServerOrder
 from loguru import logger
-from serverdeal import ServerDeal
+from pytrading import InvalidWay
+from pytrading import Buy, Sell
+from pytrading import OrderBookChanges
+from pytrading import ServerOrder
+from pytrading import ServerDeal
 
 
 class OrderBook:

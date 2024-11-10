@@ -1,12 +1,12 @@
 import sqlite3
-from abstractstorage import AbstractStorage
+from pytrading import AbstractStorage
 
 
 class SqliteStorage(AbstractStorage):
-    def __init__(self, database_filename):
-        self.database_filename = database_filename
-        self.users_table = 'Users'
-        self.connection = sqlite3.connect(self.database_filename)
+    def __init__(self, database_uri: str = ":memory:"):
+        self.database_uri = database_uri
+        self.users_table = "Users"
+        self.connection = sqlite3.connect(self.database_uri)
 
     def initialize(self):
         c = self.connection.cursor()

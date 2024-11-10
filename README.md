@@ -12,10 +12,14 @@ This project has an educational purpose to learn how financial markets work.
 
 
 ### How to generate .proto files
-To generate Protobuf "_pb2.py" files:  
-```Shell
-$ protoc --python_out=. *.proto`
-```
+
+Download `protoc` (e.g. [protoc v28.3 for Windows 64 bits](https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-win64.zip))
+
+To generate Protobuf "_pb2.py" files:
+````commandline
+cd pytrading\protobuf
+protoc --python_out=. *.proto
+````
 
 ### Lexicon
 
@@ -36,7 +40,7 @@ $ protoc --python_out=. *.proto`
 Two serializations are available: plain text (pipe separated) and Protobuf.
 
 ### Where to start
-`TradingSandbox` module gives a good example to start in local, take a look in `main_loop_hook` implementation.
+[`TradingSandbox`](tools/trading_sandbox.py) module gives a good example to start in local, take a look in `main_loop_hook` implementation.
  
 ### Requirements
 - MongoDB

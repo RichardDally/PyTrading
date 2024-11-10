@@ -2,9 +2,9 @@ import errno
 import select
 import socket
 from loguru import logger
-from exceptions import ClosedConnection
-from clientsession import ClientSession
-from sessionstatus import SessionStatus
+from pytrading import ClosedConnection
+from pytrading import ClientSession
+from pytrading import SessionStatus
 from abc import ABCMeta, abstractmethod
 
 

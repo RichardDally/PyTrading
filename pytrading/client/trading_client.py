@@ -2,12 +2,12 @@ import time
 import socket
 import traceback
 import errno
-from feederhandler import FeederHandler
-from ordersender import OrderSender
 from abc import ABCMeta, abstractmethod
-from exceptions import ClosedConnection
-from orderway import Buy, Sell
 from loguru import logger
+from pytrading import FeederHandler
+from pytrading import OrderSender
+from pytrading import ClosedConnection
+from pytrading import Buy, Sell
 
 
 class TradingClient:
@@ -88,12 +88,12 @@ class BasicClient(TradingClient):
             logger.debug("ORDER SENT")
 
 
-if __name__ == '__main__':
+def main():
     try:
         import sys
         logger.remove()
         logger.add(sys.stdout, level="TRACE")
-        from protobufserialization import ProtobufSerialization
+        from pytrading import ProtobufSerialization
         client = BasicClient(login="rick",
                              password="pass",
                              marshaller=ProtobufSerialization(),
@@ -105,3 +105,7 @@ if __name__ == '__main__':
     except ImportError as error:
         ProtobufSerialization = None
         logger.critical(f"Unable to start trading client. Reason [{error}]")
+
+
+if __name__ == '__main__':
+    main()
