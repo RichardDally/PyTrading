@@ -2,13 +2,13 @@ import time
 import socket
 import unittest
 from loguru import logger
-from toolbox import random_string
-from sqliteuserstorage import SqliteStorage
-from orderway import OrderWay, Buy, Sell
 from multiprocessing.pool import ThreadPool
-from tradingserver import TradingServer
-from tradingclient import TradingClient
-from protobufserialization import ProtobufSerialization
+from pytrading import random_string
+from pytrading import SqliteStorage
+from pytrading import OrderWay, Buy, Sell
+from pytrading import TradingServer
+from pytrading import TradingClient
+from pytrading import ProtobufSerialization
 
 
 class LiquidityTaker(TradingClient):
@@ -79,7 +79,7 @@ class TestTradingServerClient(unittest.TestCase):
 
     def start_server(self):
         try:
-            db = SqliteStorage(database_filename=self.filename)
+            db = SqliteStorage(database_uri=self.filename)
             db.initialize()
             server = TradingServer(storage=db,
                                    client_authentication=False,

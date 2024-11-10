@@ -1,7 +1,7 @@
-from logon import Logon
-from createorder import CreateOrder
-from tcpclient import TcpClient
-from exceptions import ClosedConnection
+from pytrading import Logon
+from pytrading import CreateOrder
+from pytrading import TcpClient
+from pytrading import ClosedConnection
 
 
 class OrderSender(TcpClient):

@@ -1,7 +1,7 @@
-from tcpserver import TcpServer
-from staticdata import StaticData
-from sessionstatus import SessionStatus
 from loguru import logger
+from pytrading import TcpServer
+from pytrading import StaticData
+from pytrading import SessionStatus
 
 
 class Feeder(TcpServer):

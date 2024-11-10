@@ -1,4 +1,4 @@
-from exceptions import InvalidWay
+from pytrading import InvalidWay
 
 
 class WayEnum:

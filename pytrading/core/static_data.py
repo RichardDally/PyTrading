@@ -1,5 +1,5 @@
-from instrument import Instrument
-from referential import Referential
+from pytrading import Instrument
+from pytrading import Referential
 from enum import Enum
 
 

@@ -1,14 +1,15 @@
 import sys
 import time
 import socket
-from loguru import logger
-from toolbox import random_string
-from mongostorage import MongoStorage
-from orderway import Buy, Sell
 from multiprocessing.pool import ThreadPool
-from tradingserver import TradingServer
-from tradingclient import TradingClient
-from protobufserialization import ProtobufSerialization
+from loguru import logger
+from pymongo_inmemory import MongoClient
+from pytrading import random_string
+from pytrading import MongoStorage
+from pytrading import Buy, Sell
+from pytrading import TradingServer
+from pytrading import TradingClient
+from pytrading import ProtobufSerialization
 
 
 class AbstractTrader(TradingClient):
@@ -19,10 +20,12 @@ class AbstractTrader(TradingClient):
 
     def main_loop_hook(self):
         if self.order_to_send:
-            self.ordersender.push_order(way=self.way,
-                                        price=42.0,
-                                        quantity=1.0,
-                                        instrument_identifier=1)
+            self.ordersender.push_order(
+                way=self.way,
+                price=42.0,
+                quantity=1.0,
+                instrument_identifier=1
+            )
             self.order_to_send -= 1
 
 
@@ -56,15 +59,19 @@ class TradingSandbox:
         liquidity_provider_result.get()
 
     def start_server(self):
+        """
+        Using in-memory MongoDB client
+        """
         try:
-            db = MongoStorage(host="localhost", port=27017)
-            server = TradingServer(storage=db,
-                                   client_authentication=False,
-                                   marshaller=self.serializer(),
-                                   feeder_port=60000,
-                                   matching_engine_port=60001,
-                                   uptime_in_seconds=3.0)
-
+            db = MongoStorage(client=MongoClient())
+            server = TradingServer(
+                storage=db,
+                client_authentication=False,
+                marshaller=self.serializer(),
+                feeder_port=60000,
+                matching_engine_port=60001,
+                uptime_in_seconds=3
+            )
             server.start()
         except Exception as exception:
             logger.exception(exception)
@@ -104,9 +111,11 @@ class TradingSandbox:
 
 if __name__ == '__main__':
     logger.remove()
-    logger.add(sink=sys.stdout,
-               format="{time:HH:mm:ss} | {thread} | {level} | {message}",
-               level="DEBUG",
-               colorize=True)
+    logger.add(
+        sink=sys.stdout,
+        format="{time:HH:mm:ss} | {thread} | {level} | {message}",
+        level="DEBUG",
+        colorize=True,
+    )
     sandbox = TradingSandbox()
     sandbox.start_all_components()

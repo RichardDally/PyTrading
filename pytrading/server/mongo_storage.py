@@ -1,16 +1,16 @@
 from loguru import logger
 from pymongo import MongoClient
-from abstractstorage import AbstractStorage
-from serverorder import ServerOrder
-from serverdeal import ServerDeal
+from pytrading import AbstractStorage
+from pytrading import ServerOrder
+from pytrading import ServerDeal
 
 
 class MongoStorage(AbstractStorage):
-    def __init__(self, host, port):
+    def __init__(self, client: MongoClient):
         """
         Mind aggressive timeout on distant locations (3 seconds)
         """
-        self.client = MongoClient(host=host, port=port, serverSelectionTimeoutMS=3000)
+        self.client = client
         self.client.admin.command("ismaster")
         self.database_name = "PyTrading"
         self.database = self.client[self.database_name]

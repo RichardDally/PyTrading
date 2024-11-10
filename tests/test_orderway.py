@@ -1,6 +1,6 @@
 import unittest
-from orderway import OrderWay, Buy, Sell, WayEnum
-from exceptions import InvalidWay
+from pytrading.core.order_way import OrderWay, Buy, Sell, WayEnum
+from pytrading.core.exceptions import InvalidWay
 
 
 class TestOrderWay(unittest.TestCase):

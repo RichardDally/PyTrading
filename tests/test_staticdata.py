@@ -1,5 +1,5 @@
 import unittest
-from staticdata import StaticData
+from pytrading.core.static_data import StaticData
 
 
 class TestReferential(unittest.TestCase):
