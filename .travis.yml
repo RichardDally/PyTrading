@@ -2,16 +2,18 @@ language: python
 compiler: gcc
 
 python:
-  - "3.6"
-  - "3.6-dev"
-  - "3.7-dev"
+  - "3.9"
+  - "3.10"
+  - "3.11"
+  - "3.12"
   - "nightly"
 
 install:
   - pip install codecov -r requirements.txt
-  - wget https://github.com/google/protobuf/releases/download/v3.4.0/protoc-3.4.0-linux-x86_64.zip
-  - unzip protoc-3.4.0-linux-x86_64.zip -d protoc-3.4.0-linux-x86_64
-  - protoc-3.4.0-linux-x86_64/bin/protoc --python_out=. *.proto
+  - wget https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-linux-x86_64.zip
+  - unzip protoc-28.3-linux-x86_64.zip -d protoc
+  - cd pytrading/protobuf
+  - protoc/bin/protoc --python_out=. *.proto
 
 script:
   - pytest --cov=./
